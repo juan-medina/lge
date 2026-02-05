@@ -7,7 +7,12 @@
 
 #include <raylib.h>
 
+#include <cstdio>
+#include <optional>
+#include <spdlog/common.h>
+#include <spdlog/spdlog-inl.h>
 #include <spdlog/spdlog.h>
+#include <vector>
 
 #ifdef __EMSCRIPTEN__
 #	include <emscripten/emscripten.h>

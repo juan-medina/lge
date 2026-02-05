@@ -5,6 +5,8 @@
 
 #include <lge/result.hpp>
 
+#include <cstdarg>
+
 namespace lge {
 
 class app {
