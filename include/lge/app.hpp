@@ -9,9 +9,6 @@ namespace lge {
 
 class app {
 public:
-	// =============================================================================
-	// Public API
-	// =============================================================================
 	explicit app() = default;
 	virtual ~app() = default;
 
@@ -22,6 +19,15 @@ public:
 	auto operator=(app &&) -> app & = delete;
 
 	[[nodiscard]] virtual auto run() -> result<>;
+
+private:
+	auto init() -> result<>;
+	auto setup_log() -> result<>;
+
+	static constexpr auto empty_format = "%v";
+	static constexpr auto color_line_format = "[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v %@";
+	static constexpr auto banner = "\033[38;2;0;255;0ml\033[38;2;128;128;128m[\033[38;2;0;0;255mg\033[38;2;128;128;"
+								   "128m]\033[38;2;255;0;0me\033[0m";
 };
 
 } // namespace lge

@@ -5,6 +5,7 @@
 
 #include <lge/main.hpp>
 #include <lge/result.hpp>
+#include <spdlog/spdlog.h>
 
 #include <iostream>
 #include <random>
@@ -22,7 +23,6 @@ auto hello_world::run() -> lge::result<> {
 		return lge::error{"random failure"};
 	}
 
-	std::cout << "Hello world\n";
-
+	SPDLOG_INFO("Hello world");
 	return true;
 }

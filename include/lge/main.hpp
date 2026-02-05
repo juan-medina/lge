@@ -12,6 +12,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <exception>
+#include <spdlog/spdlog.h>
 
 #ifdef _WIN32
 #	include <windows.h>
@@ -25,6 +26,7 @@ auto run_app() -> int {
 	try {
 		App_Type application;
 		if(const auto error = application.run().unwrap(); error) {
+			SPDLOG_ERROR("{}", error->to_string());
 #ifndef __EMSCRIPTEN__
 			boxer::show(error->get_message().c_str(), "Error!", boxer::Style::Error);
 #endif
@@ -45,15 +47,15 @@ auto run_app() -> int {
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define LGE_MAIN(AppClass) \
-auto main(int, char *[]) -> int { \
-return lge::run_app<AppClass>(); \
-} \
+	auto main(int, char *[]) -> int { \
+		return lge::run_app<AppClass>(); \
+	} \
 \
-IF_WIN32(auto WINAPI WinMain([[maybe_unused]] HINSTANCE instance, \
-[[maybe_unused]] HINSTANCE prev_instance, \
-[[maybe_unused]] LPSTR cmd_line, \
-[[maybe_unused]] int show) \
-->int { return lge::run_app<AppClass>(); })
+	IF_WIN32(auto WINAPI WinMain([[maybe_unused]] HINSTANCE instance, \
+								 [[maybe_unused]] HINSTANCE prev_instance, \
+								 [[maybe_unused]] LPSTR cmd_line, \
+								 [[maybe_unused]] int show) \
+				 ->int { return lge::run_app<AppClass>(); })
 
 #ifdef _WIN32
 #	define IF_WIN32(...) __VA_ARGS__ // NOLINT(cppcoreguidelines-macro-usage)
