@@ -21,7 +21,7 @@ public:
 	auto operator=(const app &) -> app & = delete;
 	auto operator=(app &&) -> app & = delete;
 
-	[[nodiscard]] auto run() -> result<>;
+	[[nodiscard]] virtual auto run() -> result<>;
 };
 
 } // namespace lge

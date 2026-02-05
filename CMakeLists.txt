@@ -20,18 +20,18 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-file(GLOB_RECURSE APP_PUBLIC_HEADERS "include/lge/*.hpp")
-file(GLOB_RECURSE APP_SOURCE_FILES "src/lge/*.cpp")
+file(GLOB_RECURSE LIB_PUBLIC_HEADERS "include/lge/*.hpp")
+file(GLOB_RECURSE LIB_SOURCE_FILES "src/lge/*.cpp")
 
 set(EMSCRIPTEN FALSE)
 if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     set(EMSCRIPTEN TRUE)
 endif ()
 
-add_library(${PROJECT_NAME} STATIC ${APP_SOURCE_FILES})
+add_library(${PROJECT_NAME} STATIC ${LIB_SOURCE_FILES})
 
-if (APP_PUBLIC_HEADERS)
-    target_sources(${PROJECT_NAME} PUBLIC ${APP_PUBLIC_HEADERS})
+if (LIB_PUBLIC_HEADERS)
+    target_sources(${PROJECT_NAME} PUBLIC ${LIB_PUBLIC_HEADERS})
 endif ()
 
 target_include_directories(${PROJECT_NAME}
@@ -43,10 +43,17 @@ if (WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
             WIN32_LEAN_AND_MEAN
             NOMINMAX
-            NOUSER
-            NOGDI
     )
 endif ()
+
+# not on emscripten
+if (NOT EMSCRIPTEN)
+    # boxer
+    add_subdirectory(external/boxer)
+    target_link_libraries(${PROJECT_NAME} PUBLIC Boxer)
+
+endif ()
+
 
 # Add optional examples directory. Examples are built only when BUILD_LGE_EXAMPLES is ON.
 option(BUILD_LGE_EXAMPLES "Build example programs" OFF)
