@@ -7,9 +7,7 @@ project(example_01_hello_world
         LANGUAGES CXX
 )
 
-
 file(GLOB_RECURSE APP_SOURCE_FILES "src/*.cpp")
-
 
 add_executable(${PROJECT_NAME} ${APP_SOURCE_FILES})
 
@@ -29,4 +27,19 @@ if (WIN32)
             NOUSER
             NOGDI
     )
+endif ()
+
+
+if (EMSCRIPTEN)
+    set(CMAKE_EXECUTABLE_SUFFIX ".html")
+    set(CUSTOM_SHELL ${CMAKE_CURRENT_SOURCE_DIR}/../web/template.html)
+    target_link_options(${PROJECT_NAME} PRIVATE
+            "--shell-file=${CUSTOM_SHELL}"
+            "-sUSE_GLFW=3"
+            "-sALLOW_MEMORY_GROWTH=1"
+            "--bind"
+            "-sEXPORTED_RUNTIME_METHODS=['HEAPF32','HEAP32','HEAPU8','requestFullscreen']"
+    )
+    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "index")
+    configure_file(../web/favicon.ico favicon.ico COPYONLY)
 endif ()

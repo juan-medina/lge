@@ -32,7 +32,13 @@ private:
 	static constexpr auto banner = "\033[38;2;0;255;0ml\033[38;2;128;128;128m[\033[38;2;0;0;255mg\033[38;2;128;128;"
 								   "128m]\033[38;2;255;0;0me\033[0m";
 
+#ifndef __EMSCRIPTEN__
 	bool should_exit_ = false;
+#endif
+
+	[[nodiscard]] static auto is_fullscreen() -> bool;
+	static auto set_fullscreen(bool fullscreen) -> void;
+	static auto toggle_fullscreen() -> void;
 };
 
 } // namespace lge
