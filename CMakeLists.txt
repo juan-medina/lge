@@ -43,7 +43,15 @@ if (WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
             WIN32_LEAN_AND_MEAN
             NOMINMAX
+            NOUSER
+            NOGDI
     )
+endif ()
+
+if (MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+else ()
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)
 endif ()
 
 # spdlog
@@ -51,6 +59,11 @@ add_subdirectory(external/spdlog)
 target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog_header_only)
 target_compile_definitions(${PROJECT_NAME} PUBLIC SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
 target_compile_definitions(${PROJECT_NAME} PUBLIC SPDLOG_USE_STD_FORMAT)
+
+# raylib
+add_subdirectory(external/raylib)
+target_link_libraries(${PROJECT_NAME} PUBLIC raylib)
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/raylib/src)
 
 # not on emscripten
 if (NOT EMSCRIPTEN)
