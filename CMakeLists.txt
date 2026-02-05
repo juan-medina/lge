@@ -47,3 +47,9 @@ if (WIN32)
             NOGDI
     )
 endif ()
+
+# Add optional examples directory. Examples are built only when BUILD_LGE_EXAMPLES is ON.
+option(BUILD_LGE_EXAMPLES "Build example programs" OFF)
+if (BUILD_LGE_EXAMPLES)
+    add_subdirectory(examples)
+endif ()

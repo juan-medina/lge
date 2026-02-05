@@ -3,10 +3,15 @@
 
 #pragma once
 
+#include <lge/result.hpp>
+
 namespace lge {
 
 class app {
 public:
+	// =============================================================================
+	// Public API
+	// =============================================================================
 	explicit app() = default;
 	virtual ~app() = default;
 
@@ -15,6 +20,8 @@ public:
 	app(app &&) = delete;
 	auto operator=(const app &) -> app & = delete;
 	auto operator=(app &&) -> app & = delete;
+
+	[[nodiscard]] auto run() -> result<>;
 };
 
 } // namespace lge
