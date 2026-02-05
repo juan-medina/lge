@@ -20,10 +20,12 @@ public:
 	auto operator=(const app &) -> app & = delete;
 	auto operator=(app &&) -> app & = delete;
 
-	[[nodiscard]] virtual auto run() -> result<>;
+	[[nodiscard]] auto run() -> result<>;
+
+protected:
+	virtual auto init() -> result<>;
 
 private:
-	auto init() -> result<>;
 	auto setup_log() -> result<>;
 	auto end() -> result<>;
 	auto main_loop() -> result<>;

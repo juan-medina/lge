@@ -7,5 +7,5 @@
 
 class hello_world: public lge::app {
 public:
-	auto run() -> lge::result<> override;
+	[[nodiscard]] auto init() -> lge::result<> override;
 };

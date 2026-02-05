@@ -11,8 +11,8 @@
 
 LGE_MAIN(hello_world);
 
-auto hello_world::run() -> lge::result<> {
-	if(const auto err = app::run().unwrap(); err) {
+auto hello_world::init() -> lge::result<> {
+	if(const auto err = app::init().unwrap(); err) {
 		return lge::error("error init the app", *err);
 	}
 
