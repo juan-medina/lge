@@ -17,7 +17,7 @@ An little 2D game engine built in C++20 using raylib.
 
 **Third-party libraries:**
 
-TBC
+- [Boxer](https://github.com/aaronmjacobs/Boxer) (licensed under MIT)
 
 **Graphics**
 
