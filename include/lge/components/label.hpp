@@ -8,10 +8,16 @@
 
 namespace lge {
 
+enum class vertical_alignment { top, center, bottom };
+
+enum class horizontal_alignment { left, center, right };
+
 struct label {
 	std::string text;
 	glm::vec4 color{1, 1, 1, 1};
 	float size = 16.0F;
+	vertical_alignment vertical_align = vertical_alignment::top;
+	horizontal_alignment horizontal_align = horizontal_alignment::left;
 };
 
 } // namespace lge

@@ -22,8 +22,11 @@ auto hello_world::init() -> lge::result<> {
 
 	auto &world = get_world();
 	const auto text = world.create();
-	world.emplace<lge::label>(text, "Hello world!", glm::vec4{1, 1, 1, 1}, 24.0F);
-	world.emplace<glm::vec2>(text, 10, 10);
+	auto &text_label = world.emplace<lge::label>(text, "Hello world!");
+	text_label.vertical_align = lge::vertical_alignment::center;
+	text_label.horizontal_align = lge::horizontal_alignment::center;
+	text_label.color = {1, 1, 0, 1};
+	world.emplace<glm::vec2>(text, 0, 0);
 
 	SPDLOG_INFO("Hello world");
 	return true;

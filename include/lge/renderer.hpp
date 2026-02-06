@@ -9,6 +9,7 @@
 #include <raylib.h>
 
 #include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float4.hpp>
 #include <glm/glm.hpp>
 #include <glm/vec2.hpp>
 
@@ -39,7 +40,7 @@ public:
 	static auto setup_raylib_log() -> void;
 	static auto get_delta_time() -> float;
 
-	static auto render_label(const label &label, const glm::vec2 &position) -> void;
+	auto render_label(const label &label, const glm::vec2 &position) const -> void;
 
 private:
 	static auto log_callback(int log_level, const char *text, va_list args) -> void; // NOLINT(*-include-cleaner)
@@ -57,6 +58,10 @@ private:
 
 	static Color ColorFromGLM(const glm::vec4 &v) {
 		return ColorFromNormalized({v.r, v.g, v.b, v.a});
+	}
+
+	[[nodiscard]] auto to_screen(const glm::vec2 &p) const -> glm::vec2 {
+		return {p.x + (drawing_resolution_.x * 0.5F), p.y + drawing_resolution_.y * 0.5F};
 	}
 };
 

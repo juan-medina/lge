@@ -215,10 +215,39 @@ auto renderer::screen_size_changed(glm::vec2 screen_size) -> result<> {
 	return true;
 }
 
-auto renderer::render_label(const label &label, const glm::vec2 &position) -> void {
+auto renderer::render_label(const label &label, const glm::vec2 &position) const -> void {
+	const auto text_width = static_cast<float>(MeasureText(label.text.c_str(), static_cast<int>(label.size)));
+	const auto text_height = label.size;
+
+	auto aligned = position;
+
+	switch(label.horizontal_align) {
+	case horizontal_alignment::center:
+		aligned.x -= text_width * 0.5f;
+		break;
+	case horizontal_alignment::right:
+		aligned.x -= text_width;
+		break;
+	case horizontal_alignment::left:
+		break;
+	}
+
+	switch(label.vertical_align) {
+	case vertical_alignment::center:
+		aligned.y -= text_height * 0.5f;
+		break;
+	case vertical_alignment::bottom:
+		aligned.y -= text_height;
+		break;
+	case vertical_alignment::top:
+		break;
+	}
+
+	const auto screen_pos = to_screen(aligned);
+
 	DrawText(label.text.c_str(),
-			 static_cast<int>(position.x),
-			 static_cast<int>(position.y),
+			 static_cast<int>(screen_pos.x),
+			 static_cast<int>(screen_pos.y),
 			 static_cast<int>(label.size),
 			 ColorFromGLM(label.color));
 }
