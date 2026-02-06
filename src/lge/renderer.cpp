@@ -181,7 +181,7 @@ auto renderer::log_callback(const int log_level, const char *text, va_list args)
 		break;
 	}
 
-	spdlog::log(level, "[raylib] {}", buffer.data());
+	spdlog::log(level, "[raylib] " + std::string(buffer.data()));
 }
 
 auto renderer::screen_size_changed(glm::vec2 screen_size) -> result<> {
