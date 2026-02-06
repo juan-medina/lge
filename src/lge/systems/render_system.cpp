@@ -7,8 +7,6 @@
 
 #include <raylib.h>
 
-#include <glm/ext/vector_float2.hpp>
-
 namespace lge {
 
 auto render_system::update(const float /*dt*/) -> result<> {
@@ -18,12 +16,7 @@ auto render_system::update(const float /*dt*/) -> result<> {
 				 static_cast<int>(position.x),
 				 static_cast<int>(position.y),
 				 static_cast<int>(label.size),
-				 Color{
-					 .r = static_cast<unsigned char>(label.color.r * 255),
-					 .g = static_cast<unsigned char>(label.color.g * 255),
-					 .b = static_cast<unsigned char>(label.color.b * 255),
-					 .a = static_cast<unsigned char>(label.color.a * 255),
-				 });
+				 ColorFromGLM(label.color));
 	}
 
 	return true;
