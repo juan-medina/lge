@@ -3,9 +3,10 @@
 
 #pragma once
 
+#include <lge/renderer.hpp>
 #include <lge/result.hpp>
 
-#include <cstdarg>
+#include <entt/entt.hpp>
 
 namespace lge {
 
@@ -22,14 +23,21 @@ public:
 
 	[[nodiscard]] auto run() -> result<>;
 
+	[[nodiscard]] auto get_world() -> entt::registry & {
+		return world_;
+	}
+
+	[[nodiscard]] auto get_world() const -> const entt::registry & {
+		return world_;
+	}
+
 protected:
 	virtual auto init() -> result<>;
 
 private:
 	auto setup_log() -> result<>;
-	auto end() -> result<>;
-	auto main_loop() -> result<>;
-	static auto log_callback(int log_level, const char *text, va_list args) -> void;
+	[[nodiscard]] auto end() -> result<>;
+	[[nodiscard]] auto main_loop() const -> result<>;
 
 	static constexpr auto empty_format = "%v";
 	static constexpr auto color_line_format = "[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v %@";
@@ -40,9 +48,9 @@ private:
 	bool should_exit_ = false;
 #endif
 
-	[[nodiscard]] static auto is_fullscreen() -> bool;
-	static auto set_fullscreen(bool fullscreen) -> void;
-	static auto toggle_fullscreen() -> void;
+	renderer renderer_;
+
+	entt::registry world_;
 };
 
 } // namespace lge

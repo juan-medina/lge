@@ -5,13 +5,9 @@
 
 #include <lge/result.hpp>
 
-#include <raylib.h>
-
-#include <cstdio>
 #include <optional>
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
-#include <vector>
 
 #ifdef __EMSCRIPTEN__
 #	include <emscripten/emscripten.h>
@@ -23,20 +19,6 @@ auto app::run() -> result<> {
 	if(const auto err = init().unwrap(); err) [[unlikely]] {
 		return error("failed to init the application", *err);
 	}
-
-#if defined(_WIN32) || defined(__EMSCRIPTEN__)
-	InitWindow(1920, 1080, "LGE Application");
-#else
-	InitWindow(0, 0, "LGE Application");
-#endif
-
-#ifndef __EMSCRIPTEN__
-	if(!IsWindowReady()) {
-		return error("failed to initialize window");
-	}
-#endif
-
-	SetTargetFPS(60);
 
 #ifdef __EMSCRIPTEN__
 	emscripten_set_main_loop_arg(
@@ -51,9 +33,9 @@ auto app::run() -> result<> {
 		0,
 		true);
 #else
-	set_fullscreen(true);
+	renderer::set_fullscreen(true);
 	while(!should_exit_) {
-		should_exit_ = should_exit_ || WindowShouldClose();
+		should_exit_ = should_exit_ || renderer_.should_close();
 		if(const auto err = main_loop().unwrap(); err) {
 			return error("error during main loop", *err);
 		}
@@ -73,6 +55,10 @@ auto app::init() -> result<> {
 		return error("failed to setup log", *err);
 	}
 
+	if(const auto err = renderer_.init().unwrap(); err) {
+		return error("failed to initialize renderer", *err);
+	}
+
 	SPDLOG_INFO("application initialized successfully");
 
 	return true;
@@ -82,16 +68,14 @@ auto app::init() -> result<> {
 auto app::setup_log() -> result<> { // NOLINT(*-convert-member-functions-to-static)
 #ifdef NDEBUG
 	spdlog::set_level(spdlog::level::err);
-	SetTraceLogLevel(LOG_ERROR);
 #else
 	spdlog::set_level(spdlog::level::debug);
-	SetTraceLogLevel(LOG_DEBUG);
 #endif
 	spdlog::set_pattern(empty_format);
 	SPDLOG_INFO(banner);
 	spdlog::set_pattern(color_line_format);
 
-	SetTraceLogCallback(log_callback);
+	renderer::setup_raylib_log();
 
 	SPDLOG_INFO("log setup complete");
 	return true;
@@ -99,92 +83,24 @@ auto app::setup_log() -> result<> { // NOLINT(*-convert-member-functions-to-stat
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
 auto app::end() -> result<> { // NOLINT(*-convert-member-functions-to-static)
-
-	CloseWindow();
+	if(const auto err = renderer_.end().unwrap(); err) {
+		return error("failed to shutdown renderer", *err);
+	}
 
 	return true;
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-auto app::main_loop() -> result<> { // NOLINT(*-convert-member-functions-to-static)
+auto app::main_loop() const -> result<> { // NOLINT(*-convert-member-functions-to-static)
+	if(const auto err = renderer_.begin_frame().unwrap(); err) {
+		return error("failed to begin frame", *err);
+	}
 
-	BeginDrawing();
-	ClearBackground(BLACK);
-	DrawText("Hello, LGE!", 10, 10, 20, RAYWHITE);
-	EndDrawing();
+	if(const auto err = renderer_.end_frame().unwrap(); err) {
+		return error("failed to end frame", *err);
+	}
 
 	return true;
-}
-
-auto app::log_callback(const int log_level, const char *text, va_list args) -> void {
-	constexpr std::size_t initial_size = 1024;
-	thread_local std::vector<char> buffer(initial_size);
-
-	va_list args_copy{};	  // NOLINT(cppcoreguidelines-pro-type-vararg)
-	va_copy(args_copy, args); // NOLINT(*-pro-bounds-array-to-pointer-decay)
-	int const needed =
-		std::vsnprintf(buffer.data(), buffer.size(), text, args_copy); // NOLINT(*-pro-bounds-array-to-pointer-decay)
-	va_end(args_copy);												   // NOLINT(*-pro-bounds-array-to-pointer-decay)
-
-	if(needed < 0) {
-		SPDLOG_ERROR("[raylib] log formatting error in log callback");
-		return;
-	}
-
-	if(static_cast<std::size_t>(needed) >= buffer.size()) {
-		buffer.resize(static_cast<std::size_t>(needed) + 1);
-		std::vsnprintf(buffer.data(), buffer.size(), text, args);
-	}
-
-	spdlog::level::level_enum level = spdlog::level::info;
-	switch(log_level) {
-	case LOG_TRACE:
-		level = spdlog::level::trace;
-		break;
-	case LOG_DEBUG:
-		level = spdlog::level::debug;
-		break;
-	case LOG_INFO:
-		level = spdlog::level::info;
-		break;
-	case LOG_WARNING:
-		level = spdlog::level::warn;
-		break;
-	case LOG_ERROR:
-		level = spdlog::level::err;
-		break;
-	case LOG_FATAL:
-		level = spdlog::level::critical;
-		break;
-	default:
-		break;
-	}
-
-	spdlog::log(level, "[raylib] {}", buffer.data());
-}
-
-auto app::is_fullscreen() -> bool {
-	bool full_screen = false;
-#ifdef _WIN32
-	full_screen = IsWindowState(FLAG_BORDERLESS_WINDOWED_MODE);
-#else
-	full_screen = IsWindowFullscreen();
-#endif
-	return full_screen;
-}
-
-auto app::set_fullscreen(const bool fullscreen) -> void {
-	if(const auto current_state = is_fullscreen(); current_state != fullscreen) {
-		toggle_fullscreen();
-	}
-}
-
-auto app::toggle_fullscreen() -> void {
-#ifdef WIN32
-	ToggleBorderlessWindowed();
-#else
-	ToggleFullscreen();
-#endif
 }
 
 } // namespace lge

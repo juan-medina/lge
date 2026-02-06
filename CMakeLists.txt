@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Juan Medina
 # SPDX-License-Identifier: MIT
 
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.28)
 
 project(lge
         VERSION 0.1.0.0
@@ -64,6 +64,10 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC SPDLOG_USE_STD_FORMAT)
 add_subdirectory(external/raylib)
 target_link_libraries(${PROJECT_NAME} PUBLIC raylib)
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/raylib/src)
+
+# entt
+add_subdirectory(external/entt)
+target_link_libraries(${PROJECT_NAME} PUBLIC EnTT::EnTT)
 
 # not on emscripten
 if (NOT EMSCRIPTEN)
