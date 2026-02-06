@@ -3,11 +3,13 @@
 
 #pragma once
 
+#include <lge/components/label.hpp>
 #include <lge/result.hpp>
 
 #include <raylib.h>
 
 #include <glm/ext/vector_float2.hpp>
+#include <glm/glm.hpp>
 #include <glm/vec2.hpp>
 
 namespace lge {
@@ -37,6 +39,8 @@ public:
 	static auto setup_raylib_log() -> void;
 	static auto get_delta_time() -> float;
 
+	static auto render_label(const label &label, const glm::vec2 &position) -> void;
+
 private:
 	static auto log_callback(int log_level, const char *text, va_list args) -> void; // NOLINT(*-include-cleaner)
 
@@ -50,6 +54,10 @@ private:
 	RenderTexture2D render_texture_{};
 
 	[[nodiscard]] auto screen_size_changed(glm::vec2 screen_size) -> result<>;
+
+	static Color ColorFromGLM(const glm::vec4 &v) {
+		return ColorFromNormalized({v.r, v.g, v.b, v.a});
+	}
 };
 
 } // namespace lge

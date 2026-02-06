@@ -60,7 +60,7 @@ auto app::init() -> result<> {
 		return error("failed to initialize renderer", *err);
 	}
 
-	register_system<render_system>();
+	register_system<render_system>(renderer_);
 
 	SPDLOG_INFO("application initialized successfully");
 

@@ -215,4 +215,12 @@ auto renderer::screen_size_changed(glm::vec2 screen_size) -> result<> {
 	return true;
 }
 
+auto renderer::render_label(const label &label, const glm::vec2 &position) -> void {
+	DrawText(label.text.c_str(),
+			 static_cast<int>(position.x),
+			 static_cast<int>(position.y),
+			 static_cast<int>(label.size),
+			 ColorFromGLM(label.color));
+}
+
 } // namespace lge

@@ -56,10 +56,10 @@ private:
 	entt::registry world_;
 	std::vector<std::unique_ptr<system>> systems_;
 
-	template<typename T>
+	template<typename T, typename... Args>
 		requires std::is_base_of_v<system, T>
-	void register_system() {
-		auto system = std::make_unique<T>(world_);
+	void register_system(Args &&...args) {
+		auto system = std::make_unique<T>(world_, std::forward<Args>(args)...);
 		const auto id = system->id();
 		const auto type_name = get_type_name<T>();
 		systems_.push_back(std::move(system));
