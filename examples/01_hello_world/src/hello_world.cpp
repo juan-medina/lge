@@ -4,6 +4,7 @@
 #include "hello_world.hpp"
 
 #include <lge/app.hpp>
+#include <lge/app_config.hpp>
 #include <lge/components/label.hpp>
 #include <lge/main.hpp>
 #include <lge/result.hpp>
@@ -14,6 +15,12 @@
 #include <spdlog/spdlog.h>
 
 LGE_MAIN(hello_world);
+
+lge::app_config hello_world::configure() {
+	return {.design_resolution = {640, 360}, // world expands horizontally keep the vertical size fixed
+			.clear_color = {0, 0, 0, 1},	 // black background
+			.window_title = "Hello world!"};
+}
 
 auto hello_world::init() -> lge::result<> {
 	if(const auto err = app::init().unwrap(); err) {
@@ -26,7 +33,7 @@ auto hello_world::init() -> lge::result<> {
 	text_label.vertical_align = lge::vertical_alignment::center;
 	text_label.horizontal_align = lge::horizontal_alignment::center;
 	text_label.color = {1, 1, 0, 1};
-	world.emplace<glm::vec2>(text, 0, 0);
+	world.emplace<glm::vec2>(text, 0, 0); // center of the world, which is the center of the screen in this case
 
 	SPDLOG_INFO("Hello world");
 	return true;

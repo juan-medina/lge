@@ -56,7 +56,7 @@ auto app::init() -> result<> {
 		return error("failed to setup log", *err);
 	}
 
-	if(const auto err = renderer_.init().unwrap(); err) {
+	if(const auto err = renderer_.init(configure()).unwrap(); err) {
 		return error("failed to initialize renderer", *err);
 	}
 

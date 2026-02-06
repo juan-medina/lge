@@ -1,6 +1,7 @@
 ﻿// SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
+#include <lge/app_config.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
 
@@ -14,11 +15,15 @@
 
 namespace lge {
 
-auto renderer::init() -> result<> {
+auto renderer::init(const app_config &config) -> result<> {
+	clear_color_ = ColorFromGLM(config.clear_color);
+	design_resolution_ = config.design_resolution;
+	title_ = config.window_title;
+
 #if defined(_WIN32) || defined(__EMSCRIPTEN__)
-	InitWindow(1920, 1080, "LGE Application");
+	InitWindow(1920, 1080, title_.c_str());
 #else
-	InitWindow(0, 0, "LGE Application");
+	InitWindow(0, 0, title_.c_str());
 #endif
 
 #ifndef __EMSCRIPTEN__

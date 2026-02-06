@@ -8,4 +8,5 @@
 class hello_world: public lge::app {
 public:
 	[[nodiscard]] auto init() -> lge::result<> override;
+	[[nodiscard]] auto configure() -> lge::app_config override;
 };

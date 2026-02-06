@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <lge/app_config.hpp>
 #include <lge/components/label.hpp>
 #include <lge/result.hpp>
 
@@ -11,7 +12,7 @@
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float4.hpp>
 #include <glm/glm.hpp>
-#include <glm/vec2.hpp>
+#include <string>
 
 namespace lge {
 
@@ -25,7 +26,7 @@ public:
 	auto operator=(const renderer &) -> renderer & = delete;
 	auto operator=(renderer &&) -> renderer & = delete;
 
-	[[nodiscard]] auto init() -> result<>;
+	[[nodiscard]] auto init(const app_config &config) -> result<>;
 	[[nodiscard]] auto end() -> result<>;
 
 	[[nodiscard]] auto begin_frame() -> result<>;
@@ -47,9 +48,10 @@ private:
 
 	bool initialized_ = false;
 
-	Color clear_color_{BLACK};
+	std::string title_;
+	Color clear_color_;
 	glm::vec2 screen_size_{};
-	glm::vec2 design_resolution_{640, 360};
+	glm::vec2 design_resolution_{};
 	glm::vec2 drawing_resolution_{};
 	float scale_factor_{1.0F};
 	RenderTexture2D render_texture_{};

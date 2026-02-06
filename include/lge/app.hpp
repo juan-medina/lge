@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <lge/app_config.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
 #include <lge/systems/system.hpp>
@@ -32,6 +33,10 @@ public:
 
 	[[nodiscard]] auto get_world() const -> const entt::registry & {
 		return world_;
+	}
+
+	[[nodiscard]] virtual auto configure() -> app_config {
+		return app_config{};
 	}
 
 protected:
