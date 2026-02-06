@@ -106,6 +106,10 @@ auto renderer::setup_raylib_log() -> void {
 	SetTraceLogCallback(log_callback);
 }
 
+auto renderer::get_delta_time() -> float {
+	return GetFrameTime();
+}
+
 auto renderer::log_callback(const int log_level, const char *text, va_list args) -> void {
 	constexpr std::size_t initial_size = 1024;
 	thread_local std::vector<char> buffer(initial_size);

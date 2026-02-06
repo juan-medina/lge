@@ -4,6 +4,7 @@
 #include "lge/app.hpp"
 
 #include <lge/result.hpp>
+#include <lge/systems/render_system.hpp>
 
 #include <optional>
 #include <spdlog/common.h>
@@ -59,6 +60,8 @@ auto app::init() -> result<> {
 		return error("failed to initialize renderer", *err);
 	}
 
+	register_system<render_system>();
+
 	SPDLOG_INFO("application initialized successfully");
 
 	return true;
@@ -94,6 +97,13 @@ auto app::end() -> result<> { // NOLINT(*-convert-member-functions-to-static)
 auto app::main_loop() const -> result<> { // NOLINT(*-convert-member-functions-to-static)
 	if(const auto err = renderer_.begin_frame().unwrap(); err) {
 		return error("failed to begin frame", *err);
+	}
+
+	auto const delta_time = renderer::get_delta_time();
+	for(const auto &system: systems_) {
+		if(const auto err = system->update(delta_time).unwrap(); err) {
+			return error("failed to update system", *err);
+		}
 	}
 
 	if(const auto err = renderer_.end_frame().unwrap(); err) {

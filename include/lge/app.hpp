@@ -5,8 +5,11 @@
 
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
+#include <lge/systems/system.hpp>
+#include <lge/types.hpp>
 
 #include <entt/entt.hpp>
+#include <spdlog/spdlog.h>
 
 namespace lge {
 
@@ -51,6 +54,17 @@ private:
 	renderer renderer_;
 
 	entt::registry world_;
+	std::vector<std::unique_ptr<system>> systems_;
+
+	template<typename T>
+		requires std::is_base_of_v<system, T>
+	void register_system() {
+		auto system = std::make_unique<T>(world_);
+		const auto id = system->id();
+		const auto type_name = get_type_name<T>();
+		systems_.push_back(std::move(system));
+		SPDLOG_DEBUG("system of type `{}` registered with id {}", type_name, id);
+	}
 };
 
 } // namespace lge

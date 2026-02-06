@@ -30,6 +30,7 @@ public:
 	static auto toggle_fullscreen() -> void;
 
 	static auto setup_raylib_log() -> void;
+	static auto get_delta_time() -> float;
 
 private:
 	static auto log_callback(int log_level, const char *text, va_list args) -> void;

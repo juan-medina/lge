@@ -15,7 +15,8 @@ readability-*,
 -readability-magic-numbers,
 -*-identifier-length,
 llvm-include-cleaner,
-misc-include-cleaner
+misc-include-cleaner,
+-*-pro-type-union-access
 '
 
 CheckOptions:

@@ -68,6 +68,12 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_
 # entt
 add_subdirectory(external/entt)
 target_link_libraries(${PROJECT_NAME} PUBLIC EnTT::EnTT)
+target_include_directories(lge SYSTEM PUBLIC external/entt/src/entt)
+
+
+# glm
+add_subdirectory(external/glm)
+target_link_libraries(${PROJECT_NAME} PUBLIC glm::glm)
 
 # not on emscripten
 if (NOT EMSCRIPTEN)

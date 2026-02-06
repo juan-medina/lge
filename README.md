@@ -19,6 +19,7 @@ An little 2D game engine built in C++20 using raylib.
 
 - [raylib](https://www.raylib.com/) (licensed under zlib/libpng)
 - [entt](https://github.com/skypjack/entt) (licensed under MIT)
+- [glm](https://github.com/g-truc/glm) (licensed under The Happy Bunny License (Modified MIT License))
 - [spdlog](https://github.com/gabime/spdlog) (licensed under MIT)
 - [Boxer](https://github.com/aaronmjacobs/Boxer) (licensed under MIT)
 
