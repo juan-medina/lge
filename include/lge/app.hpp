@@ -40,7 +40,7 @@ protected:
 private:
 	auto setup_log() -> result<>;
 	[[nodiscard]] auto end() -> result<>;
-	[[nodiscard]] auto main_loop() const -> result<>;
+	[[nodiscard]] auto main_loop() -> result<>;
 
 	static constexpr auto empty_format = "%v";
 	static constexpr auto color_line_format = "[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v %@";

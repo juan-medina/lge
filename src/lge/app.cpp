@@ -94,7 +94,7 @@ auto app::end() -> result<> { // NOLINT(*-convert-member-functions-to-static)
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-auto app::main_loop() const -> result<> { // NOLINT(*-convert-member-functions-to-static)
+auto app::main_loop() -> result<> { // NOLINT(*-convert-member-functions-to-static)
 	if(const auto err = renderer_.begin_frame().unwrap(); err) {
 		return error("failed to begin frame", *err);
 	}

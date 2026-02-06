@@ -1,11 +1,14 @@
 ﻿// SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
-#include "lge/renderer.hpp"
+#include <lge/renderer.hpp>
+#include <lge/result.hpp>
 
 #include <raylib.h>
 
+#include <cstdarg>
 #include <cstdio>
+#include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <vector>
 
@@ -40,17 +43,28 @@ auto renderer::end() -> result<> {
 	CloseWindow();
 	initialized_ = false;
 
+	if(render_texture_.id != 0) {
+		UnloadRenderTexture(render_texture_);
+	}
+
 	SPDLOG_INFO("renderer ended");
 	return true;
 }
 
-auto renderer::begin_frame() const -> result<> {
+auto renderer::begin_frame() -> result<> {
 	if(!initialized_) {
 		return error("renderer not initialized");
 	}
 
-	BeginDrawing();
-	ClearBackground(BLACK);
+	if(auto const screen_size = glm::vec2{static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
+	   screen_size_.x != screen_size.x || screen_size_.y != screen_size.y) {
+		if(auto const err = screen_size_changed(screen_size).unwrap(); err) {
+			return error("failed to handle screen size change: {}", *err);
+		}
+	}
+
+	BeginTextureMode(render_texture_);
+	ClearBackground(clear_color_);
 
 	return true;
 }
@@ -60,6 +74,19 @@ auto renderer::end_frame() const -> result<> {
 		return error("renderer not initialized");
 	}
 
+	EndTextureMode();
+
+	BeginDrawing();
+	ClearBackground(clear_color_);
+	DrawTexturePro(render_texture_.texture,
+				   {0.0F,
+					0.0F,
+					static_cast<float>(render_texture_.texture.width),
+					-static_cast<float>(render_texture_.texture.height)},
+				   {0.0F, 0.0F, screen_size_.x, screen_size_.y},
+				   {0.0F, 0.0F},
+				   0.0F,
+				   WHITE);
 	EndDrawing();
 
 	return true;
@@ -155,6 +182,37 @@ auto renderer::log_callback(const int log_level, const char *text, va_list args)
 	}
 
 	spdlog::log(level, "[raylib] {}", buffer.data());
+}
+
+auto renderer::screen_size_changed(glm::vec2 screen_size) -> result<> {
+	screen_size_ = screen_size;
+
+	scale_factor_ = screen_size_.y / design_resolution_.y;
+	drawing_resolution_.y = design_resolution_.y;
+	drawing_resolution_.x = static_cast<float>(static_cast<int>(screen_size_.x / scale_factor_));
+
+	SPDLOG_DEBUG("display resized, design resolution ({},{}) real resolution ({}x{}), drawing resolution ({}x{}), "
+				 "scale factor {}",
+				 design_resolution_.x,
+				 design_resolution_.y,
+				 screen_size_.x,
+				 screen_size_.y,
+				 drawing_resolution_.x,
+				 drawing_resolution_.y,
+				 scale_factor_);
+
+	if(render_texture_.id != 0) {
+		UnloadRenderTexture(render_texture_);
+	}
+
+	render_texture_ =
+		LoadRenderTexture(static_cast<int>(drawing_resolution_.x), static_cast<int>(drawing_resolution_.y));
+	if(render_texture_.id == 0) {
+		return error("failed to create render texture on screen size change");
+	}
+	SetTextureFilter(render_texture_.texture, TEXTURE_FILTER_POINT);
+
+	return true;
 }
 
 } // namespace lge
