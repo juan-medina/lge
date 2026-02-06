@@ -3,10 +3,12 @@
 
 #include "hello_world.hpp"
 
+#include <lge/app.hpp>
 #include <lge/components/label.hpp>
 #include <lge/main.hpp>
 #include <lge/result.hpp>
 
+#include <glm/ext/vector_float2.hpp>
 #include <glm/glm.hpp>
 #include <iostream>
 #include <spdlog/spdlog.h>
