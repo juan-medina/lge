@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <lge/app_config.hpp>
+#include <lge/components/position.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
 

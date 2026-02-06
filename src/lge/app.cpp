@@ -4,7 +4,9 @@
 #include "lge/app.hpp"
 
 #include <lge/result.hpp>
+#include <lge/systems/hierarchy_system.hpp>
 #include <lge/systems/render_system.hpp>
+#include <lge/systems/system.hpp>
 
 #include <optional>
 #include <spdlog/common.h>
@@ -61,6 +63,7 @@ auto app::init() -> result<> {
 	}
 
 	register_system<render_system>(renderer_);
+	register_system<hierarchy_system>();
 
 	SPDLOG_INFO("application initialized successfully");
 
@@ -100,14 +103,29 @@ auto app::main_loop() -> result<> { // NOLINT(*-convert-member-functions-to-stat
 	}
 
 	auto const delta_time = renderer::get_delta_time();
-	for(const auto &system: systems_) {
-		if(const auto err = system->update(delta_time).unwrap(); err) {
-			return error("failed to update system", *err);
-		}
+
+	if(const auto err = update_system(phase::update, delta_time).unwrap(); err) {
+		return error("failed to update systems in update phase", *err);
+	}
+
+	if(const auto err = update_system(phase::render, delta_time).unwrap(); err) {
+		return error("failed to update systems in render phase", *err);
 	}
 
 	if(const auto err = renderer_.end_frame().unwrap(); err) {
 		return error("failed to end frame", *err);
+	}
+
+	return true;
+}
+
+auto app::update_system(const phase p, const float dt) const -> result<> {
+	for(const auto &system: systems_) {
+		if(system->get_phase() == p) {
+			if(const auto err = system->update(dt).unwrap(); err) {
+				return error("failed to update system", *err);
+			}
+		}
 	}
 
 	return true;

@@ -42,6 +42,15 @@ public:
 protected:
 	virtual auto init() -> result<>;
 
+	template<typename T, typename... Args>
+		requires std::is_base_of_v<system, T>
+	void register_system(Args &&...args) {
+		auto system = std::make_unique<T>(world_, std::forward<Args>(args)...);
+		const auto type_name = get_type_name<T>();
+		systems_.push_back(std::move(system));
+		SPDLOG_DEBUG("system of type `{}` registered", type_name);
+	}
+
 private:
 	auto setup_log() -> result<>;
 	[[nodiscard]] auto end() -> result<>;
@@ -61,15 +70,7 @@ private:
 	entt::registry world_;
 	std::vector<std::unique_ptr<system>> systems_;
 
-	template<typename T, typename... Args>
-		requires std::is_base_of_v<system, T>
-	void register_system(Args &&...args) {
-		auto system = std::make_unique<T>(world_, std::forward<Args>(args)...);
-		const auto id = system->id();
-		const auto type_name = get_type_name<T>();
-		systems_.push_back(std::move(system));
-		SPDLOG_DEBUG("system of type `{}` registered with id {}", type_name, id);
-	}
+	[[nodiscard]] auto update_system(phase p, float dt) const -> result<>;
 };
 
 } // namespace lge

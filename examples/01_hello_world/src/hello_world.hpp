@@ -4,6 +4,9 @@
 #pragma once
 
 #include <lge/app.hpp>
+#include <lge/app_config.hpp>
+
+#include <lge/result.hpp>
 
 class hello_world: public lge::app {
 public:

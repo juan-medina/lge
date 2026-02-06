@@ -12,6 +12,8 @@ namespace lge {
 
 using system_id = uint32_t;
 
+enum class phase : std::uint8_t { update, render };
+
 class system {
 public:
 	explicit system(entt::registry &w): world{w} {}
@@ -26,8 +28,8 @@ public:
 	// Called every frame when the system is active
 	virtual auto update(float dt) -> result<> = 0;
 
-	// Each system must define its ID
-	[[nodiscard]] virtual auto id() const -> system_id = 0;
+	// Each system must define its phase (update or render)
+	[[nodiscard]] virtual auto get_phase() const -> phase = 0;
 
 protected:
 	entt::registry &world; // NOLINT(*-non-private-member-variables-in-classes)
