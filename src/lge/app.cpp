@@ -39,7 +39,10 @@ auto app::run() -> result<> {
 		0,
 		true);
 #else
+
+#	ifdef NDEBUG
 	renderer::set_fullscreen(true);
+#	endif
 	while(!should_exit_) {
 		should_exit_ = should_exit_ || renderer_.should_close();
 		if(const auto err = main_loop().unwrap(); err) {
@@ -66,8 +69,8 @@ auto app::init() -> result<> {
 	}
 
 	register_system<dirty_propagation_system>(phase::update);
-	register_system<hierarchy_system>(phase::update);
 	register_system<label_aabb_system>(phase::update);
+	register_system<hierarchy_system>(phase::update);
 	register_system<render_system>(phase::render, renderer_);
 	register_system<dirty_removal_system>(phase::post_render);
 
@@ -110,12 +113,16 @@ auto app::main_loop() -> result<> { // NOLINT(*-convert-member-functions-to-stat
 
 	auto const delta_time = renderer::get_delta_time();
 
-	if(const auto err = update_system(phase::update, delta_time).unwrap(); err) [[unlikely]] {
-		return error("failed to update systems in update phase", *err);
-	}
+	input_.update(delta_time);
+
+	renderer::show_cursor(!input_.is_controller_available());
 
 	if(const auto err = update(delta_time).unwrap(); err) [[unlikely]] {
 		return error("failed to update the application", *err);
+	}
+
+	if(const auto err = update_system(phase::update, delta_time).unwrap(); err) [[unlikely]] {
+		return error("failed to update systems in update phase", *err);
 	}
 
 	if(const auto err = update_system(phase::render, delta_time).unwrap(); err) [[unlikely]] {

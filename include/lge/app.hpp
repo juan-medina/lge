@@ -4,6 +4,7 @@
 #pragma once
 
 #include <lge/app_config.hpp>
+#include <lge/input.hpp>
 #include <lge/log.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
@@ -66,8 +67,23 @@ protected:
 		return renderer_;
 	}
 
+	[[nodiscard]] auto get_input() -> input & {
+		return input_;
+	}
+
+	[[nodiscard]] auto get_input() const -> const input & {
+		return input_;
+	}
+
+	auto exit() -> void {
+#ifndef __EMSCRIPTEN__
+		should_exit_ = true;
+#endif
+	}
+
 private:
 	renderer renderer_;
+	input input_;
 	auto setup_log() -> result<>;
 	[[nodiscard]] auto end() -> result<>;
 	[[nodiscard]] auto main_loop() -> result<>;

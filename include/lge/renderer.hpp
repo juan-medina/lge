@@ -59,6 +59,8 @@ public:
 
 	static auto get_label_size(const label &lbl) -> glm::vec2;
 
+	static auto show_cursor(bool show) -> void;
+
 private:
 	static auto log_callback(int log_level, const char *text, va_list args) -> void; // NOLINT(*-include-cleaner)
 

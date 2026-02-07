@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #include <lge/app_config.hpp>
-#include <lge/components/label.hpp>
 #include <lge/components/aabb.hpp>
+#include <lge/components/label.hpp>
 #include <lge/log.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
@@ -36,6 +36,7 @@ auto renderer::init(const app_config &config) -> result<> {
 	}
 #endif
 
+	SetExitKey(KEY_NULL);
 	SetTargetFPS(60);
 
 	initialized_ = true;
@@ -149,6 +150,14 @@ auto renderer::get_delta_time() -> float {
 auto renderer::get_label_size(const label &lbl) -> glm::vec2 {
 	auto width = static_cast<float>(MeasureText(lbl.text.c_str(), static_cast<int>(lbl.size)));
 	return {width, lbl.size};
+}
+
+auto renderer::show_cursor(bool show) -> void {
+	if(show) {
+		ShowCursor();
+	} else {
+		HideCursor();
+	}
 }
 
 auto renderer::log_callback(const int log_level, const char *text, va_list args) -> void {
