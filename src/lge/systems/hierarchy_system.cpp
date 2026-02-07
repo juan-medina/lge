@@ -1,6 +1,7 @@
 ﻿// SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
+#include <lge/components/aabb.hpp>
 #include <lge/components/hierarchy.hpp>
 #include <lge/components/position.hpp>
 #include <lge/result.hpp>
@@ -11,7 +12,7 @@
 
 namespace lge {
 
-hierarchy_system::hierarchy_system(entt::registry &world): system(world) {
+hierarchy_system::hierarchy_system(const phase p, entt::registry &world): system(p, world) {
 	world.on_destroy<parent>().connect<&hierarchy_system::on_child_detached>();
 	world.on_destroy<children>().connect<&hierarchy_system::on_parent_children_cleared>();
 }
@@ -28,6 +29,11 @@ void hierarchy_system::resolve_node(const entt::entity entity, const glm::vec2 p
 	const glm::vec2 global = parent_pos + local.value;
 
 	world.emplace_or_replace<global_position>(entity, global);
+
+	if(world.all_of<local_aabb>(entity)) {
+		const auto &[min, max] = world.get<local_aabb>(entity);
+		world.emplace_or_replace<global_aabb>(entity, global_aabb{.min = global + min, .max = global + max});
+	}
 
 	if(world.all_of<children>(entity)) {
 		for(const auto &kids = world.get<children>(entity).ids; const auto child: kids) {

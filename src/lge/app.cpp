@@ -3,14 +3,17 @@
 
 #include "lge/app.hpp"
 
+#include <lge/log.hpp>
+#include <lge/renderer.hpp>
 #include <lge/result.hpp>
+#include <lge/systems/dirty_propagation_system.hpp>
+#include <lge/systems/dirty_removal_system.hpp>
 #include <lge/systems/hierarchy_system.hpp>
+#include <lge/systems/label_aabb_system.hpp>
 #include <lge/systems/render_system.hpp>
 #include <lge/systems/system.hpp>
 
 #include <optional>
-#include <spdlog/common.h>
-#include <spdlog/spdlog.h>
 
 #ifdef __EMSCRIPTEN__
 #	include <emscripten/emscripten.h>
@@ -48,7 +51,7 @@ auto app::run() -> result<> {
 		return error("error ending the application", *err);
 	}
 
-	SPDLOG_INFO("application ended");
+	LGE_INFO("application ended");
 #endif
 	return true;
 }
@@ -62,10 +65,13 @@ auto app::init() -> result<> {
 		return error("failed to initialize renderer", *err);
 	}
 
-	register_system<render_system>(renderer_);
-	register_system<hierarchy_system>();
+	register_system<dirty_propagation_system>(phase::update);
+	register_system<hierarchy_system>(phase::update);
+	register_system<label_aabb_system>(phase::update);
+	register_system<render_system>(phase::render, renderer_);
+	register_system<dirty_removal_system>(phase::post_render);
 
-	SPDLOG_INFO("application initialized successfully");
+	LGE_INFO("application initialized successfully");
 
 	return true;
 }
@@ -78,12 +84,12 @@ auto app::setup_log() -> result<> { // NOLINT(*-convert-member-functions-to-stat
 	spdlog::set_level(spdlog::level::debug);
 #endif
 	spdlog::set_pattern(empty_format);
-	SPDLOG_INFO(banner);
+	LGE_INFO(banner);
 	spdlog::set_pattern(color_line_format);
 
 	renderer::setup_raylib_log();
 
-	SPDLOG_INFO("log setup complete");
+	LGE_INFO("log setup complete");
 	return true;
 }
 
@@ -108,8 +114,16 @@ auto app::main_loop() -> result<> { // NOLINT(*-convert-member-functions-to-stat
 		return error("failed to update systems in update phase", *err);
 	}
 
+	if(const auto err = update(delta_time).unwrap(); err) {
+		return error("failed to update the application", *err);
+	}
+
 	if(const auto err = update_system(phase::render, delta_time).unwrap(); err) {
 		return error("failed to update systems in render phase", *err);
+	}
+
+	if(const auto err = update_system(phase::post_render, delta_time).unwrap(); err) {
+		return error("failed to update systems in post render phase", *err);
 	}
 
 	if(const auto err = renderer_.end_frame().unwrap(); err) {

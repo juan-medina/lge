@@ -10,12 +10,7 @@
 
 class move_random_system: public lge::system {
 public:
-	explicit move_random_system(entt::registry &w): system(w) {}
-
-	[[nodiscard]] auto get_phase() const -> lge::phase override {
-		return lge::phase::update;
-	}
-
+	explicit move_random_system(const lge::phase p, entt::registry &w): system(p, w) {}
 	auto update(float dt) -> lge::result<> override;
 
 	struct tag {};

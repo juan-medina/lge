@@ -6,17 +6,17 @@
 #include <lge/result.hpp>
 
 #include <cstdint>
-#include <entt/entt.hpp>
+#include <entity/fwd.hpp>
 
 namespace lge {
 
 using system_id = uint32_t;
 
-enum class phase : std::uint8_t { update, render };
+enum class phase : std::uint8_t { update, render, post_render };
 
 class system {
 public:
-	explicit system(entt::registry &w): world{w} {}
+	explicit system(const phase p, entt::registry &w): world{w}, phase_{p} {}
 	virtual ~system() = default;
 
 	// Disable copying and moving — apps are not copyable or movable
@@ -28,11 +28,15 @@ public:
 	// Called every frame when the system is active
 	virtual auto update(float dt) -> result<> = 0;
 
-	// Each system must define its phase (update or render)
-	[[nodiscard]] virtual auto get_phase() const -> phase = 0;
+	[[nodiscard]] auto get_phase() const -> phase {
+		return phase_;
+	}
 
 protected:
 	entt::registry &world; // NOLINT(*-non-private-member-variables-in-classes)
+
+private:
+	phase phase_;
 };
 
 } // namespace lge

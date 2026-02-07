@@ -4,13 +4,16 @@
 #pragma once
 
 #include <lge/app_config.hpp>
+#include <lge/log.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
 #include <lge/systems/system.hpp>
 #include <lge/types.hpp>
 
+#include <entity/fwd.hpp>
 #include <entt/entt.hpp>
-#include <spdlog/spdlog.h>
+#include <memory>
+#include <vector>
 
 namespace lge {
 
@@ -39,19 +42,30 @@ public:
 		return app_config{};
 	}
 
+	[[nodiscard]] virtual auto update(float dt) -> result<> = 0;
+
 protected:
 	virtual auto init() -> result<>;
 
 	template<typename T, typename... Args>
 		requires std::is_base_of_v<system, T>
-	void register_system(Args &&...args) {
-		auto system = std::make_unique<T>(world_, std::forward<Args>(args)...);
+	void register_system(phase p, Args &&...args) {
+		auto system = std::make_unique<T>(p, world_, std::forward<Args>(args)...);
 		const auto type_name = get_type_name<T>();
 		systems_.push_back(std::move(system));
-		SPDLOG_DEBUG("system of type `{}` registered", type_name);
+		LGE_DEBUG("system of type `{}` registered", type_name);
+	}
+
+	[[nodiscard]] auto get_renderer() -> renderer & {
+		return renderer_;
+	}
+
+	[[nodiscard]] auto get_renderer() const -> const renderer & {
+		return renderer_;
 	}
 
 private:
+	renderer renderer_;
 	auto setup_log() -> result<>;
 	[[nodiscard]] auto end() -> result<>;
 	[[nodiscard]] auto main_loop() -> result<>;
@@ -64,8 +78,6 @@ private:
 #ifndef __EMSCRIPTEN__
 	bool should_exit_ = false;
 #endif
-
-	renderer renderer_;
 
 	entt::registry world_;
 	std::vector<std::unique_ptr<system>> systems_;

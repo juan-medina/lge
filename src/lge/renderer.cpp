@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <lge/app_config.hpp>
-#include <lge/components/position.hpp>
+#include <lge/log.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
 
@@ -10,7 +10,6 @@
 
 #include <cstdarg>
 #include <cstdio>
-#include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <vector>
 
@@ -37,7 +36,7 @@ auto renderer::init(const app_config &config) -> result<> {
 
 	initialized_ = true;
 
-	SPDLOG_INFO("renderer initialized");
+	LGE_INFO("renderer initialized");
 	return true;
 }
 
@@ -53,7 +52,7 @@ auto renderer::end() -> result<> {
 		UnloadRenderTexture(render_texture_);
 	}
 
-	SPDLOG_INFO("renderer ended");
+	LGE_INFO("renderer ended");
 	return true;
 }
 
@@ -154,7 +153,7 @@ auto renderer::log_callback(const int log_level, const char *text, va_list args)
 	va_end(args_copy);												   // NOLINT(*-pro-bounds-array-to-pointer-decay)
 
 	if(needed < 0) {
-		SPDLOG_ERROR("[raylib] log formatting error in log callback");
+		LGE_INFO("[raylib] log formatting error in log callback");
 		return;
 	}
 
@@ -190,22 +189,22 @@ auto renderer::log_callback(const int log_level, const char *text, va_list args)
 	spdlog::log(level, "[raylib] " + std::string(buffer.data()));
 }
 
-auto renderer::screen_size_changed(glm::vec2 screen_size) -> result<> {
+auto renderer::screen_size_changed(const glm::vec2 screen_size) -> result<> {
 	screen_size_ = screen_size;
 
 	scale_factor_ = screen_size_.y / design_resolution_.y;
 	drawing_resolution_.y = design_resolution_.y;
 	drawing_resolution_.x = static_cast<float>(static_cast<int>(screen_size_.x / scale_factor_));
 
-	SPDLOG_DEBUG("display resized, design resolution ({},{}) real resolution ({}x{}), drawing resolution ({}x{}), "
-				 "scale factor {}",
-				 design_resolution_.x,
-				 design_resolution_.y,
-				 screen_size_.x,
-				 screen_size_.y,
-				 drawing_resolution_.x,
-				 drawing_resolution_.y,
-				 scale_factor_);
+	LGE_DEBUG("display resized, design resolution ({},{}) real resolution ({}x{}), drawing resolution ({}x{}), "
+			  "scale factor {}",
+			  design_resolution_.x,
+			  design_resolution_.y,
+			  screen_size_.x,
+			  screen_size_.y,
+			  drawing_resolution_.x,
+			  drawing_resolution_.y,
+			  scale_factor_);
 
 	if(render_texture_.id != 0) {
 		UnloadRenderTexture(render_texture_);
@@ -217,6 +216,9 @@ auto renderer::screen_size_changed(glm::vec2 screen_size) -> result<> {
 		return error("failed to create render texture on screen size change");
 	}
 	SetTextureFilter(render_texture_.texture, TEXTURE_FILTER_POINT);
+
+	LGE_DEBUG("render texture created with id {}, size ({}x{})", render_texture_.id, render_texture_.texture.width,
+			  render_texture_.texture.height);
 
 	return true;
 }
@@ -256,6 +258,16 @@ auto renderer::render_label(const label &label, const glm::vec2 &position) const
 			 static_cast<int>(screen_pos.y),
 			 static_cast<int>(label.size),
 			 ColorFromGLM(label.color));
+}
+
+auto renderer::render_aabb(const global_aabb ga) const -> void {
+	const auto screen_min = to_screen(ga.min);
+	const auto screen_max = to_screen(ga.max);
+	DrawRectangleLines(static_cast<int>(screen_min.x),
+					   static_cast<int>(screen_min.y),
+					   static_cast<int>(screen_max.x - screen_min.x),
+					   static_cast<int>(screen_max.y - screen_min.y),
+					   RED);
 }
 
 } // namespace lge

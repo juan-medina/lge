@@ -13,13 +13,9 @@ namespace lge {
 
 class hierarchy_system: public system {
 public:
-	explicit hierarchy_system(entt::registry &world);
+	explicit hierarchy_system(phase p, entt::registry &world);
 	auto resolve_node(entt::entity entity, glm::vec2 parent_pos) -> void;
 	auto update(float dt) -> result<> override;
-
-	[[nodiscard]] auto get_phase() const -> phase override {
-		return phase::update;
-	}
 
 private:
 	static auto on_child_detached(entt::registry &world, entt::entity child) -> void;

@@ -4,6 +4,7 @@
 #pragma once
 
 #include <lge/app.hpp>
+#include <lge/log.hpp>
 
 #ifndef __EMSCRIPTEN__
 #	include <boxer/boxer.h>
@@ -15,6 +16,7 @@
 #include <spdlog/spdlog.h>
 
 #ifdef _WIN32
+// ReSharper disable once CppUnusedIncludeDirective
 #	include <windows.h>
 #endif
 
@@ -26,7 +28,7 @@ auto run_app() -> int {
 	try {
 		App_Type application;
 		if(const auto error = application.run().unwrap(); error) {
-			SPDLOG_ERROR("{}", error->to_string());
+			LGE_ERROR("{}", error->to_string());
 #ifndef __EMSCRIPTEN__
 			boxer::show(error->get_message().c_str(), "Error!", boxer::Style::Error);
 #endif

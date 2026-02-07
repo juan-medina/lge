@@ -7,6 +7,8 @@
 #include <lge/components/label.hpp>
 #include <lge/result.hpp>
 
+#include "components/aabb.hpp"
+
 #include <raylib.h>
 
 #include <glm/ext/vector_float2.hpp>
@@ -43,6 +45,20 @@ public:
 
 	auto render_label(const label &label, const glm::vec2 &position) const -> void;
 
+	auto render_aabb(global_aabb ga) const -> void;
+
+	auto set_debug_draw(bool debug_draw) -> void {
+		debug_draw_ = debug_draw;
+	}
+
+	[[nodiscard]] auto is_debug_draw() const -> bool {
+		return debug_draw_;
+	}
+
+	auto toggle_debug_draw() -> void {
+		debug_draw_ = !debug_draw_;
+	}
+
 private:
 	static auto log_callback(int log_level, const char *text, va_list args) -> void; // NOLINT(*-include-cleaner)
 
@@ -65,6 +81,8 @@ private:
 	[[nodiscard]] auto to_screen(const glm::vec2 &p) const -> glm::vec2 {
 		return {p.x + (drawing_resolution_.x * 0.5F), p.y + drawing_resolution_.y * 0.5F};
 	}
+
+	bool debug_draw_ = false;
 };
 
 } // namespace lge

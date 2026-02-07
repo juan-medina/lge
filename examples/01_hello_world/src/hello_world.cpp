@@ -5,13 +5,18 @@
 
 #include <lge/app.hpp>
 #include <lge/app_config.hpp>
+#include <lge/components/dirty.hpp>
 #include <lge/components/hierarchy.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/position.hpp>
 #include <lge/main.hpp>
 #include <lge/result.hpp>
+#include <lge/systems/system.hpp>
+#include <lge/renderer.hpp>
 
 #include "move_random_system.hpp"
+
+#include <raylib.h>
 
 LGE_MAIN(hello_world);
 
@@ -20,7 +25,6 @@ auto hello_world::configure() -> lge::app_config {
 			.clear_color = {0, 0, 0, 1},	 // black background
 			.window_title = "Hello world!"};
 }
-
 auto hello_world::init() -> lge::result<> {
 	if(const auto err = app::init().unwrap(); err) {
 		return lge::error("error init the app", *err);
@@ -33,7 +37,8 @@ auto hello_world::init() -> lge::result<> {
 	hello_label.horizontal_align = lge::horizontal_alignment::center;
 	hello_label.color = {1, 1, 0, 1};
 	world.emplace<lge::local_position>(hello_text, 0, 0); // center of the world, which is the center of the screen
-	world.emplace<move_random_system::tag>(hello_text);
+	world.emplace<move_random_system::tag>(hello_text);	  // mark the entity to be moved by the move_random_system
+	world.emplace<lge::dirty>(hello_text); // mark the entity as dirty, so is aabb is calculated, and also it child
 
 	const auto world_text = world.create();
 	auto &world_label = world.emplace<lge::label>(world_text, "World");
@@ -41,9 +46,27 @@ auto hello_world::init() -> lge::result<> {
 	world_label.horizontal_align = lge::horizontal_alignment::center;
 	world_label.color = {0, 1, 1, 1};
 	world.emplace<lge::local_position>(world_text, 0, 20);
-	lge::attach(world, hello_text, world_text); // world a child of hello
-	world.emplace<move_random_system::tag>(world_text);
+	lge::attach(world, hello_text, world_text); // child of hello
 
-	register_system<move_random_system>();
+	const auto bottom_center_text = world.create();
+	auto &bottom_right_label =
+		world.emplace<lge::label>(bottom_center_text, "press F5 to toggle debug draw, F11 to toggle fullscreen");
+	bottom_right_label.size = 12;
+	bottom_right_label.vertical_align = lge::vertical_alignment::bottom;
+	bottom_right_label.horizontal_align = lge::horizontal_alignment::center;
+	world.emplace<lge::local_position>(bottom_center_text, 0, 360 / 2); // bottom center of the world
+
+	register_system<move_random_system>(lge::phase::update);
+	return true;
+}
+
+auto hello_world::update(const float /*dt*/) -> lge::result<> {
+	if(IsKeyPressed(KEY_F5)) {
+		get_renderer().toggle_debug_draw();
+	}
+
+	if(IsKeyPressed(KEY_F11)) {
+		lge::renderer::toggle_fullscreen();
+	}
 	return true;
 }

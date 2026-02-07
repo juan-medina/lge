@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <lge/renderer.hpp>
 #include <lge/result.hpp>
 
 #include "system.hpp"
@@ -12,14 +11,11 @@
 
 namespace lge {
 
-class render_system: public system {
+class dirty_propagation_system: public system {
 public:
-	explicit render_system(const phase p, entt::registry &world, renderer &renderer)
-		: system(p, world), renderer_{renderer} {}
+	explicit dirty_propagation_system(const phase p, entt::registry &world): system(p, world) {};
+	auto resolve_node(entt::entity entity) -> void;
 	auto update(float dt) -> result<> override;
-
-private:
-	renderer &renderer_;
 };
 
 } // namespace lge
