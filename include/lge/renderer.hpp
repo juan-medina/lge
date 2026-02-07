@@ -4,10 +4,9 @@
 #pragma once
 
 #include <lge/app_config.hpp>
+#include <lge/components/aabb.hpp>
 #include <lge/components/label.hpp>
 #include <lge/result.hpp>
-
-#include "components/aabb.hpp"
 
 #include <raylib.h>
 

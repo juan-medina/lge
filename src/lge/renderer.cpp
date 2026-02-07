@@ -2,15 +2,17 @@
 // SPDX-License-Identifier: MIT
 
 #include <lge/app_config.hpp>
+#include <lge/components/label.hpp>
+#include <lge/components/aabb.hpp>
 #include <lge/log.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
-#include <lge/components/label.hpp>
 
 #include <raylib.h>
 
 #include <cstdarg>
 #include <cstdio>
+#include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <vector>
 
