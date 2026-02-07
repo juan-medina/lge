@@ -5,6 +5,7 @@
 #include <lge/log.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
+#include <lge/components/label.hpp>
 
 #include <raylib.h>
 
@@ -142,6 +143,11 @@ auto renderer::get_delta_time() -> float {
 	return GetFrameTime();
 }
 
+auto renderer::get_label_size(const label &lbl) -> glm::vec2 {
+	auto width = static_cast<float>(MeasureText(lbl.text.c_str(), static_cast<int>(lbl.size)));
+	return {width, lbl.size};
+}
+
 auto renderer::log_callback(const int log_level, const char *text, va_list args) -> void {
 	constexpr std::size_t initial_size = 1024;
 	thread_local std::vector<char> buffer(initial_size);
@@ -217,24 +223,25 @@ auto renderer::screen_size_changed(const glm::vec2 screen_size) -> result<> {
 	}
 	SetTextureFilter(render_texture_.texture, TEXTURE_FILTER_POINT);
 
-	LGE_DEBUG("render texture created with id {}, size ({}x{})", render_texture_.id, render_texture_.texture.width,
+	LGE_DEBUG("render texture created with id {}, size ({}x{})",
+			  render_texture_.id,
+			  render_texture_.texture.width,
 			  render_texture_.texture.height);
 
 	return true;
 }
 
 auto renderer::render_label(const label &label, const glm::vec2 &position) const -> void {
-	const auto text_width = static_cast<float>(MeasureText(label.text.c_str(), static_cast<int>(label.size)));
-	const auto text_height = label.size;
+	const auto text_size = get_label_size(label);
 
 	auto aligned = position;
 
 	switch(label.horizontal_align) {
 	case horizontal_alignment::center:
-		aligned.x -= text_width * 0.5f;
+		aligned.x -= text_size.x * 0.5F;
 		break;
 	case horizontal_alignment::right:
-		aligned.x -= text_width;
+		aligned.x -= text_size.x;
 		break;
 	case horizontal_alignment::left:
 		break;
@@ -242,10 +249,10 @@ auto renderer::render_label(const label &label, const glm::vec2 &position) const
 
 	switch(label.vertical_align) {
 	case vertical_alignment::center:
-		aligned.y -= text_height * 0.5f;
+		aligned.y -= text_size.y * 0.5F;
 		break;
 	case vertical_alignment::bottom:
-		aligned.y -= text_height;
+		aligned.y -= text_size.y;
 		break;
 	case vertical_alignment::top:
 		break;

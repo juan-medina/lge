@@ -13,7 +13,6 @@
 
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float4.hpp>
-#include <glm/glm.hpp>
 #include <string>
 
 namespace lge {
@@ -59,13 +58,15 @@ public:
 		debug_draw_ = !debug_draw_;
 	}
 
+	static auto get_label_size(const label &lbl) -> glm::vec2;
+
 private:
 	static auto log_callback(int log_level, const char *text, va_list args) -> void; // NOLINT(*-include-cleaner)
 
 	bool initialized_ = false;
 
 	std::string title_;
-	Color clear_color_;
+	Color clear_color_ = BLACK;
 	glm::vec2 screen_size_{};
 	glm::vec2 design_resolution_{};
 	glm::vec2 drawing_resolution_{};
@@ -74,12 +75,12 @@ private:
 
 	[[nodiscard]] auto screen_size_changed(glm::vec2 screen_size) -> result<>;
 
-	static Color ColorFromGLM(const glm::vec4 &v) {
+	static auto ColorFromGLM(const glm::vec4 &v) -> Color {
 		return ColorFromNormalized({v.r, v.g, v.b, v.a});
 	}
 
 	[[nodiscard]] auto to_screen(const glm::vec2 &p) const -> glm::vec2 {
-		return {p.x + (drawing_resolution_.x * 0.5F), p.y + drawing_resolution_.y * 0.5F};
+		return {p.x + (drawing_resolution_.x * 0.5F), p.y + (drawing_resolution_.y * 0.5F)};
 	}
 
 	bool debug_draw_ = false;
