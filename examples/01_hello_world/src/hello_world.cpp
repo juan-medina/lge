@@ -21,9 +21,7 @@
 LGE_MAIN(hello_world);
 
 auto hello_world::configure() -> lge::app_config {
-	return {.design_resolution = {640, 360}, // world expands horizontally keep the vertical size fixed
-			.clear_color = {0, 0, 0, 1},	 // black background
-			.window_title = "Hello world!"};
+	return {.design_resolution = game_res, .clear_color = clear_color, .window_title = game_title};
 }
 auto hello_world::init() -> lge::result<> {
 	if(const auto err = app::init().unwrap(); err) {
@@ -48,13 +46,12 @@ auto hello_world::init() -> lge::result<> {
 	world.emplace<lge::local_position>(world_text, 0, 20);
 	lge::attach(world, hello_text, world_text); // child of hello
 
-	const auto bottom_center_text = world.create();
-	auto &bottom_right_label = world.emplace<lge::label>(
-		bottom_center_text, "press F5 to toggle debug draw, F11 to toggle fullscreen, Esc to exit");
-	bottom_right_label.size = 12;
-	bottom_right_label.vertical_align = lge::vertical_alignment::bottom;
-	bottom_right_label.horizontal_align = lge::horizontal_alignment::center;
-	world.emplace<lge::local_position>(bottom_center_text, 0, 360 / 2); // bottom center of the world
+	const auto message_text = world.create();
+	auto &message_label = world.emplace<lge::label>(message_text, message);
+	message_label.size = 12;
+	message_label.vertical_align = lge::vertical_alignment::bottom;
+	message_label.horizontal_align = lge::horizontal_alignment::center;
+	world.emplace<lge::local_position>(message_text, 0.0F, game_res.y / 2); // bottom center of the world
 
 	register_system<move_random_system>(lge::phase::update);
 	return true;
