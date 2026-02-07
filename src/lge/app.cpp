@@ -61,7 +61,7 @@ auto app::init() -> result<> {
 		return error("failed to setup log", *err);
 	}
 
-	if(const auto err = renderer_.init(configure()).unwrap(); err) {
+	if(const auto err = renderer_.init(configure()).unwrap(); err) [[unlikely]] {
 		return error("failed to initialize renderer", *err);
 	}
 
@@ -95,7 +95,7 @@ auto app::setup_log() -> result<> { // NOLINT(*-convert-member-functions-to-stat
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
 auto app::end() -> result<> { // NOLINT(*-convert-member-functions-to-static)
-	if(const auto err = renderer_.end().unwrap(); err) {
+	if(const auto err = renderer_.end().unwrap(); err) [[unlikely]] {
 		return error("failed to shutdown renderer", *err);
 	}
 
@@ -104,29 +104,29 @@ auto app::end() -> result<> { // NOLINT(*-convert-member-functions-to-static)
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
 auto app::main_loop() -> result<> { // NOLINT(*-convert-member-functions-to-static)
-	if(const auto err = renderer_.begin_frame().unwrap(); err) {
+	if(const auto err = renderer_.begin_frame().unwrap(); err) [[unlikely]] {
 		return error("failed to begin frame", *err);
 	}
 
 	auto const delta_time = renderer::get_delta_time();
 
-	if(const auto err = update_system(phase::update, delta_time).unwrap(); err) {
+	if(const auto err = update_system(phase::update, delta_time).unwrap(); err) [[unlikely]] {
 		return error("failed to update systems in update phase", *err);
 	}
 
-	if(const auto err = update(delta_time).unwrap(); err) {
+	if(const auto err = update(delta_time).unwrap(); err) [[unlikely]] {
 		return error("failed to update the application", *err);
 	}
 
-	if(const auto err = update_system(phase::render, delta_time).unwrap(); err) {
+	if(const auto err = update_system(phase::render, delta_time).unwrap(); err) [[unlikely]] {
 		return error("failed to update systems in render phase", *err);
 	}
 
-	if(const auto err = update_system(phase::post_render, delta_time).unwrap(); err) {
+	if(const auto err = update_system(phase::post_render, delta_time).unwrap(); err) [[unlikely]] {
 		return error("failed to update systems in post render phase", *err);
 	}
 
-	if(const auto err = renderer_.end_frame().unwrap(); err) {
+	if(const auto err = renderer_.end_frame().unwrap(); err) [[unlikely]] {
 		return error("failed to end frame", *err);
 	}
 
@@ -136,7 +136,7 @@ auto app::main_loop() -> result<> { // NOLINT(*-convert-member-functions-to-stat
 auto app::update_system(const phase p, const float dt) const -> result<> {
 	for(const auto &system: systems_) {
 		if(system->get_phase() == p) {
-			if(const auto err = system->update(dt).unwrap(); err) {
+			if(const auto err = system->update(dt).unwrap(); err) [[unlikely]] {
 				return error("failed to update system", *err);
 			}
 		}

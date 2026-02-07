@@ -28,7 +28,7 @@ auto renderer::init(const app_config &config) -> result<> {
 #endif
 
 #ifndef __EMSCRIPTEN__
-	if(!IsWindowReady()) {
+	if(!IsWindowReady()) [[unlikely]] {
 		return error("failed to initialize window");
 	}
 #endif
@@ -42,14 +42,14 @@ auto renderer::init(const app_config &config) -> result<> {
 }
 
 auto renderer::end() -> result<> {
-	if(!initialized_) {
+	if(!initialized_) [[unlikely]] {
 		return true;
 	}
 
 	CloseWindow();
 	initialized_ = false;
 
-	if(render_texture_.id != 0) {
+	if(render_texture_.id != 0) [[unlikely]] {
 		UnloadRenderTexture(render_texture_);
 	}
 
@@ -58,13 +58,13 @@ auto renderer::end() -> result<> {
 }
 
 auto renderer::begin_frame() -> result<> {
-	if(!initialized_) {
+	if(!initialized_) [[unlikely]] {
 		return error("renderer not initialized");
 	}
 
 	if(auto const screen_size = glm::vec2{static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
 	   screen_size_.x != screen_size.x || screen_size_.y != screen_size.y) {
-		if(auto const err = screen_size_changed(screen_size).unwrap(); err) {
+		if(auto const err = screen_size_changed(screen_size).unwrap(); err) [[unlikely]] {
 			return error("failed to handle screen size change: {}", *err);
 		}
 	}
@@ -76,7 +76,7 @@ auto renderer::begin_frame() -> result<> {
 }
 
 auto renderer::end_frame() const -> result<> {
-	if(!initialized_) {
+	if(!initialized_) [[unlikely]] {
 		return error("renderer not initialized");
 	}
 
@@ -99,7 +99,7 @@ auto renderer::end_frame() const -> result<> {
 }
 
 auto renderer::should_close() const -> bool {
-	if(!initialized_) {
+	if(!initialized_) [[unlikely]] {
 		return false;
 	}
 
@@ -158,12 +158,12 @@ auto renderer::log_callback(const int log_level, const char *text, va_list args)
 		std::vsnprintf(buffer.data(), buffer.size(), text, args_copy); // NOLINT(*-pro-bounds-array-to-pointer-decay)
 	va_end(args_copy);												   // NOLINT(*-pro-bounds-array-to-pointer-decay)
 
-	if(needed < 0) {
+	if(needed < 0) [[unlikely]] {
 		LGE_INFO("[raylib] log formatting error in log callback");
 		return;
 	}
 
-	if(static_cast<std::size_t>(needed) >= buffer.size()) {
+	if(static_cast<std::size_t>(needed) >= buffer.size()) [[unlikely]] {
 		buffer.resize(static_cast<std::size_t>(needed) + 1);
 		std::vsnprintf(buffer.data(), buffer.size(), text, args);
 	}
@@ -218,7 +218,7 @@ auto renderer::screen_size_changed(const glm::vec2 screen_size) -> result<> {
 
 	render_texture_ =
 		LoadRenderTexture(static_cast<int>(drawing_resolution_.x), static_cast<int>(drawing_resolution_.y));
-	if(render_texture_.id == 0) {
+	if(render_texture_.id == 0) [[unlikely]] {
 		return error("failed to create render texture on screen size change");
 	}
 	SetTextureFilter(render_texture_.texture, TEXTURE_FILTER_POINT);
