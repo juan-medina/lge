@@ -10,9 +10,9 @@
 #include <lge/components/label.hpp>
 #include <lge/components/position.hpp>
 #include <lge/main.hpp>
+#include <lge/renderer.hpp>
 #include <lge/result.hpp>
 #include <lge/systems/system.hpp>
-#include <lge/renderer.hpp>
 
 #include "move_random_system.hpp"
 
@@ -49,8 +49,8 @@ auto hello_world::init() -> lge::result<> {
 	lge::attach(world, hello_text, world_text); // child of hello
 
 	const auto bottom_center_text = world.create();
-	auto &bottom_right_label =
-		world.emplace<lge::label>(bottom_center_text, "press F5 to toggle debug draw, F11 to toggle fullscreen");
+	auto &bottom_right_label = world.emplace<lge::label>(
+		bottom_center_text, "press F5 to toggle debug draw, F11 to toggle fullscreen, Esc to exit");
 	bottom_right_label.size = 12;
 	bottom_right_label.vertical_align = lge::vertical_alignment::bottom;
 	bottom_right_label.horizontal_align = lge::horizontal_alignment::center;
@@ -60,7 +60,7 @@ auto hello_world::init() -> lge::result<> {
 	return true;
 }
 
-auto hello_world::update(const float /*dt*/) -> lge::result<> {
+auto hello_world::update(const float dt) -> lge::result<> {
 	if(IsKeyPressed(KEY_F5)) {
 		get_renderer().toggle_debug_draw();
 	}
@@ -68,5 +68,5 @@ auto hello_world::update(const float /*dt*/) -> lge::result<> {
 	if(IsKeyPressed(KEY_F11)) {
 		lge::renderer::toggle_fullscreen();
 	}
-	return true;
+	return app::update(dt);
 }

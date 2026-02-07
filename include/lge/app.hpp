@@ -42,7 +42,9 @@ public:
 		return app_config{};
 	}
 
-	[[nodiscard]] virtual auto update(float dt) -> result<> = 0;
+	[[nodiscard]] virtual auto update(float /*dt*/) -> result<> {
+		return true;
+	}
 
 protected:
 	virtual auto init() -> result<>;

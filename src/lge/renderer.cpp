@@ -19,7 +19,7 @@
 namespace lge {
 
 auto renderer::init(const app_config &config) -> result<> {
-	clear_color_ = ColorFromGLM(config.clear_color);
+	clear_color_ = color_from_glm(config.clear_color);
 	design_resolution_ = config.design_resolution;
 	title_ = config.window_title;
 
@@ -28,6 +28,7 @@ auto renderer::init(const app_config &config) -> result<> {
 #else
 	InitWindow(0, 0, title_.c_str());
 #endif
+	SetWindowState(FLAG_WINDOW_RESIZABLE);
 
 #ifndef __EMSCRIPTEN__
 	if(!IsWindowReady()) [[unlikely]] {
@@ -266,7 +267,7 @@ auto renderer::render_label(const label &label, const glm::vec2 &position) const
 			 static_cast<int>(screen_pos.x),
 			 static_cast<int>(screen_pos.y),
 			 static_cast<int>(label.size),
-			 ColorFromGLM(label.color));
+			 color_from_glm(label.color));
 }
 
 auto renderer::render_aabb(const global_aabb ga) const -> void {

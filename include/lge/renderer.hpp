@@ -74,7 +74,7 @@ private:
 
 	[[nodiscard]] auto screen_size_changed(glm::vec2 screen_size) -> result<>;
 
-	static auto ColorFromGLM(const glm::vec4 &v) -> Color {
+	static auto color_from_glm(const glm::vec4 &v) -> Color {
 		return ColorFromNormalized({v.r, v.g, v.b, v.a});
 	}
 
