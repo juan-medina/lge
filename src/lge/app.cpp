@@ -8,12 +8,13 @@
 #include <lge/result.hpp>
 #include <lge/systems/dirty_propagation_system.hpp>
 #include <lge/systems/dirty_removal_system.hpp>
-#include <lge/systems/hierarchy_system.hpp>
 #include <lge/systems/label_aabb_system.hpp>
 #include <lge/systems/render_system.hpp>
 #include <lge/systems/system.hpp>
+#include <lge/systems/transform_system.hpp>
 
 #include <optional>
+#include <spdlog/common.h>
 
 #ifdef __EMSCRIPTEN__
 #	include <emscripten/emscripten.h>
@@ -68,9 +69,9 @@ auto app::init() -> result<> {
 		return error("failed to initialize renderer", *err);
 	}
 
-	register_system<dirty_propagation_system>(phase::update);
-	register_system<label_aabb_system>(phase::update);
-	register_system<hierarchy_system>(phase::update);
+	register_system<dirty_propagation_system>(phase::local_update);
+	register_system<label_aabb_system>(phase::local_update);
+	register_system<transform_system>(phase::global_update);
 	register_system<render_system>(phase::render, renderer_);
 	register_system<dirty_removal_system>(phase::post_render);
 
@@ -121,8 +122,16 @@ auto app::main_loop() -> result<> { // NOLINT(*-convert-member-functions-to-stat
 		return error("failed to update the application", *err);
 	}
 
-	if(const auto err = update_system(phase::update, delta_time).unwrap(); err) [[unlikely]] {
-		return error("failed to update systems in update phase", *err);
+	if(const auto err = update_system(phase::game_update, delta_time).unwrap(); err) [[unlikely]] {
+		return error("failed to update systems in local update phase", *err);
+	}
+
+	if(const auto err = update_system(phase::local_update, delta_time).unwrap(); err) [[unlikely]] {
+		return error("failed to update systems in local update phase", *err);
+	}
+
+	if(const auto err = update_system(phase::global_update, delta_time).unwrap(); err) [[unlikely]] {
+		return error("failed to update systems in global update phase", *err);
 	}
 
 	if(const auto err = update_system(phase::render, delta_time).unwrap(); err) [[unlikely]] {

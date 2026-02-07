@@ -72,7 +72,7 @@ auto hello_world::init() -> lge::result<> {
 	message_label.horizontal_align = lge::horizontal_alignment::center;
 	world.emplace<lge::local_position>(message_, 0.0F, game_res.y / 2); // bottom center of the world
 	world.emplace<lge::dirty>(message_);
-	register_system<move_random_system>(lge::phase::update);
+	register_system<move_random_system>(lge::phase::game_update);
 	return true;
 }
 

@@ -11,9 +11,9 @@
 
 namespace lge {
 
-class hierarchy_system: public system {
+class transform_system: public system {
 public:
-	explicit hierarchy_system(phase p, entt::registry &world);
+	explicit transform_system(phase p, entt::registry &world);
 	auto resolve_node(entt::entity entity, glm::vec2 parent_pos) -> void;
 	auto update(float dt) -> result<> override;
 

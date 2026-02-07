@@ -12,7 +12,7 @@ namespace lge {
 
 using system_id = uint32_t;
 
-enum class phase : std::uint8_t { update, render, post_render };
+enum class phase : std::uint8_t { game_update, local_update, global_update, render, post_render };
 
 class system {
 public:
