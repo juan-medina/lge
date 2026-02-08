@@ -5,7 +5,6 @@
 
 #include <lge/app.hpp>
 #include <lge/app_config.hpp>
-#include <lge/components/dirty.hpp>
 #include <lge/components/hierarchy.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/position.hpp>
@@ -55,7 +54,6 @@ auto hello_world::init() -> lge::result<> {
 	hello_label.color = {1, 1, 0, 1};
 	world.emplace<lge::local_position>(hello_text, 0, 0); // center of the world, which is the center of the screen
 	world.emplace<move_random_system::tag>(hello_text);	  // mark the entity to be moved by the move_random_system
-	world.emplace<lge::dirty>(hello_text); // mark the entity as dirty, so is aabb is calculated, and also it child
 
 	const auto world_text = world.create();
 	auto &world_label = world.emplace<lge::label>(world_text, "World");
@@ -71,7 +69,6 @@ auto hello_world::init() -> lge::result<> {
 	message_label.vertical_align = lge::vertical_alignment::bottom;
 	message_label.horizontal_align = lge::horizontal_alignment::center;
 	world.emplace<lge::local_position>(message_, 0.0F, game_res.y / 2); // bottom center of the world
-	world.emplace<lge::dirty>(message_);
 	register_system<move_random_system>(lge::phase::game_update);
 	return true;
 }
@@ -94,7 +91,6 @@ auto hello_world::update(const float dt) -> lge::result<> {
 	if(const auto in_controller_mode = input.is_controller_available(); in_controller_mode != was_in_controller_mode_) {
 		auto &world = get_world();
 		auto &message_label = world.get<lge::label>(message_);
-		world.emplace_or_replace<lge::dirty>(message_); // mark the message as dirty to update its aabb
 		if(in_controller_mode) {
 			message_label.text = controller_message;
 		} else {

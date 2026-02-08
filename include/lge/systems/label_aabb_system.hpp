@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <lge/components/label.hpp>
 #include <lge/result.hpp>
 
 #include "system.hpp"
@@ -15,6 +16,10 @@ class label_aabb_system: public system {
 public:
 	explicit label_aabb_system(const phase p, entt::registry &world): system(p, world) {};
 	auto update(float dt) -> result<> override;
+
+private:
+	auto calculate_aabb(entt::entity entity, const label &lbl) const -> void;
+	static auto is_label_dirty(const label &lbl) -> bool;
 };
 
 } // namespace lge

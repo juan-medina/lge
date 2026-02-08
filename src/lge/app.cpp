@@ -6,8 +6,6 @@
 #include <lge/log.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
-#include <lge/systems/dirty_propagation_system.hpp>
-#include <lge/systems/dirty_removal_system.hpp>
 #include <lge/systems/label_aabb_system.hpp>
 #include <lge/systems/render_system.hpp>
 #include <lge/systems/system.hpp>
@@ -15,6 +13,7 @@
 
 #include <optional>
 #include <spdlog/common.h>
+#include <spdlog/spdlog.h>
 
 #ifdef __EMSCRIPTEN__
 #	include <emscripten/emscripten.h>
@@ -69,11 +68,11 @@ auto app::init() -> result<> {
 		return error("failed to initialize renderer", *err);
 	}
 
-	register_system<dirty_propagation_system>(phase::local_update);
+	// phase::game_update systems go here
 	register_system<label_aabb_system>(phase::local_update);
 	register_system<transform_system>(phase::global_update);
 	register_system<render_system>(phase::render, renderer_);
-	register_system<dirty_removal_system>(phase::post_render);
+	// future post render systems go here
 
 	LGE_INFO("application initialized successfully");
 

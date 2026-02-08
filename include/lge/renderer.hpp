@@ -4,8 +4,6 @@
 #pragma once
 
 #include <lge/app_config.hpp>
-#include <lge/components/aabb.hpp>
-#include <lge/components/label.hpp>
 #include <lge/result.hpp>
 
 #include <raylib.h>
@@ -41,11 +39,12 @@ public:
 	static auto setup_raylib_log() -> void;
 	static auto get_delta_time() -> float;
 
-	auto render_label(const label &label, const glm::vec2 &position) const -> void;
+	auto render_label(const std::string &text, const int &size, const glm::vec4 &color, const glm::vec2 &position) const
+		-> void;
 
-	auto render_aabb(global_aabb ga) const -> void;
+	auto render_rectangle(const glm::vec2 &from, const glm::vec2 &to, const glm::vec4 &color) const -> void;
 
-	auto set_debug_draw(bool debug_draw) -> void {
+	auto set_debug_draw(const bool debug_draw) -> void {
 		debug_draw_ = debug_draw;
 	}
 
@@ -57,7 +56,7 @@ public:
 		debug_draw_ = !debug_draw_;
 	}
 
-	static auto get_label_size(const label &lbl) -> glm::vec2;
+	static auto get_label_size(const std::string &text, const int &size) -> glm::vec2;
 
 	static auto show_cursor(bool show) -> void;
 

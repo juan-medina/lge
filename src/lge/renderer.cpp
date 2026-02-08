@@ -147,9 +147,9 @@ auto renderer::get_delta_time() -> float {
 	return GetFrameTime();
 }
 
-auto renderer::get_label_size(const label &lbl) -> glm::vec2 {
-	auto width = static_cast<float>(MeasureText(lbl.text.c_str(), static_cast<int>(lbl.size)));
-	return {width, lbl.size};
+auto renderer::get_label_size(const std::string &text, const int &size) -> glm::vec2 {
+	auto width = static_cast<float>(MeasureText(text.c_str(), size));
+	return {width, size};
 }
 
 auto renderer::show_cursor(bool show) -> void {
@@ -243,50 +243,22 @@ auto renderer::screen_size_changed(const glm::vec2 screen_size) -> result<> {
 	return true;
 }
 
-auto renderer::render_label(const label &label, const glm::vec2 &position) const -> void {
-	const auto text_size = get_label_size(label);
-
-	auto aligned = position;
-
-	switch(label.horizontal_align) {
-	case horizontal_alignment::center:
-		aligned.x -= text_size.x * 0.5F;
-		break;
-	case horizontal_alignment::right:
-		aligned.x -= text_size.x;
-		break;
-	case horizontal_alignment::left:
-		break;
-	}
-
-	switch(label.vertical_align) {
-	case vertical_alignment::center:
-		aligned.y -= text_size.y * 0.5F;
-		break;
-	case vertical_alignment::bottom:
-		aligned.y -= text_size.y;
-		break;
-	case vertical_alignment::top:
-		break;
-	}
-
-	const auto screen_pos = to_screen(aligned);
-
-	DrawText(label.text.c_str(),
-			 static_cast<int>(screen_pos.x),
-			 static_cast<int>(screen_pos.y),
-			 static_cast<int>(label.size),
-			 color_from_glm(label.color));
+auto renderer::render_label(const std::string &text,
+							const int &size,
+							const glm::vec4 &color,
+							const glm::vec2 &position) const -> void {
+	const auto screen_pos = to_screen(position);
+	DrawText(text.c_str(), static_cast<int>(screen_pos.x), static_cast<int>(screen_pos.y), size, color_from_glm(color));
 }
 
-auto renderer::render_aabb(const global_aabb ga) const -> void {
-	const auto screen_min = to_screen(ga.min);
-	const auto screen_max = to_screen(ga.max);
+auto renderer::render_rectangle(const glm::vec2 &from, const glm::vec2 &to, const glm::vec4 &color) const -> void {
+	const auto screen_min = to_screen(from);
+	const auto screen_max = to_screen(to);
 	DrawRectangleLines(static_cast<int>(screen_min.x),
 					   static_cast<int>(screen_min.y),
 					   static_cast<int>(screen_max.x - screen_min.x),
 					   static_cast<int>(screen_max.y - screen_min.y),
-					   RED);
+					   color_from_glm(color));
 }
 
 } // namespace lge

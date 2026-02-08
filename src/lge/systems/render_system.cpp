@@ -13,21 +13,25 @@ namespace lge {
 
 auto render_system::update(const float /*dt*/) -> result<> {
 	for(const auto view = world.view<global_position>(); const auto entity: view) {
-		const auto &pos = view.get<global_position>(entity);
+		// we ignore for now
+		[[maybe_unused]] const auto &pos = view.get<global_position>(entity);
+		if(world.all_of<global_aabb>(entity)) {
+			auto &ga = world.get<global_aabb>(entity);
 
-		// Draw label if present
-		if(world.all_of<label>(entity)) {
-			const auto &lbl = world.get<label>(entity);
-			renderer_.render_label(lbl, pos.value);
-		}
+			// Draw label if present
+			if(world.all_of<label>(entity)) {
+				const auto &lbl = world.get<label>(entity);
+				renderer_.render_label(lbl.text, lbl.size, lbl.color, ga.min);
+			}
 
-		// Draw AABB if present and debug draw is enabled
-		if(renderer_.is_debug_draw() && world.all_of<global_aabb>(entity)) {
-			const auto &ga = world.get<global_aabb>(entity);
-			renderer_.render_aabb(ga);
+			// Draw AABB if debug draw is enabled
+			if(renderer_.is_debug_draw()) {
+				renderer_.render_rectangle(ga.min, ga.max, {1, 0, 0, 0.5F});
+			}
 		}
 	}
 
 	return true;
 }
+
 } // namespace lge
