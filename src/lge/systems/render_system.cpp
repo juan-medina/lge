@@ -1,6 +1,7 @@
 ﻿// SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
+#include <lge/components/bounds.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/metrics.hpp>
 #include <lge/components/transform.hpp>
@@ -16,22 +17,29 @@ namespace lge {
 
 auto render_system::update(const float /*dt*/) -> result<> {
 	for(const auto entity: world.view<transform, metrics>()) {
-		const auto &tf = world.get<transform>(entity);
-		const auto &mt = world.get<metrics>(entity);
-
-		// Compute local top-left (relative to pivot)
-		const auto top_left_local = -mt.pivot_to_top_left;
-
-		// Transform to world space
-		const auto top_left_world = transform_point(tf.world, top_left_local);
+		const auto &[world_transform] = world.get<transform>(entity);
 
 		// Draw label if present
 		if(world.all_of<label>(entity)) {
+			// Get the pivot to top left offset from metrics
+			const auto &[size, pivot_to_top_left] = world.get<metrics>(entity);
+
+			// Transform to world space, text is always drawn from the top left corner
+			const auto top_left_world = transform_point(world_transform, -pivot_to_top_left);
+
 			const auto &lbl = world.get<label>(entity);
 			renderer_.render_label(lbl.text, static_cast<int>(lbl.size), lbl.color, top_left_world);
 		}
 
-		// Debug rectangle will use bounds system later
+		// Debug draw bounds if present
+		if(world.all_of<bounds>(entity) && renderer_.is_debug_draw()) {
+			const auto &[p0, p1, p2, p3] = world.get<bounds>(entity);
+			renderer_.render_quad(transform_point(world_transform, p0),
+								  transform_point(world_transform, p1),
+								  transform_point(world_transform, p2),
+								  transform_point(world_transform, p3),
+								  {1, 0, 0, 0.5f});
+		}
 	}
 
 	return true;

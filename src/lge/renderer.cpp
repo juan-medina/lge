@@ -260,5 +260,27 @@ auto renderer::render_rectangle(const glm::vec2 &from, const glm::vec2 &to, cons
 					   static_cast<int>(screen_max.y - screen_min.y),
 					   color_from_glm(color));
 }
+auto renderer::render_quad(const glm::vec2 &p0,
+						   const glm::vec2 &p1,
+						   const glm::vec2 &p2,
+						   const glm::vec2 &p3,
+						   const glm::vec4 &color) const -> void {
+	const auto screen_p0 = to_screen(p0);
+	const auto screen_p1 = to_screen(p1);
+	const auto screen_p2 = to_screen(p2);
+	const auto screen_p3 = to_screen(p3);
+
+	const auto ray_vec0 = Vector2{screen_p0.x, screen_p0.y};
+	const auto ray_vec1 = Vector2{screen_p1.x, screen_p1.y};
+	const auto ray_vec2 = Vector2{screen_p2.x, screen_p2.y};
+	const auto ray_vec3 = Vector2{screen_p3.x, screen_p3.y};
+
+	const auto ray_color = color_from_glm(color);
+
+	DrawLineV(ray_vec0, ray_vec1, ray_color);
+	DrawLineV(ray_vec1, ray_vec2, ray_color);
+	DrawLineV(ray_vec2, ray_vec3, ray_color);
+	DrawLineV(ray_vec3, ray_vec0, ray_color);
+}
 
 } // namespace lge

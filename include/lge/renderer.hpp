@@ -43,6 +43,11 @@ public:
 		-> void;
 
 	auto render_rectangle(const glm::vec2 &from, const glm::vec2 &to, const glm::vec4 &color) const -> void;
+	auto render_quad(const glm::vec2 &p0,
+					 const glm::vec2 &p1,
+					 const glm::vec2 &p2,
+					 const glm::vec2 &p3,
+					 const glm::vec4 &color) const -> void;
 
 	auto set_debug_draw(const bool debug_draw) -> void {
 		debug_draw_ = debug_draw;
