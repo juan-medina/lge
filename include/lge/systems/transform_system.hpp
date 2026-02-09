@@ -10,6 +10,7 @@
 
 #include <entity/fwd.hpp>
 #include <glm/ext/matrix_float3x3.hpp>
+#include <vector>
 
 namespace lge {
 
@@ -20,6 +21,7 @@ public:
 	auto update(float dt) -> result<> override;
 
 private:
+	std::vector<entt::entity> transform_stack_;
 	static auto on_child_detached(entt::registry &world, entt::entity child) -> void;
 	static auto on_parent_children_cleared(entt::registry &world, entt::entity parent) -> void;
 };
