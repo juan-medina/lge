@@ -1,14 +1,17 @@
 ﻿// SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
-#include <lge/components/aabb.hpp>
 #include <lge/components/hierarchy.hpp>
-#include <lge/components/position.hpp>
+#include <lge/components/placement.hpp>
+#include <lge/components/transform.hpp>
 #include <lge/result.hpp>
 #include <lge/systems/system.hpp>
 #include <lge/systems/transform_system.hpp>
 
+#include <cmath>
 #include <entity/fwd.hpp>
+#include <glm/ext/matrix_float3x3.hpp>
+#include <vector>
 
 namespace lge {
 
@@ -17,29 +20,49 @@ transform_system::transform_system(const phase p, entt::registry &world): system
 	world.on_destroy<children>().connect<&transform_system::on_parent_children_cleared>();
 }
 
+auto transform_system::compose_transform(const placement &node_placement) -> glm::mat3 {
+	const float s = std::sin(node_placement.rotation);
+	const float c = std::cos(node_placement.rotation);
+
+	const auto root_scale = glm::mat3{{c * node_placement.scale.x, -s * node_placement.scale.y, 0.F},
+									  {s * node_placement.scale.x, c * node_placement.scale.y, 0.F},
+									  {0.F, 0.F, 1.F}};
+
+	const auto translation =
+		glm::mat3{{1.F, 0.F, 0.F}, {0.F, 1.F, 0.F}, {node_placement.position.x, node_placement.position.y, 1.F}};
+
+	return translation * root_scale;
+}
+
 auto transform_system::update(const float /*dt*/) -> result<> {
-	for(const auto roots = world.view<local_position>(entt::exclude<parent>); auto e: roots) {
-		resolve_node(e, glm::vec2{0, 0});
+	auto stack = std::vector<entt::entity>{};
+
+	for(const auto entity: world.view<placement>(entt::exclude<parent>)) {
+		const auto &local = world.get<placement>(entity);
+		const auto world_mat = compose_transform(local);
+		world.emplace_or_replace<transform>(entity, transform{.world = world_mat});
+		stack.push_back(entity);
+	}
+
+	while(!stack.empty()) {
+		const auto entity = stack.back();
+		stack.pop_back();
+
+		const auto &[node_transform] = world.get<transform>(entity);
+
+		if(world.any_of<children>(entity)) {
+			for(const auto &kids = world.get<children>(entity).ids; const auto child: kids) {
+				const auto &local = world.get<placement>(child);
+				const auto local_mat = compose_transform(local);
+				const auto world_mat = node_transform * local_mat;
+
+				world.emplace_or_replace<transform>(child, transform{.world = world_mat});
+				stack.push_back(child);
+			}
+		}
 	}
 
 	return true;
-}
-void transform_system::resolve_node(const entt::entity entity, const glm::vec2 parent_pos) { // NOLINT(*-no-recursion)
-	const auto &local = world.get<local_position>(entity);
-	const glm::vec2 global = parent_pos + local.value;
-
-	world.emplace_or_replace<global_position>(entity, global);
-
-	if(world.all_of<local_aabb>(entity)) {
-		const auto &[min, max] = world.get<local_aabb>(entity);
-		world.emplace_or_replace<global_aabb>(entity, global_aabb{.min = global + min, .max = global + max});
-	}
-
-	if(world.all_of<children>(entity)) {
-		for(const auto &kids = world.get<children>(entity).ids; const auto child: kids) {
-			resolve_node(child, global);
-		}
-	}
 }
 
 auto transform_system::on_child_detached(entt::registry &world, const entt::entity child) -> void {

@@ -9,6 +9,8 @@
 #include "system.hpp"
 
 #include <entity/fwd.hpp>
+#include <glm/ext/matrix_float3x3.hpp>
+#include <glm/ext/vector_float2.hpp>
 
 namespace lge {
 
@@ -20,6 +22,8 @@ public:
 
 private:
 	renderer &renderer_;
+
+	static auto transform_point(const glm::mat3 &m, const glm::vec2 &p) -> glm::vec2;
 };
 
 } // namespace lge

@@ -3,15 +3,13 @@
 
 #pragma once
 
-#include <glm/vec2.hpp>
+#include <glm/ext/matrix_float3x3.hpp>
 
 namespace lge {
 
-// local space position, rotation, and scale
+// full 2D affine transform
 struct transform {
-	glm::vec2 position;
-	float rotation;
-	glm::vec2 scale;
+	glm::mat3 world;
 };
 
 } // namespace lge

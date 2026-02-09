@@ -2,33 +2,6 @@
 
 ## Systems
 
-### MetricsSystem (LOCAL)
-Inputs:
-- sprite or label
-- resource manager
-- placement.scale (optional if scale affects text measurement)
-
-Outputs:
-- metrics
-
-Responsibilities:
-- Compute pixel size (sprite frame or text measurement).
-- Compute pivot offset.
-- Produces local-space values only.
-
-### TransformSystem (WORLD)
-Inputs:
-- placement
-- parent transform (optional)
-
-Outputs:
-- transform
-
-Responsibilities:
-- Compute world-space position, rotation, scale.
-- Apply hierarchy.
-- Handle dirty propagation.
-
 ### BoundsSystem (WORLD GEOMETRY)
 Inputs:
 - transform

@@ -3,18 +3,20 @@
 
 #pragma once
 
+#include <lge/components/placement.hpp>
 #include <lge/result.hpp>
 
 #include "system.hpp"
 
 #include <entity/fwd.hpp>
+#include <glm/ext/matrix_float3x3.hpp>
 
 namespace lge {
 
 class transform_system: public system {
 public:
 	explicit transform_system(phase p, entt::registry &world);
-	auto resolve_node(entt::entity entity, glm::vec2 parent_pos) -> void;
+	static auto compose_transform(const placement &node_placement) -> glm::mat3;
 	auto update(float dt) -> result<> override;
 
 private:

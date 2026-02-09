@@ -3,15 +3,17 @@
 
 #pragma once
 
-#include <glm/vec2.hpp>
+#include "glm/ext/vector_float2.hpp"
 
 namespace lge {
 
 // local space position, rotation, and scale
 struct placement {
-	glm::vec2 position;
-	float rotation;
-	glm::vec2 scale;
+	placement(const float x, const float y, const float rot = 0.F, const glm::vec2 scl = {1.F, 1.F})
+		: position{x, y}, rotation(rot), scale(scl) {}
+	glm::vec2 position; // NOLINT(*-non-private-member-variables-in-classes)
+	float rotation;		// NOLINT(*-non-private-member-variables-in-classes)
+	glm::vec2 scale;	// NOLINT(*-non-private-member-variables-in-classes)
 };
 
 } // namespace lge

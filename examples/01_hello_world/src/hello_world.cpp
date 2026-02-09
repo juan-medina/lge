@@ -7,8 +7,7 @@
 #include <lge/app_config.hpp>
 #include <lge/components/hierarchy.hpp>
 #include <lge/components/label.hpp>
-#include <lge/components/position.hpp>
-#include <lge/log.hpp>
+#include <lge/components/placement.hpp>
 #include <lge/main.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
@@ -52,15 +51,15 @@ auto hello_world::init() -> lge::result<> {
 	hello_label.vertical_align = lge::vertical_alignment::center;
 	hello_label.horizontal_align = lge::horizontal_alignment::center;
 	hello_label.color = {1, 1, 0, 1};
-	world.emplace<lge::local_position>(hello_text, 0, 0); // center of the world, which is the center of the screen
-	world.emplace<move_random_system::tag>(hello_text);	  // mark the entity to be moved by the move_random_system
+	world.emplace<lge::placement>(hello_text, 0, 0);	// center of the world, which is the center of the screen
+	world.emplace<move_random_system::tag>(hello_text); // mark the entity to be moved by the move_random_system
 
 	const auto world_text = world.create();
 	auto &world_label = world.emplace<lge::label>(world_text, "World");
 	world_label.vertical_align = lge::vertical_alignment::center;
 	world_label.horizontal_align = lge::horizontal_alignment::center;
 	world_label.color = {0, 1, 1, 1};
-	world.emplace<lge::local_position>(world_text, 0, 20);
+	world.emplace<lge::placement>(world_text, 0, 20);
 	lge::attach(world, hello_text, world_text); // child of hello
 
 	message_ = world.create();
@@ -68,7 +67,7 @@ auto hello_world::init() -> lge::result<> {
 	message_label.size = 12;
 	message_label.vertical_align = lge::vertical_alignment::bottom;
 	message_label.horizontal_align = lge::horizontal_alignment::center;
-	world.emplace<lge::local_position>(message_, 0.0F, game_res.y / 2); // bottom center of the world
+	world.emplace<lge::placement>(message_, 0.0F, game_res.y / 2); // bottom center of the world
 	register_system<move_random_system>(lge::phase::game_update);
 	return true;
 }
