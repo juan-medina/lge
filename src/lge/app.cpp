@@ -6,7 +6,7 @@
 #include <lge/log.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
-#include <lge/systems/label_aabb_system.hpp>
+#include <lge/systems/metrics_system.hpp>
 #include <lge/systems/render_system.hpp>
 #include <lge/systems/system.hpp>
 #include <lge/systems/transform_system.hpp>
@@ -69,7 +69,7 @@ auto app::init() -> result<> {
 	}
 
 	// phase::game_update systems go here
-	register_system<label_aabb_system>(phase::local_update);
+	register_system<metrics_system>(phase::local_update);
 	register_system<transform_system>(phase::global_update);
 	register_system<render_system>(phase::render, renderer_);
 	// future post render systems go here

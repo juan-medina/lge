@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include <glm/vec2.hpp>
+#include <glm/ext/vector_float2.hpp>
 
 namespace lge {
 
 // local space size and pivot offset
 struct metrics {
 	glm::vec2 size;
-	glm::vec2 pivot_offset;
+	glm::vec2 pivot_to_top_left;
 };
 
 } // namespace lge

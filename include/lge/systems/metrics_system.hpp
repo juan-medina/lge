@@ -12,13 +12,13 @@
 
 namespace lge {
 
-class label_aabb_system: public system {
+class metrics_system: public system {
 public:
-	explicit label_aabb_system(const phase p, entt::registry &world): system(p, world) {};
+	explicit metrics_system(const phase p, entt::registry &world): system(p, world) {};
 	auto update(float dt) -> result<> override;
 
 private:
-	auto calculate_aabb(entt::entity entity, const label &lbl) const -> void;
+	auto calculate_label_metrics(entt::entity entity, const label &lbl) const -> void;
 	static auto is_label_dirty(const label &lbl) -> bool;
 };
 
