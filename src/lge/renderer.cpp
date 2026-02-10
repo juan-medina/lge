@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include <lge/app_config.hpp>
-#include <lge/components/aabb.hpp>
-#include <lge/components/label.hpp>
 #include <lge/log.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
@@ -12,6 +10,7 @@
 
 #include <cstdarg>
 #include <cstdio>
+#include <glm/ext/vector_float4.hpp>
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <vector>
@@ -246,20 +245,23 @@ auto renderer::screen_size_changed(const glm::vec2 screen_size) -> result<> {
 auto renderer::render_label(const std::string &text,
 							const int &size,
 							const glm::vec4 &color,
-							const glm::vec2 &position) const -> void {
+							const glm::vec2 &position,
+							const glm::vec2 &origin,
+							const float rotation) const -> void {
 	const auto screen_pos = to_screen(position);
-	DrawText(text.c_str(), static_cast<int>(screen_pos.x), static_cast<int>(screen_pos.y), size, color_from_glm(color));
+	const auto default_font = GetFontDefault();
+	const auto spacing = size / default_font.baseSize;
+
+	DrawTextPro(default_font,
+				text.c_str(),
+				{screen_pos.x, screen_pos.y},
+				{origin.x, origin.y},
+				rotation,
+				static_cast<float>(size),
+				static_cast<float>(spacing),
+				color_from_glm(color));
 }
 
-auto renderer::render_rectangle(const glm::vec2 &from, const glm::vec2 &to, const glm::vec4 &color) const -> void {
-	const auto screen_min = to_screen(from);
-	const auto screen_max = to_screen(to);
-	DrawRectangleLines(static_cast<int>(screen_min.x),
-					   static_cast<int>(screen_min.y),
-					   static_cast<int>(screen_max.x - screen_min.x),
-					   static_cast<int>(screen_max.y - screen_min.y),
-					   color_from_glm(color));
-}
 auto renderer::render_quad(const glm::vec2 &p0,
 						   const glm::vec2 &p1,
 						   const glm::vec2 &p2,

@@ -8,10 +8,13 @@
 #include <lge/result.hpp>
 #include <lge/systems/render_system.hpp>
 
+#include <cmath>
 #include <entt/entt.hpp>
 #include <glm/ext/matrix_float3x3.hpp>
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float3.hpp>
+#include <glm/geometric.hpp>
+#include <glm/trigonometric.hpp>
 
 namespace lge {
 
@@ -28,7 +31,8 @@ auto render_system::update(const float /*dt*/) -> result<> {
 			const auto top_left_world = transform_point(world_transform, -pivot_to_top_left);
 
 			const auto &lbl = world.get<label>(entity);
-			renderer_.render_label(lbl.text, static_cast<int>(lbl.size), lbl.color, top_left_world);
+			const auto rotation = get_rotation(world_transform);
+			renderer_.render_label(lbl.text, static_cast<int>(lbl.size), lbl.color, top_left_world, {0.0f, 0.0f}, rotation);
 		}
 
 		// Debug draw bounds if present
@@ -38,7 +42,7 @@ auto render_system::update(const float /*dt*/) -> result<> {
 								  transform_point(world_transform, p1),
 								  transform_point(world_transform, p2),
 								  transform_point(world_transform, p3),
-								  {1, 0, 0, 0.5f});
+								  {1, 0, 0, 0.5F});
 		}
 	}
 
@@ -46,9 +50,15 @@ auto render_system::update(const float /*dt*/) -> result<> {
 }
 
 auto render_system::transform_point(const glm::mat3 &m, const glm::vec2 &p) -> glm::vec2 {
-	const glm::vec3 v{p.x, p.y, 1.f};
+	const glm::vec3 v{p.x, p.y, 1.F};
 	const auto r = m * v;
 	return {r.x, r.y};
+}
+
+auto render_system::get_rotation(const glm::mat3 &m) -> float {
+	const auto sx = glm::length(glm::vec2{m[0][0], m[0][1]});
+	const auto angle = std::atan2(m[0][1] / sx, m[0][0] / sx);
+	return glm::degrees(angle);
 }
 
 } // namespace lge
