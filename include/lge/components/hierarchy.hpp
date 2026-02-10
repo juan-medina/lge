@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <entity/fwd.hpp>
 #include <entt/entt.hpp>
 #include <vector>
 

@@ -43,7 +43,6 @@ public:
 					  const int &size,
 					  const glm::vec4 &color,
 					  const glm::vec2 &position,
-					  const glm::vec2 &origin,
 					  float rotation) const -> void;
 
 	auto render_quad(const glm::vec2 &p0,

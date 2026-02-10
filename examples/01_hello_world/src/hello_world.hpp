@@ -21,7 +21,7 @@ private:
 	static constexpr auto clear_color = glm::vec4{0, 0, 0, 1}; // black background
 	static constexpr auto game_title = "Hello world!";
 	static constexpr auto kb_message = "press 1 or 2 to hide parent or children, F5 to toggle debug draw, "
-									   "F11 to toggle fullscreen or Esc to exit";
+									   "F11 to toggle fullscreen, Esc to exit";
 	static constexpr auto controller_message = "controller A / X to hide parent or children, START debug draw, "
 											   "SELECT toggle fullscreen or B exit";
 

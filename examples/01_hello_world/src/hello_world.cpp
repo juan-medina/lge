@@ -13,7 +13,7 @@
 #include <lge/result.hpp>
 #include <lge/systems/system.hpp>
 
-#include "move_random_system.hpp"
+#include "oscillation_system.hpp"
 
 #include <raylib.h>
 
@@ -46,29 +46,40 @@ auto hello_world::init() -> lge::result<> {
 			   });
 
 	auto &world = get_world();
+
+	const auto center = world.create();
+	world.emplace<lge::placement>(center, 0, 0);
+	world.emplace<oscillation_system::effect>(center,
+											  oscillation_system::effect{
+												  .scale = {.min_ = 1.0F, .max = 3.0F, .period = 8.0F},
+												  .rotation = {.min_ = 0.0F, .max = 360.0F, .period = 4.0F},
+											  });
+
+	static constexpr auto gap_between_labels = 10.0F;
+
 	const auto hello_text = world.create();
 	auto &hello_label = world.emplace<lge::label>(hello_text, "Hello");
-	hello_label.vertical_align = lge::vertical_alignment::center;
+	hello_label.vertical_align = lge::vertical_alignment::bottom;
 	hello_label.horizontal_align = lge::horizontal_alignment::center;
 	hello_label.color = {1, 1, 0, 1};
-	world.emplace<lge::placement>(hello_text, 0, 0);	// center of the world, which is the center of the screen
-	world.emplace<move_random_system::tag>(hello_text); // mark the entity to be moved by the move_random_system
+	world.emplace<lge::placement>(hello_text, 0, -gap_between_labels / 2); // above center
+	lge::attach(world, center, hello_text); // child of center
 
 	const auto world_text = world.create();
 	auto &world_label = world.emplace<lge::label>(world_text, "World");
-	world_label.vertical_align = lge::vertical_alignment::center;
-	world_label.horizontal_align = lge::horizontal_alignment::center;
+	world_label.vertical_align = lge::vertical_alignment::top;
+	world_label.horizontal_align = lge::horizontal_alignment::center; // bellow center
 	world_label.color = {0, 1, 1, 1};
-	world.emplace<lge::placement>(world_text, 0, 20);
-	lge::attach(world, hello_text, world_text); // child of hello
+	world.emplace<lge::placement>(world_text, 0, gap_between_labels / 2);
+	lge::attach(world, center, world_text); // child of center
 
 	message_ = world.create();
 	auto &message_label = world.emplace<lge::label>(message_, kb_message);
 	message_label.size = 12;
 	message_label.vertical_align = lge::vertical_alignment::bottom;
 	message_label.horizontal_align = lge::horizontal_alignment::center;
-	world.emplace<lge::placement>(message_, 0.0F, game_res.y / 2); // bottom center of the world
-	register_system<move_random_system>(lge::phase::game_update);
+	world.emplace<lge::placement>(message_, 0.0F, game_res.y / 2); // at the bottom of the screen
+	register_system<oscillation_system>(lge::phase::game_update);
 	return true;
 }
 

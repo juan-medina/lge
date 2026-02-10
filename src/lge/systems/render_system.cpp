@@ -32,7 +32,9 @@ auto render_system::update(const float /*dt*/) -> result<> {
 
 			const auto &lbl = world.get<label>(entity);
 			const auto rotation = get_rotation(world_transform);
-			renderer_.render_label(lbl.text, static_cast<int>(lbl.size), lbl.color, top_left_world, {0.0f, 0.0f}, rotation);
+			const auto world_scale = get_scale(world_transform);
+			const auto final_font_size = lbl.size * world_scale.y;
+			renderer_.render_label(lbl.text, static_cast<int>(final_font_size), lbl.color, top_left_world, rotation);
 		}
 
 		// Debug draw bounds if present
@@ -59,6 +61,11 @@ auto render_system::get_rotation(const glm::mat3 &m) -> float {
 	const auto sx = glm::length(glm::vec2{m[0][0], m[0][1]});
 	const auto angle = std::atan2(m[0][1] / sx, m[0][0] / sx);
 	return glm::degrees(angle);
+}
+auto render_system::get_scale(const glm::mat3 &m) -> glm::vec2 {
+	const auto sx = glm::length(glm::vec2{m[0][0], m[0][1]});
+	const auto sy = glm::length(glm::vec2{m[1][0], m[1][1]});
+	return {sx, sy};
 }
 
 } // namespace lge

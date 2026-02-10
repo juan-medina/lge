@@ -25,6 +25,7 @@ private:
 
 	static auto transform_point(const glm::mat3 &m, const glm::vec2 &p) -> glm::vec2;
 	static auto get_rotation(const glm::mat3 &m) -> float;
+	static auto get_scale(const glm::mat3 &m) -> glm::vec2;
 };
 
 } // namespace lge

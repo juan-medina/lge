@@ -147,8 +147,11 @@ auto renderer::get_delta_time() -> float {
 }
 
 auto renderer::get_label_size(const std::string &text, const int &size) -> glm::vec2 {
-	auto width = static_cast<float>(MeasureText(text.c_str(), size));
-	return {width, size};
+	const auto default_font = GetFontDefault();
+	const auto spacing = static_cast<float>(size) / static_cast<float>(default_font.baseSize);
+
+	const auto [width, height] = MeasureTextEx(default_font, text.c_str(), static_cast<float>(size), spacing);
+	return {width, height};
 }
 
 auto renderer::show_cursor(bool show) -> void {
@@ -246,19 +249,18 @@ auto renderer::render_label(const std::string &text,
 							const int &size,
 							const glm::vec4 &color,
 							const glm::vec2 &position,
-							const glm::vec2 &origin,
 							const float rotation) const -> void {
 	const auto screen_pos = to_screen(position);
 	const auto default_font = GetFontDefault();
-	const auto spacing = size / default_font.baseSize;
+	const auto spacing = static_cast<float>(size) / static_cast<float>(default_font.baseSize);
 
 	DrawTextPro(default_font,
 				text.c_str(),
 				{screen_pos.x, screen_pos.y},
-				{origin.x, origin.y},
+				{0.0F, 0.0F},
 				rotation,
 				static_cast<float>(size),
-				static_cast<float>(spacing),
+				spacing,
 				color_from_glm(color));
 }
 
