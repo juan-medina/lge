@@ -25,7 +25,7 @@ auto input::update(const float delta_time) -> void {
 			down = down || IsKeyDown(k);
 		}
 
-		if(default_controller_ >= 0) {
+		if(controller_available_ && default_controller_ >= 0 ) {
 			for(const auto b: binding.buttons) {
 				pressed = pressed || IsGamepadButtonPressed(default_controller_, b);
 				released = released || IsGamepadButtonReleased(default_controller_, b);
