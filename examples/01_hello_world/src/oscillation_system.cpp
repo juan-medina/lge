@@ -3,6 +3,7 @@
 
 #include "oscillation_system.hpp"
 
+#include <lge/components/hidden.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/effects/oscillator.hpp>
 #include <lge/result.hpp>
@@ -11,7 +12,7 @@
 #include <entt/entt.hpp>
 
 auto oscillation_system::update(const float dt) -> lge::result<> {
-	for(const auto view = world.view<lge::placement, effect>(); const auto e: view) {
+	for(const auto view = world.view<lge::placement, effect>(entt::exclude<lge::hidden>); const auto e: view) {
 		auto &plc = view.get<lge::placement>(e);
 		auto &[osc_scale, osc_rotation] = view.get<effect>(e);
 		plc.rotation = lge::effects::update_oscillator(osc_rotation, dt);

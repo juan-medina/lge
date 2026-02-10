@@ -5,6 +5,7 @@
 
 #include <lge/app.hpp>
 #include <lge/app_config.hpp>
+#include <lge/components/hidden.hpp>
 #include <lge/components/hierarchy.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/placement.hpp>
@@ -45,11 +46,23 @@ auto hello_world::init() -> lge::result<> {
 				   .buttons = {GAMEPAD_BUTTON_RIGHT_FACE_RIGHT},
 			   });
 
+	input.bind(hide_hello_world_action,
+			   {
+				   .keys = {KEY_ONE},
+				   .buttons = {GAMEPAD_BUTTON_RIGHT_FACE_DOWN},
+			   });
+
+	input.bind(hide_world_action,
+			   {
+				   .keys = {KEY_TWO},
+				   .buttons = {GAMEPAD_BUTTON_RIGHT_FACE_LEFT},
+			   });
+
 	auto &world = get_world();
 
-	const auto center = world.create();
-	world.emplace<lge::placement>(center, 0, 0);
-	world.emplace<oscillation_system::effect>(center,
+	center_ent_ = world.create();
+	world.emplace<lge::placement>(center_ent_, 0, 0);
+	world.emplace<oscillation_system::effect>(center_ent_,
 											  oscillation_system::effect{
 												  .scale = {.min_ = 1.0F, .max = 3.0F, .period = 8.0F},
 												  .rotation = {.min_ = 0.0F, .max = 360.0F, .period = 4.0F},
@@ -57,33 +70,34 @@ auto hello_world::init() -> lge::result<> {
 
 	static constexpr auto gap_between_labels = 10.0F;
 
-	const auto hello_text = world.create();
-	auto &hello_label = world.emplace<lge::label>(hello_text, "Hello");
+	const auto hello_text_ent = world.create();
+	auto &hello_label = world.emplace<lge::label>(hello_text_ent, "Hello");
 	hello_label.vertical_align = lge::vertical_alignment::bottom;
 	hello_label.horizontal_align = lge::horizontal_alignment::center;
 	hello_label.color = {1, 1, 0, 1};
-	world.emplace<lge::placement>(hello_text, 0, -gap_between_labels / 2); // above center
-	lge::attach(world, center, hello_text); // child of center
+	world.emplace<lge::placement>(hello_text_ent, 0, -gap_between_labels / 2); // above center
+	lge::attach(world, center_ent_, hello_text_ent);						   // child of center
 
-	const auto world_text = world.create();
-	auto &world_label = world.emplace<lge::label>(world_text, "World");
+	world_text_ent_ = world.create();
+	auto &world_label = world.emplace<lge::label>(world_text_ent_, "World");
 	world_label.vertical_align = lge::vertical_alignment::top;
 	world_label.horizontal_align = lge::horizontal_alignment::center; // bellow center
 	world_label.color = {0, 1, 1, 1};
-	world.emplace<lge::placement>(world_text, 0, gap_between_labels / 2);
-	lge::attach(world, center, world_text); // child of center
+	world.emplace<lge::placement>(world_text_ent_, 0, gap_between_labels / 2);
+	lge::attach(world, center_ent_, world_text_ent_); // child of center
 
-	message_ = world.create();
-	auto &message_label = world.emplace<lge::label>(message_, kb_message);
+	message_ent_ = world.create();
+	auto &message_label = world.emplace<lge::label>(message_ent_, kb_message);
 	message_label.size = 12;
 	message_label.vertical_align = lge::vertical_alignment::bottom;
 	message_label.horizontal_align = lge::horizontal_alignment::center;
-	world.emplace<lge::placement>(message_, 0.0F, game_res.y / 2); // at the bottom of the screen
+	world.emplace<lge::placement>(message_ent_, 0.0F, game_res.y / 2); // at the bottom of the screen
 	register_system<oscillation_system>(lge::phase::game_update);
 	return true;
 }
 
 auto hello_world::update(const float dt) -> lge::result<> {
+	auto &world = get_world();
 	const auto &input = get_input();
 
 	if(input.get(debug_action).pressed) {
@@ -98,9 +112,27 @@ auto hello_world::update(const float dt) -> lge::result<> {
 		exit();
 	}
 
+	// toggle hidden on the center entity, this will hide both labels since they are children of the center entity
+	if(input.get(hide_hello_world_action).pressed) {
+		if(world.any_of<lge::hidden>(center_ent_)) {
+			world.remove<lge::hidden>(center_ent_);
+		} else {
+			world.emplace<lge::hidden>(center_ent_);
+		}
+	}
+
+	// toggle hidden on the world label, this will hide only the world label
+	if(input.get(hide_world_action).pressed) {
+		if(world.any_of<lge::hidden>(world_text_ent_)) {
+			world.remove<lge::hidden>(world_text_ent_);
+		} else {
+			world.emplace<lge::hidden>(world_text_ent_);
+		}
+	}
+
+	// check if we switched between controller and keyboard mode to update the message at the bottom of the screen
 	if(const auto in_controller_mode = input.is_controller_available(); in_controller_mode != was_in_controller_mode_) {
-		auto &world = get_world();
-		auto &message_label = world.get<lge::label>(message_);
+		auto &message_label = world.get<lge::label>(message_ent_);
 		if(in_controller_mode) {
 			message_label.text = controller_message;
 		} else {

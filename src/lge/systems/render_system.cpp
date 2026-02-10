@@ -1,6 +1,7 @@
 ﻿// SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
+#include <lge/components/hidden.hpp>
 #include <lge/components/bounds.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/metrics.hpp>
@@ -19,7 +20,7 @@
 namespace lge {
 
 auto render_system::update(const float /*dt*/) -> result<> {
-	for(const auto entity: world.view<transform, metrics>()) {
+	for(const auto entity: world.view<transform, metrics>(entt::exclude<global_hidden>)) {
 		const auto &[world_transform] = world.get<transform>(entity);
 
 		// Draw label if present
