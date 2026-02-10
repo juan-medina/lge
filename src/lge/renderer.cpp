@@ -258,7 +258,7 @@ auto renderer::render_label(const std::string &text,
 				text.c_str(),
 				{screen_pos.x, screen_pos.y},
 				{0.0F, 0.0F},
-				rotation,
+				-rotation, // raylib rotation is CW, math standard is CCW, so negate the angle
 				static_cast<float>(size),
 				spacing,
 				color_from_glm(color));
