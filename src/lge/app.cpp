@@ -4,6 +4,7 @@
 #include "lge/app.hpp"
 
 #include <lge/log.hpp>
+#include <lge/raylib/raylib_input.hpp>
 #include <lge/raylib/raylib_renderer.hpp>
 #include <lge/result.hpp>
 #include <lge/systems/bounds_system.hpp>
@@ -24,9 +25,9 @@
 
 namespace lge {
 
-
 app::app() {
 	renderer_ = std::make_unique<raylib_renderer>();
+	input_ = std::make_unique<raylib_input>();
 }
 
 auto app::run() -> result<> {
@@ -121,9 +122,9 @@ auto app::main_loop() -> result<> { // NOLINT(*-convert-member-functions-to-stat
 
 	auto const delta_time = renderer_->get_delta_time();
 
-	input_.update(delta_time);
+	input_->update(delta_time);
 
-	renderer_->show_cursor(!input_.is_controller_available());
+	renderer_->show_cursor(!input_->is_controller_available());
 
 	if(const auto err = update(delta_time).unwrap(); err) [[unlikely]] {
 		return error("failed to update the application", *err);

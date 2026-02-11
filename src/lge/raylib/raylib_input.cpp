@@ -1,18 +1,17 @@
 ﻿// SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
-#include "lge/log.hpp"
-#include <lge/input.hpp>
+#include <lge/log.hpp>
+#include <lge/raylib/raylib_input.hpp>
 
 #include <raylib.h>
 
 #include <cstdlib>
-#include <ranges>
 #include <unordered_map>
 
 namespace lge {
 
-auto input::update(const float delta_time) -> void {
+auto raylib_input::update(const float delta_time) -> void {
 	update_controller_mode(delta_time);
 	reset_states();
 
@@ -20,30 +19,24 @@ auto input::update(const float delta_time) -> void {
 		auto &[pressed, released, down] = states_[bid];
 
 		for(const auto k: binding.keys) {
-			pressed = pressed || IsKeyPressed(k);
-			released = released || IsKeyReleased(k);
-			down = down || IsKeyDown(k);
+			const auto raylib_key = key_to_raylib(k);
+			pressed = pressed || IsKeyPressed(raylib_key);
+			released = released || IsKeyReleased(raylib_key);
+			down = down || IsKeyDown(raylib_key);
 		}
 
-		if(controller_available_ && default_controller_ >= 0 ) {
+		if(controller_available_ && default_controller_ >= 0) {
 			for(const auto b: binding.buttons) {
-				pressed = pressed || IsGamepadButtonPressed(default_controller_, b);
-				released = released || IsGamepadButtonReleased(default_controller_, b);
-				down = down || IsGamepadButtonDown(default_controller_, b);
+				const auto raylib_button = button_to_raylib(b);
+				pressed = pressed || IsGamepadButtonPressed(default_controller_, raylib_button);
+				released = released || IsGamepadButtonReleased(default_controller_, raylib_button);
+				down = down || IsGamepadButtonDown(default_controller_, raylib_button);
 			}
 		}
 	}
 }
 
-auto input::get(const id bid) const -> const state & {
-	static auto constexpr empty = state{};
-	if(const auto it = states_.find(bid); it != states_.end()) {
-		return it->second;
-	}
-	return empty;
-}
-
-auto input::update_controller_mode(float delta_time) -> void {
+auto raylib_input::update_controller_mode(const float delta_time) -> void {
 	const auto was_no_controller = default_controller_ == -1;
 	default_controller_ = -1;
 
@@ -60,22 +53,22 @@ auto input::update_controller_mode(float delta_time) -> void {
 			bool is_validated = validated_controllers_.contains(name_str);
 
 			if(!is_validated) {
-				bool input_detected = false;
+				bool raylib_input_detected = false;
 
-				for(int button = 0; button <= GAMEPAD_BUTTON_RIGHT_THUMB && !input_detected; button++) {
+				for(int button = 0; button <= GAMEPAD_BUTTON_RIGHT_THUMB && !raylib_input_detected; button++) {
 					if(IsGamepadButtonPressed(i, button)) {
-						input_detected = true;
+						raylib_input_detected = true;
 					}
 				}
 
 				constexpr float axis_threshold = 0.3f;
-				for(int axis = 0; axis <= GAMEPAD_AXIS_RIGHT_Y && !input_detected; axis++) {
+				for(int axis = 0; axis <= GAMEPAD_AXIS_RIGHT_Y && !raylib_input_detected; axis++) {
 					if(std::abs(GetGamepadAxisMovement(i, axis)) > axis_threshold) {
-						input_detected = true;
+						raylib_input_detected = true;
 					}
 				}
 
-				if(input_detected) {
+				if(raylib_input_detected) {
 					validated_controllers_.insert(name_str);
 					is_validated = true;
 					SPDLOG_DEBUG("validated controller: {}", name_str);
@@ -141,14 +134,7 @@ auto input::update_controller_mode(float delta_time) -> void {
 	}
 }
 
-auto input::reset_states() -> void {
-	for(auto &st: states_ | std::views::values) {
-		st.pressed = false;
-		st.released = false;
-	}
-}
-
-auto input::is_gamepad_input_detected() const -> bool {
+auto raylib_input::is_gamepad_input_detected() const -> bool {
 	if(!IsGamepadAvailable(default_controller_)) {
 		return false;
 	}
@@ -169,7 +155,8 @@ auto input::is_gamepad_input_detected() const -> bool {
 	return false;
 }
 
-auto input::is_mouse_keyboard_active() -> bool {
+// ReSharper disable once CppMemberFunctionMayBeStatic
+auto raylib_input::is_mouse_keyboard_active() -> bool { // NOLINT(*-convert-member-functions-to-static)
 	constexpr auto delta_threshold = 2.0F;
 	const auto [mouse_delta_x, mouse_delta_y] = GetMouseDelta();
 

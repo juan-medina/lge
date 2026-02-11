@@ -68,11 +68,11 @@ protected:
 	}
 
 	[[nodiscard]] auto get_input() -> input & {
-		return input_;
+		return *input_;
 	}
 
 	[[nodiscard]] auto get_input() const -> const input & {
-		return input_;
+		return *input_;
 	}
 
 	auto exit() -> void {
@@ -83,7 +83,7 @@ protected:
 
 private:
 	std::unique_ptr<renderer> renderer_;
-	input input_;
+	std::shared_ptr<input> input_;
 	auto setup_log() -> result<>;
 	[[nodiscard]] auto end() const -> result<>;
 	[[nodiscard]] auto main_loop() -> result<>;

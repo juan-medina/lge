@@ -16,8 +16,6 @@
 
 #include "oscillation_system.hpp"
 
-#include <raylib.h>
-
 LGE_MAIN(hello_world);
 
 auto hello_world::configure() -> lge::app_config {
@@ -31,31 +29,31 @@ auto hello_world::init() -> lge::result<> {
 	auto &input = get_input();
 	input.bind(debug_action,
 			   {
-				   .keys = {KEY_F5},
-				   .buttons = {GAMEPAD_BUTTON_MIDDLE_RIGHT},
+				   .keys = {lge::input::key::f5},
+				   .buttons = {lge::input::button::middle_right},
 			   });
 	input.bind(fullscreen_action,
 			   {
-				   .keys = {KEY_F11},
-				   .buttons = {GAMEPAD_BUTTON_MIDDLE_LEFT},
+				   .keys = {lge::input::key::f11},
+				   .buttons = {lge::input::button::middle_left},
 			   });
 
 	input.bind(exit_action,
 			   {
-				   .keys = {KEY_ESCAPE, KEY_F12},
-				   .buttons = {GAMEPAD_BUTTON_RIGHT_FACE_RIGHT},
+				   .keys = {lge::input::key::escape},
+				   .buttons = {lge::input::button::right_face_right},
 			   });
 
 	input.bind(hide_hello_world_action,
 			   {
-				   .keys = {KEY_ONE},
-				   .buttons = {GAMEPAD_BUTTON_RIGHT_FACE_DOWN},
+				   .keys = {lge::input::key::one},
+				   .buttons = {lge::input::button::right_face_down},
 			   });
 
 	input.bind(hide_world_action,
 			   {
-				   .keys = {KEY_TWO},
-				   .buttons = {GAMEPAD_BUTTON_RIGHT_FACE_LEFT},
+				   .keys = {lge::input::key::two},
+				   .buttons = {lge::input::button::right_face_left},
 			   });
 
 	auto &world = get_world();
