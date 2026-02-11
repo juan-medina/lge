@@ -20,7 +20,7 @@ auto metrics_system::update(const float /*dt*/) -> result<> {
 		// if the entity doesn't have metrics or the label is dirty, calculate the metrics
 		if(auto &lbl = world.get<label>(entity); !world.all_of<metrics>(entity) || is_label_dirty(lbl)) {
 			calculate_label_metrics(entity, lbl);
-			lbl.previous_text_ = lbl.text;
+			lbl.previous_text = lbl.text;
 			lbl.previous_vertical_align = lbl.vertical_align;
 			lbl.previous_horizontal_align = lbl.horizontal_align;
 			lbl.previous_size = lbl.size;
@@ -75,7 +75,7 @@ auto metrics_system::calculate_label_metrics(const entt::entity entity, const la
 
 auto metrics_system::is_label_dirty(const label &lbl) -> bool {
 	// we consider the label dirty if any of the properties that affect the metrics have changed
-	return lbl.text != lbl.previous_text_ || lbl.size != lbl.previous_size
+	return lbl.text != lbl.previous_text || lbl.size != lbl.previous_size
 		   || lbl.vertical_align != lbl.previous_vertical_align
 		   || lbl.horizontal_align != lbl.previous_horizontal_align;
 }

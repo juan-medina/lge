@@ -20,7 +20,7 @@ struct label {
 	vertical_alignment vertical_align = vertical_alignment::top;
 	horizontal_alignment horizontal_align = horizontal_alignment::left;
 
-	std::string previous_text_;
+	std::string previous_text;
 	float previous_size = 16.0F;
 	vertical_alignment previous_vertical_align = vertical_alignment::top;
 	horizontal_alignment previous_horizontal_align = horizontal_alignment::left;
