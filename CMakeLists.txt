@@ -62,8 +62,8 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC SPDLOG_USE_STD_FORMAT)
 
 # raylib
 add_subdirectory(external/raylib)
-target_link_libraries(${PROJECT_NAME} PUBLIC raylib)
-target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/raylib/src)
+target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
+target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/external/raylib/src)
 
 # entt
 add_subdirectory(external/entt)
