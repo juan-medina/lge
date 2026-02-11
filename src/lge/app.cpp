@@ -4,7 +4,7 @@
 #include "lge/app.hpp"
 
 #include <lge/log.hpp>
-#include <lge/renderer.hpp>
+#include <lge/raylib/raylib_renderer.hpp>
 #include <lge/result.hpp>
 #include <lge/systems/bounds_system.hpp>
 #include <lge/systems/hidden_system.hpp>
@@ -13,6 +13,7 @@
 #include <lge/systems/system.hpp>
 #include <lge/systems/transform_system.hpp>
 
+#include <memory>
 #include <optional>
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
@@ -22,6 +23,11 @@
 #endif
 
 namespace lge {
+
+
+app::app() {
+	renderer_ = std::make_unique<raylib_renderer>();
+}
 
 auto app::run() -> result<> {
 	if(const auto err = init().unwrap(); err) [[unlikely]] {
@@ -43,10 +49,10 @@ auto app::run() -> result<> {
 #else
 
 #	ifdef NDEBUG
-	renderer::set_fullscreen(true);
+	renderer_->set_fullscreen(true);
 #	endif
 	while(!should_exit_) {
-		should_exit_ = should_exit_ || renderer_.should_close();
+		should_exit_ = should_exit_ || renderer_->should_close();
 		if(const auto err = main_loop().unwrap(); err) {
 			return error("error during main loop", *err);
 		}
@@ -66,7 +72,7 @@ auto app::init() -> result<> {
 		return error("failed to setup log", *err);
 	}
 
-	if(const auto err = renderer_.init(configure()).unwrap(); err) [[unlikely]] {
+	if(const auto err = renderer_->init(configure()).unwrap(); err) [[unlikely]] {
 		return error("failed to initialize renderer", *err);
 	}
 
@@ -75,7 +81,7 @@ auto app::init() -> result<> {
 	register_system<bounds_system>(phase::game_update);
 	register_system<hidden_system>(phase::game_update);
 	register_system<transform_system>(phase::global_update);
-	register_system<render_system>(phase::render, renderer_);
+	register_system<render_system>(phase::render, *renderer_);
 	// future post render systems go here
 
 	LGE_INFO("application initialized successfully");
@@ -94,15 +100,13 @@ auto app::setup_log() -> result<> { // NOLINT(*-convert-member-functions-to-stat
 	LGE_INFO(banner);
 	spdlog::set_pattern(color_line_format);
 
-	renderer::setup_raylib_log();
-
 	LGE_INFO("log setup complete");
 	return true;
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-auto app::end() -> result<> { // NOLINT(*-convert-member-functions-to-static)
-	if(const auto err = renderer_.end().unwrap(); err) [[unlikely]] {
+auto app::end() const -> result<> { // NOLINT(*-convert-member-functions-to-static)
+	if(const auto err = renderer_->end().unwrap(); err) [[unlikely]] {
 		return error("failed to shutdown renderer", *err);
 	}
 
@@ -111,15 +115,15 @@ auto app::end() -> result<> { // NOLINT(*-convert-member-functions-to-static)
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
 auto app::main_loop() -> result<> { // NOLINT(*-convert-member-functions-to-static)
-	if(const auto err = renderer_.begin_frame().unwrap(); err) [[unlikely]] {
+	if(const auto err = renderer_->begin_frame().unwrap(); err) [[unlikely]] {
 		return error("failed to begin frame", *err);
 	}
 
-	auto const delta_time = renderer::get_delta_time();
+	auto const delta_time = renderer_->get_delta_time();
 
 	input_.update(delta_time);
 
-	renderer::show_cursor(!input_.is_controller_available());
+	renderer_->show_cursor(!input_.is_controller_available());
 
 	if(const auto err = update(delta_time).unwrap(); err) [[unlikely]] {
 		return error("failed to update the application", *err);
@@ -145,7 +149,7 @@ auto app::main_loop() -> result<> { // NOLINT(*-convert-member-functions-to-stat
 		return error("failed to update systems in post render phase", *err);
 	}
 
-	if(const auto err = renderer_.end_frame().unwrap(); err) [[unlikely]] {
+	if(const auto err = renderer_->end_frame().unwrap(); err) [[unlikely]] {
 		return error("failed to end frame", *err);
 	}
 

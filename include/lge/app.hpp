@@ -20,7 +20,7 @@ namespace lge {
 
 class app {
 public:
-	explicit app() = default;
+	explicit app();
 	virtual ~app() = default;
 
 	// Disable copying and moving — apps are not copyable or movable
@@ -60,11 +60,11 @@ protected:
 	}
 
 	[[nodiscard]] auto get_renderer() -> renderer & {
-		return renderer_;
+		return *renderer_;
 	}
 
 	[[nodiscard]] auto get_renderer() const -> const renderer & {
-		return renderer_;
+		return *renderer_;
 	}
 
 	[[nodiscard]] auto get_input() -> input & {
@@ -82,10 +82,10 @@ protected:
 	}
 
 private:
-	renderer renderer_;
+	std::unique_ptr<renderer> renderer_;
 	input input_;
 	auto setup_log() -> result<>;
-	[[nodiscard]] auto end() -> result<>;
+	[[nodiscard]] auto end() const -> result<>;
 	[[nodiscard]] auto main_loop() -> result<>;
 
 	static constexpr auto empty_format = "%v";

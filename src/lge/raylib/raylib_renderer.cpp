@@ -3,7 +3,7 @@
 
 #include <lge/app_config.hpp>
 #include <lge/log.hpp>
-#include <lge/renderer.hpp>
+#include <lge/raylib/raylib_renderer.hpp>
 #include <lge/result.hpp>
 
 #include <raylib.h>
@@ -17,10 +17,12 @@
 
 namespace lge {
 
-auto renderer::init(const app_config &config) -> result<> {
+auto raylib_renderer::init(const app_config &config) -> result<> {
 	clear_color_ = color_from_glm(config.clear_color);
 	design_resolution_ = config.design_resolution;
 	title_ = config.window_title;
+
+	setup_raylib_log();
 
 #if defined(_WIN32) || defined(__EMSCRIPTEN__)
 	InitWindow(1920, 1080, title_.c_str());
@@ -40,11 +42,11 @@ auto renderer::init(const app_config &config) -> result<> {
 
 	initialized_ = true;
 
-	LGE_INFO("renderer initialized");
+	LGE_INFO("raylib_renderer initialized");
 	return true;
 }
 
-auto renderer::end() -> result<> {
+auto raylib_renderer::end() -> result<> {
 	if(!initialized_) [[unlikely]] {
 		return true;
 	}
@@ -56,13 +58,13 @@ auto renderer::end() -> result<> {
 		UnloadRenderTexture(render_texture_);
 	}
 
-	LGE_INFO("renderer ended");
+	LGE_INFO("raylib_renderer ended");
 	return true;
 }
 
-auto renderer::begin_frame() -> result<> {
+auto raylib_renderer::begin_frame() -> result<> {
 	if(!initialized_) [[unlikely]] {
-		return error("renderer not initialized");
+		return error("raylib_renderer not initialized");
 	}
 
 	if(auto const screen_size = glm::vec2{static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
@@ -78,9 +80,9 @@ auto renderer::begin_frame() -> result<> {
 	return true;
 }
 
-auto renderer::end_frame() const -> result<> {
+auto raylib_renderer::end_frame() const -> result<> {
 	if(!initialized_) [[unlikely]] {
-		return error("renderer not initialized");
+		return error("raylib_renderer not initialized");
 	}
 
 	EndTextureMode();
@@ -101,7 +103,7 @@ auto renderer::end_frame() const -> result<> {
 	return true;
 }
 
-auto renderer::should_close() const -> bool {
+auto raylib_renderer::should_close() const -> bool {
 	if(!initialized_) [[unlikely]] {
 		return false;
 	}
@@ -109,7 +111,7 @@ auto renderer::should_close() const -> bool {
 	return WindowShouldClose();
 }
 
-auto renderer::is_fullscreen() -> bool {
+auto raylib_renderer::is_fullscreen() -> bool {
 	bool full_screen = false;
 #ifdef _WIN32
 	full_screen = IsWindowState(FLAG_BORDERLESS_WINDOWED_MODE);
@@ -119,13 +121,13 @@ auto renderer::is_fullscreen() -> bool {
 	return full_screen;
 }
 
-auto renderer::set_fullscreen(const bool fullscreen) -> void {
+auto raylib_renderer::set_fullscreen(const bool fullscreen) -> void {
 	if(const auto current_state = is_fullscreen(); current_state != fullscreen) {
 		toggle_fullscreen();
 	}
 }
 
-auto renderer::toggle_fullscreen() -> void {
+auto raylib_renderer::toggle_fullscreen() -> void {
 #ifdef WIN32
 	ToggleBorderlessWindowed();
 #else
@@ -133,7 +135,7 @@ auto renderer::toggle_fullscreen() -> void {
 #endif
 }
 
-auto renderer::setup_raylib_log() -> void {
+auto raylib_renderer::setup_raylib_log() -> void {
 #ifdef NDEBUG
 	SetTraceLogLevel(LOG_ERROR);
 #else
@@ -142,11 +144,11 @@ auto renderer::setup_raylib_log() -> void {
 	SetTraceLogCallback(log_callback);
 }
 
-auto renderer::get_delta_time() -> float {
+auto raylib_renderer::get_delta_time() -> float {
 	return GetFrameTime();
 }
 
-auto renderer::get_label_size(const std::string &text, const int &size) -> glm::vec2 {
+auto raylib_renderer::get_label_size(const std::string &text, const int &size) -> glm::vec2 {
 	const auto default_font = GetFontDefault();
 	const auto spacing = static_cast<float>(size) / static_cast<float>(default_font.baseSize);
 
@@ -154,7 +156,7 @@ auto renderer::get_label_size(const std::string &text, const int &size) -> glm::
 	return {width, height};
 }
 
-auto renderer::show_cursor(bool show) -> void {
+auto raylib_renderer::show_cursor(const bool show) -> void {
 	if(show) {
 		ShowCursor();
 	} else {
@@ -162,7 +164,7 @@ auto renderer::show_cursor(bool show) -> void {
 	}
 }
 
-auto renderer::log_callback(const int log_level, const char *text, va_list args) -> void {
+auto raylib_renderer::log_callback(const int log_level, const char *text, va_list args) -> void {
 	constexpr std::size_t initial_size = 1024;
 	thread_local std::vector<char> buffer(initial_size);
 
@@ -209,7 +211,7 @@ auto renderer::log_callback(const int log_level, const char *text, va_list args)
 	spdlog::log(level, "[raylib] " + std::string(buffer.data()));
 }
 
-auto renderer::screen_size_changed(const glm::vec2 screen_size) -> result<> {
+auto raylib_renderer::screen_size_changed(const glm::vec2 screen_size) -> result<> {
 	screen_size_ = screen_size;
 
 	scale_factor_ = screen_size_.y / design_resolution_.y;
@@ -245,11 +247,11 @@ auto renderer::screen_size_changed(const glm::vec2 screen_size) -> result<> {
 	return true;
 }
 
-auto renderer::render_label(const std::string &text,
-							const int &size,
-							const glm::vec4 &color,
-							const glm::vec2 &position,
-							const float rotation) const -> void {
+auto raylib_renderer::render_label(const std::string &text,
+								   const int &size,
+								   const glm::vec4 &color,
+								   const glm::vec2 &position,
+								   const float rotation) const -> void {
 	const auto screen_pos = to_screen(position);
 	const auto default_font = GetFontDefault();
 	const auto spacing = static_cast<float>(size) / static_cast<float>(default_font.baseSize);
@@ -264,11 +266,11 @@ auto renderer::render_label(const std::string &text,
 				color_from_glm(color));
 }
 
-auto renderer::render_quad(const glm::vec2 &p0,
-						   const glm::vec2 &p1,
-						   const glm::vec2 &p2,
-						   const glm::vec2 &p3,
-						   const glm::vec4 &color) const -> void {
+auto raylib_renderer::render_quad(const glm::vec2 &p0,
+								  const glm::vec2 &p1,
+								  const glm::vec2 &p2,
+								  const glm::vec2 &p3,
+								  const glm::vec4 &color) const -> void {
 	const auto screen_p0 = to_screen(p0);
 	const auto screen_p1 = to_screen(p1);
 	const auto screen_p2 = to_screen(p2);

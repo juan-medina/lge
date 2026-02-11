@@ -6,8 +6,6 @@
 #include <lge/app_config.hpp>
 #include <lge/result.hpp>
 
-#include <raylib.h>
-
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float4.hpp>
 #include <string>
@@ -17,39 +15,42 @@ namespace lge {
 class renderer {
 public:
 	explicit renderer() = default;
-	~renderer() = default;
+	virtual ~renderer() = default;
 
 	renderer(const renderer &) = delete;
 	renderer(renderer &&) = delete;
 	auto operator=(const renderer &) -> renderer & = delete;
 	auto operator=(renderer &&) -> renderer & = delete;
 
-	[[nodiscard]] auto init(const app_config &config) -> result<>;
-	[[nodiscard]] auto end() -> result<>;
+	[[nodiscard]] virtual auto init(const app_config &config) -> result<> = 0;
+	[[nodiscard]] virtual auto end() -> result<> = 0;
 
-	[[nodiscard]] auto begin_frame() -> result<>;
-	[[nodiscard]] auto end_frame() const -> result<>;
+	[[nodiscard]] virtual auto begin_frame() -> result<> = 0;
+	[[nodiscard]] virtual auto end_frame() const -> result<> = 0;
 
-	[[nodiscard]] auto should_close() const -> bool;
+	[[nodiscard]] virtual auto should_close() const -> bool = 0;
 
-	[[nodiscard]] static auto is_fullscreen() -> bool;
-	static auto set_fullscreen(bool fullscreen) -> void;
-	static auto toggle_fullscreen() -> void;
+	[[nodiscard]] virtual auto is_fullscreen() -> bool = 0;
+	virtual auto set_fullscreen(bool fullscreen) -> void = 0;
+	virtual auto toggle_fullscreen() -> void = 0;
 
-	static auto setup_raylib_log() -> void;
-	static auto get_delta_time() -> float;
+	virtual auto render_label(const std::string &text,
+							  const int &size,
+							  const glm::vec4 &color,
+							  const glm::vec2 &position,
+							  float rotation) const -> void = 0;
 
-	auto render_label(const std::string &text,
-					  const int &size,
-					  const glm::vec4 &color,
-					  const glm::vec2 &position,
-					  float rotation) const -> void;
+	virtual auto render_quad(const glm::vec2 &p0,
+							 const glm::vec2 &p1,
+							 const glm::vec2 &p2,
+							 const glm::vec2 &p3,
+							 const glm::vec4 &color) const -> void = 0;
 
-	auto render_quad(const glm::vec2 &p0,
-					 const glm::vec2 &p1,
-					 const glm::vec2 &p2,
-					 const glm::vec2 &p3,
-					 const glm::vec4 &color) const -> void;
+	virtual auto get_label_size(const std::string &text, const int &size) -> glm::vec2 = 0;
+
+	virtual auto show_cursor(bool show) -> void = 0;
+
+	virtual auto get_delta_time() -> float = 0;
 
 	auto set_debug_draw(const bool debug_draw) -> void {
 		debug_draw_ = debug_draw;
@@ -63,33 +64,7 @@ public:
 		debug_draw_ = !debug_draw_;
 	}
 
-	static auto get_label_size(const std::string &text, const int &size) -> glm::vec2;
-
-	static auto show_cursor(bool show) -> void;
-
 private:
-	static auto log_callback(int log_level, const char *text, va_list args) -> void; // NOLINT(*-include-cleaner)
-
-	bool initialized_ = false;
-
-	std::string title_;
-	Color clear_color_ = BLACK;
-	glm::vec2 screen_size_{};
-	glm::vec2 design_resolution_{};
-	glm::vec2 drawing_resolution_{};
-	float scale_factor_{1.0F};
-	RenderTexture2D render_texture_{};
-
-	[[nodiscard]] auto screen_size_changed(glm::vec2 screen_size) -> result<>;
-
-	static auto color_from_glm(const glm::vec4 &v) -> Color {
-		return ColorFromNormalized({v.r, v.g, v.b, v.a});
-	}
-
-	[[nodiscard]] auto to_screen(const glm::vec2 &p) const -> glm::vec2 {
-		return {p.x + (drawing_resolution_.x * 0.5F), p.y + (drawing_resolution_.y * 0.5F)};
-	}
-
 	bool debug_draw_ = false;
 };
 
