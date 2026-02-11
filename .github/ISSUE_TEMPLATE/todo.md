@@ -1,4 +1,4 @@
-﻿---
+---
 name: TODO
 about: Internal task or work item for the lge engine
 title: "[TODO]"
