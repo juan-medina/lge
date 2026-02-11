@@ -1,31 +1,37 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Report a reproducible issue in lge
 title: "[BUG]"
 labels: bug
 assignees: ''
-
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Description
+A concise description of the bug and its visible symptoms.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. First '...'
-2. Then '...'
+## Reproduction Steps
+List the exact steps needed to reproduce the issue. Include minimal code if relevant.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+1. …
+2. …
+3. …
 
-**Specs (please complete the following information):**
-- Game Version: [e.g. 0.5.1.456]
-- OS: [e.g. Mac, Windows, Ubuntu]
-- OS Version [e.g. Mojave, 10 Home, 19.04]
-- Architecture: [e.g. x86, ARMv7]
-- CPU: [e.g. Intel i7, Cortex-A9]
-- GPU: [e.g. ATI Radeon 5500 XT, GeForge GTX1080]
-- RAM: [e.g. 4GB]
+## Expected Behavior
+Describe what *should* have happened.
 
-**Additional context**
-Add any other context about the problem here.
+## Actual Behavior
+Describe what *did* happen, including logs or screenshots if available.
+
+## Environment
+Please provide **exact** specs:
+
+- lge Version: (e.g. 0.5.1.456)
+- OS: (e.g. Windows, macOS, Ubuntu)
+- OS Version: (e.g. 10 Home, Ventura, 22.04)
+- Architecture: (e.g. x86_64, ARM64)
+- CPU: (e.g. Intel i7‑8700K, M1)
+- GPU: (e.g. Radeon 5500 XT, GTX 1080)
+- RAM: (e.g. 16GB)
+
+## Additional Context
+Anything else that helps diagnose the issue (logs, screenshots, minimal repro project, etc.).

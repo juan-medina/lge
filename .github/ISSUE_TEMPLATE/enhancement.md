@@ -1,14 +1,22 @@
 ---
 name: Enhancement
-about: Create a request for a enhancement
+about: Suggest an improvement or new feature for lge
 title: "[ENHANCEMENT]"
 labels: enhancement
 assignees: ''
-
 ---
 
-**Describe the enhancement**
-A clear and concise description of what the enhancement is.
+## Summary
+A short description of the enhancement.
 
-**Additional context**
-Add any other context about the enhancement here.
+## Motivation
+Explain *why* this enhancement is needed. What problem does it solve? What workflow does it improve?
+
+## Proposed Solution
+Describe how you imagine this working. Include API ideas, examples, or behavior details if relevant.
+
+## Alternatives Considered
+List any alternative approaches you thought about.
+
+## Additional Context
+Anything else that helps clarify the request.
