@@ -105,7 +105,7 @@ auto hello_world::update(const float dt) -> lge::result<> {
 	}
 
 	if(input.get(fullscreen_action).pressed) {
-		lge::renderer::toggle_fullscreen();
+		get_renderer().toggle_fullscreen();
 	}
 
 	if(input.get(exit_action).pressed) {

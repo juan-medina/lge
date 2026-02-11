@@ -34,7 +34,7 @@ auto metrics_system::update(const float /*dt*/) -> result<> {
 
 auto metrics_system::calculate_label_metrics(const entt::entity entity, const label &lbl) const -> void {
 	// we calculate the size of the text and the offset from the pivot to the top left corner of the text
-	const auto text_size = renderer::get_label_size(lbl.text, static_cast<int>(lbl.size));
+	const auto text_size = renderer_.get_label_size(lbl.text, static_cast<int>(lbl.size));
 	auto pivot_to_top_left = glm::vec2{0.F, 0.F};
 
 	switch(lbl.horizontal_align) {
