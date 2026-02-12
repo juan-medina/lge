@@ -1,0 +1,22 @@
+// SPDX-FileCopyrightText: 2026 Juan Medina
+// SPDX-License-Identifier: MIT
+
+#pragma once
+
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float4.hpp>
+
+namespace lge {
+
+struct rect {
+	glm::vec2 from;
+	glm::vec2 to;
+	glm::vec4 border_color{1, 1, 1, 1};
+	glm::vec4 fill_color{0, 0, 0, 0};
+	float border_thickness = 1.0F;
+
+	glm::vec2 previous_from;
+	glm::vec2 previous_to;
+};
+
+} // namespace lge

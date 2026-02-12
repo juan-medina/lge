@@ -3,19 +3,18 @@
 
 #include <lge/components/label.hpp>
 #include <lge/components/metrics.hpp>
-#include <lge/log.hpp>
+#include <lge/components/shapes.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
 #include <lge/systems/metrics_system.hpp>
 
-#include <cstdint>
 #include <entity/fwd.hpp>
 #include <entt/entt.hpp>
 
 namespace lge {
 
 auto metrics_system::update(const float /*dt*/) -> result<> {
-	// we only calculate metrics for labels, but we could add more in the future
+	// metrics for labels
 	for(const auto entity: world.view<label>()) {
 		// if the entity doesn't have metrics or the label is dirty, calculate the metrics
 		if(auto &lbl = world.get<label>(entity); !world.all_of<metrics>(entity) || is_label_dirty(lbl)) {
@@ -27,8 +26,15 @@ auto metrics_system::update(const float /*dt*/) -> result<> {
 		}
 	}
 
-	// future metrics calculations for other components would go here
-
+	// metrics for rect
+	for(const auto entity: world.view<rect>()) {
+		if(auto &r = world.get<rect>(entity); !world.all_of<metrics>(entity) || is_rect_dirty(r)) {
+			calculate_rect_metrics(entity, r);
+			r.previous_from = r.from;
+			r.previous_to = r.to;
+		}
+	}
+	
 	return true;
 }
 
@@ -63,14 +69,14 @@ auto metrics_system::calculate_label_metrics(const entt::entity entity, const la
 		.size = text_size,
 		.pivot_to_top_left = pivot_to_top_left,
 	};
-
-	LGE_DEBUG("calculated metrics for label entity {}: size({}, {}), offset({}, {})",
-			  static_cast<std::uint32_t>(entity),
-			  text_size.x,
-			  text_size.y,
-			  pivot_to_top_left.x,
-			  pivot_to_top_left.y);
 	world.emplace_or_replace<metrics>(entity, label_metrics);
+}
+auto metrics_system::calculate_rect_metrics(entt::entity entity, const rect &r) const -> void {
+	world.emplace_or_replace<metrics>(entity,
+									  metrics{
+										  .size = r.to - r.from,
+										  .pivot_to_top_left = glm::vec2{0.F, 0.F},
+									  });
 }
 
 auto metrics_system::is_label_dirty(const label &lbl) -> bool {
@@ -78,6 +84,11 @@ auto metrics_system::is_label_dirty(const label &lbl) -> bool {
 	return lbl.text != lbl.previous_text || lbl.size != lbl.previous_size
 		   || lbl.vertical_align != lbl.previous_vertical_align
 		   || lbl.horizontal_align != lbl.previous_horizontal_align;
+}
+
+auto metrics_system::is_rect_dirty(const rect &r) -> bool {
+	// we consider the rect dirty if any of the properties that affect the metrics have changed
+	return r.from != r.previous_from || r.to != r.previous_to;
 }
 
 } // namespace lge

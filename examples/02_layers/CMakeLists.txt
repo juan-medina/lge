@@ -1,9 +1,9 @@
 ﻿# SPDX-FileCopyrightText: 2026 Juan Medina
 # SPDX-License-Identifier: MIT
 
-project(example_01_hello_world
+project(example_02_layers
         VERSION 0.1.0.0
-        DESCRIPTION "example 01 - hello world"
+        DESCRIPTION "example 01 - layers"
         LANGUAGES CXX
 )
 
@@ -40,6 +40,6 @@ if (EMSCRIPTEN)
             "--bind"
             "-sEXPORTED_RUNTIME_METHODS=['HEAPF32','HEAP32','HEAPU8','requestFullscreen']"
     )
-    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "hello_index")
+    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "layers_index")
     configure_file(../web/favicon.ico favicon.ico COPYONLY)
 endif ()

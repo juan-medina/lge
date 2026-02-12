@@ -46,6 +46,12 @@ public:
 							 const glm::vec2 &p3,
 							 const glm::vec4 &color) const -> void = 0;
 
+	virtual auto render_rect(const glm::vec2 &from,
+							 const glm::vec2 &to,
+							 const glm::vec4 &border_color,
+							 const glm::vec4 &fill_color,
+							 float border_thickness) const -> void = 0;
+
 	virtual auto get_label_size(const std::string &text, const int &size) -> glm::vec2 = 0;
 
 	virtual auto show_cursor(bool show) -> void = 0;

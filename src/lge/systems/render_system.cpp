@@ -1,8 +1,9 @@
 ﻿// SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
-#include <lge/components/hidden.hpp>
+#include <lge/components/shapes.hpp>
 #include <lge/components/bounds.hpp>
+#include <lge/components/hidden.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/metrics.hpp>
 #include <lge/components/transform.hpp>
@@ -36,6 +37,16 @@ auto render_system::update(const float /*dt*/) -> result<> {
 			const auto world_scale = get_scale(world_transform);
 			const auto final_font_size = lbl.size * world_scale.y;
 			renderer_.render_label(lbl.text, static_cast<int>(final_font_size), lbl.color, top_left_world, rotation);
+		}
+
+		// Draw rect if present
+		if(world.all_of<rect>(entity)) {
+			const auto r = world.get<rect>(entity);
+			renderer_.render_rect(transform_point(world_transform, r.from),
+								  transform_point(world_transform, r.to),
+								  r.border_color,
+								  r.fill_color,
+								  r.border_thickness);
 		}
 
 		// Debug draw bounds if present

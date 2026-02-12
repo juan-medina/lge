@@ -289,4 +289,25 @@ auto raylib_renderer::render_quad(const glm::vec2 &p0,
 	DrawLineV(ray_vec3, ray_vec0, ray_color);
 }
 
+auto raylib_renderer::render_rect(const glm::vec2 &from,
+								  const glm::vec2 &to,
+								  const glm::vec4 &border_color,
+								  const glm::vec4 &fill_color,
+								  float border_thickness) const -> void {
+	const auto screen_from = to_screen(from);
+	const auto screen_to = to_screen(to);
+	const auto ray_border_color = color_from_glm(border_color);
+	const auto ray_fill_color = color_from_glm(fill_color);
+	const auto width = screen_to.x - screen_from.x;
+	const auto height = screen_to.y - screen_from.y;
+
+	if(fill_color.a > 0.0F) {
+		DrawRectangleV({screen_from.x, screen_from.y}, {width, height}, ray_fill_color);
+	}
+
+	if(border_color.a > 0.0F && border_thickness > 0.0F) {
+		DrawRectangleLinesEx({screen_from.x, screen_from.y, width, height}, border_thickness, ray_border_color);
+	}
+}
+
 } // namespace lge
