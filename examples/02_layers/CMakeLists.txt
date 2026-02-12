@@ -8,8 +8,9 @@ project(example_02_layers
 )
 
 file(GLOB_RECURSE APP_SOURCE_FILES "src/*.cpp")
+file(GLOB_RECURSE COMMON_SOURCE_FILES "../src/*.cpp")
 
-add_executable(${PROJECT_NAME} ${APP_SOURCE_FILES})
+add_executable(${PROJECT_NAME} ${APP_SOURCE_FILES} ${COMMON_SOURCE_FILES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE lge)
 

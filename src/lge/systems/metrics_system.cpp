@@ -34,7 +34,7 @@ auto metrics_system::update(const float /*dt*/) -> result<> {
 			r.previous_to = r.to;
 		}
 	}
-	
+
 	return true;
 }
 
@@ -71,11 +71,11 @@ auto metrics_system::calculate_label_metrics(const entt::entity entity, const la
 	};
 	world.emplace_or_replace<metrics>(entity, label_metrics);
 }
-auto metrics_system::calculate_rect_metrics(entt::entity entity, const rect &r) const -> void {
+auto metrics_system::calculate_rect_metrics(const entt::entity entity, const rect &r) const -> void {
 	world.emplace_or_replace<metrics>(entity,
 									  metrics{
 										  .size = r.to - r.from,
-										  .pivot_to_top_left = glm::vec2{0.F, 0.F},
+										  .pivot_to_top_left = -r.from,
 									  });
 }
 
