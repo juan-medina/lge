@@ -38,12 +38,13 @@ private:
 
 	// randomly interleave colors until we have exactly rect_count_per_color of each
 	std::array<size_t, colors.size()> color_counts_ = {0, 0, 0};
-	static constexpr auto shapes_count_per_color = 40;
-	static constexpr auto shapes_border_thickness = 2.0F;
+	static constexpr auto shapes_count_per_color = 1;
+	static constexpr auto shapes_border_thickness = 1.0F;
 	static constexpr auto shapes_border_color = glm::vec4{0.7F, 0.7F, 0.7F, 1.0F};
 
-	// shapes 0 = rect, 1 = circle
-	std::uniform_int_distribution<> shape_dist{0, 1};
+	// shapes
+	static constexpr auto shape_rect = 0;
+	static constexpr auto shape_circle = 1;
 
 	// rectangle parameters
 	static constexpr auto rect_min_width = 30.0F;

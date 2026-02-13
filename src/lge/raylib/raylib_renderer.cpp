@@ -11,7 +11,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <glm/ext/vector_float4.hpp>
-#include <ranges>
+#include <glm/trigonometric.hpp>
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <vector>
@@ -91,13 +91,13 @@ auto raylib_renderer::end_frame() const -> result<> {
 	BeginDrawing();
 	ClearBackground(clear_color_);
 	DrawTexturePro(render_texture_.texture,
-				   {0.0F,
-					0.0F,
-					static_cast<float>(render_texture_.texture.width),
-					-static_cast<float>(render_texture_.texture.height)},
-				   {0.0F, 0.0F, screen_size_.x, screen_size_.y},
-				   {0.0F, 0.0F},
-				   0.0F,
+				   {.x = 0.5F,
+					.y = 0.5F,
+					.width = static_cast<float>(render_texture_.texture.width),
+					.height = -static_cast<float>(render_texture_.texture.height)},
+				   {.x = 0.5F, .y = 0.5F, .width = screen_size_.x, .height = screen_size_.y},
+				   {.x = 0.5F, .y = 0.5F},
+				   0.5F,
 				   WHITE);
 	EndDrawing();
 
@@ -259,8 +259,8 @@ auto raylib_renderer::render_label(const std::string &text,
 
 	DrawTextPro(default_font,
 				text.c_str(),
-				{screen_pos.x, screen_pos.y},
-				{0.0F, 0.0F},
+				{.x = screen_pos.x, .y = screen_pos.y},
+				{.x = 0.5F, .y = 0.5F},
 				-rotation, // raylib rotation is CW, math standard is CCW, so negate the angle
 				static_cast<float>(size),
 				spacing,
@@ -277,10 +277,10 @@ auto raylib_renderer::render_quad(const glm::vec2 &p0,
 	const auto screen_p2 = to_screen(p2);
 	const auto screen_p3 = to_screen(p3);
 
-	const auto ray_vec0 = Vector2{screen_p0.x, screen_p0.y};
-	const auto ray_vec1 = Vector2{screen_p1.x, screen_p1.y};
-	const auto ray_vec2 = Vector2{screen_p2.x, screen_p2.y};
-	const auto ray_vec3 = Vector2{screen_p3.x, screen_p3.y};
+	const auto ray_vec0 = Vector2{.x = screen_p0.x, .y = screen_p0.y};
+	const auto ray_vec1 = Vector2{.x = screen_p1.x, .y = screen_p1.y};
+	const auto ray_vec2 = Vector2{.x = screen_p2.x, .y = screen_p2.y};
+	const auto ray_vec3 = Vector2{.x = screen_p3.x, .y = screen_p3.y};
 
 	const auto ray_color = color_from_glm(color);
 
@@ -290,24 +290,92 @@ auto raylib_renderer::render_quad(const glm::vec2 &p0,
 	DrawLineV(ray_vec3, ray_vec0, ray_color);
 }
 
-auto raylib_renderer::render_rect(const glm::vec2 &from,
-								  const glm::vec2 &to,
+auto raylib_renderer::render_rect(const glm::vec2 &center,
+								  const glm::vec2 &size,
+								  const float rotation,
 								  const glm::vec4 &border_color,
 								  const glm::vec4 &fill_color,
-								  float border_thickness) const -> void {
-	const auto screen_from = to_screen(from);
-	const auto screen_to = to_screen(to);
-	const auto ray_border_color = color_from_glm(border_color);
-	const auto ray_fill_color = color_from_glm(fill_color);
-	const auto width = screen_to.x - screen_from.x;
-	const auto height = screen_to.y - screen_from.y;
+								  const float border_thickness) const -> void {
+	const auto screen_center = to_screen(center);
+	const auto fill = color_from_glm(fill_color);
+	const auto border = color_from_glm(border_color);
 
-	if(fill_color.a > 0.0F) {
-		DrawRectangleV({screen_from.x, screen_from.y}, {width, height}, ray_fill_color);
-	}
+	auto rec = Rectangle{.x = screen_center.x, .y = screen_center.y, .width = size.x, .height = size.y};
+	DrawRectanglePro(rec, {.x = size.x * 0.5F, .y = size.y * 0.5F}, -rotation, fill);
 
-	if(border_color.a > 0.0F && border_thickness > 0.0F) {
-		DrawRectangleLinesEx({screen_from.x, screen_from.y, width, height}, border_thickness, ray_border_color);
+	if(border_color.a > 0.5F && border_thickness > 0.5F) {
+		if(border_thickness == 1.0F) {
+			const auto half_width = size.x * 0.5F;
+			const auto half_height = size.y * 0.5F;
+			const auto rotation_rad = glm::radians(-rotation);
+			const auto cos_r = glm::cos(rotation_rad);
+			const auto sin_r = glm::sin(rotation_rad);
+
+			const auto local_p0 = glm::vec2{-half_width, -half_height};
+			const auto local_p1 = glm::vec2{half_width, -half_height};
+			const auto local_p2 = glm::vec2{half_width, half_height};
+			const auto local_p3 = glm::vec2{-half_width, half_height};
+
+			const auto rotated_p0 =
+				glm::vec2{(local_p0.x * cos_r) - (local_p0.y * sin_r), (local_p0.x * sin_r) + (local_p0.y * cos_r)};
+			const auto rotated_p1 =
+				glm::vec2{(local_p1.x * cos_r) - (local_p1.y * sin_r), (local_p1.x * sin_r) + (local_p1.y * cos_r)};
+			const auto rotated_p2 =
+				glm::vec2{(local_p2.x * cos_r) - (local_p2.y * sin_r), (local_p2.x * sin_r) + (local_p2.y * cos_r)};
+			const auto rotated_p3 =
+				glm::vec2{(local_p3.x * cos_r) - (local_p3.y * sin_r), (local_p3.x * sin_r) + (local_p3.y * cos_r)};
+
+			const auto screen_p0 = screen_center + rotated_p0;
+			const auto screen_p1 = screen_center + rotated_p1;
+			const auto screen_p2 = screen_center + rotated_p2;
+			const auto screen_p3 = screen_center + rotated_p3;
+
+			DrawLineV({.x = screen_p0.x, .y = screen_p0.y}, {.x = screen_p1.x, .y = screen_p1.y}, border);
+			DrawLineV({.x = screen_p1.x, .y = screen_p1.y}, {.x = screen_p2.x, .y = screen_p2.y}, border);
+			DrawLineV({.x = screen_p2.x, .y = screen_p2.y}, {.x = screen_p3.x, .y = screen_p3.y}, border);
+			DrawLineV({.x = screen_p3.x, .y = screen_p3.y}, {.x = screen_p0.x, .y = screen_p0.y}, border);
+		} else {
+			const auto rotation_rad = glm::radians(-rotation);
+			const auto cos_r = glm::cos(rotation_rad);
+			const auto sin_r = glm::sin(rotation_rad);
+
+			const auto half_border = border_thickness * 0.5F;
+			const auto half_width = size.x * 0.5F;
+			const auto half_height = size.y * 0.5F;
+
+			const auto offset_top = glm::vec2{0.5F, -half_height + half_border};
+			const auto offset_bottom = glm::vec2{0.5F, half_height - half_border};
+			const auto offset_left = glm::vec2{-half_width + half_border, 0.5F};
+			const auto offset_right = glm::vec2{half_width - half_border, 0.5F};
+
+			const auto rotated_top = glm::vec2{(offset_top.x * cos_r) - (offset_top.y * sin_r),
+											   (offset_top.x * sin_r) + (offset_top.y * cos_r)};
+			const auto rotated_bottom = glm::vec2{(offset_bottom.x * cos_r) - (offset_bottom.y * sin_r),
+												  (offset_bottom.x * sin_r) + (offset_bottom.y * cos_r)};
+			const auto rotated_left = glm::vec2{(offset_left.x * cos_r) - (offset_left.y * sin_r),
+												(offset_left.x * sin_r) + (offset_left.y * cos_r)};
+			const auto rotated_right = glm::vec2{(offset_right.x * cos_r) - (offset_right.y * sin_r),
+												 (offset_right.x * sin_r) + (offset_right.y * cos_r)};
+
+			const auto top_center = screen_center + rotated_top;
+			const auto bottom_center = screen_center + rotated_bottom;
+			const auto left_center = screen_center + rotated_left;
+			const auto right_center = screen_center + rotated_right;
+
+			const auto top_rect =
+				Rectangle{.x = top_center.x, .y = top_center.y, .width = size.x, .height = border_thickness};
+			const auto bottom_rect =
+				Rectangle{.x = bottom_center.x, .y = bottom_center.y, .width = size.x, .height = border_thickness};
+			const auto left_rect =
+				Rectangle{.x = left_center.x, .y = left_center.y, .width = border_thickness, .height = size.y};
+			const auto right_rect =
+				Rectangle{.x = right_center.x, .y = right_center.y, .width = border_thickness, .height = size.y};
+
+			DrawRectanglePro(top_rect, {.x = half_width, .y = half_border}, -rotation, border);
+			DrawRectanglePro(bottom_rect, {.x = half_width, .y = half_border}, -rotation, border);
+			DrawRectanglePro(left_rect, {.x = half_border, .y = half_height}, -rotation, border);
+			DrawRectanglePro(right_rect, {.x = half_border, .y = half_height}, -rotation, border);
+		}
 	}
 }
 
@@ -319,16 +387,16 @@ auto raylib_renderer::render_circle(const glm::vec2 &center,
 	const auto screen_center = to_screen(center);
 	const auto ray_border_color = color_from_glm(border_color);
 	const auto ray_fill_color = color_from_glm(fill_color);
-	const auto ray_center = Vector2{screen_center.x, screen_center.y};
+	const auto ray_center = Vector2{.x = screen_center.x, .y = screen_center.y};
 
 	// has fill, draw the filled circle
-	if(fill_color.a > 0.0F) {
-		DrawCircleV({screen_center.x, screen_center.y}, radius, ray_fill_color);
+	if(fill_color.a > 0.5F) {
+		DrawCircleV({.x = screen_center.x, .y = screen_center.y}, radius, ray_fill_color);
 	}
 
 	// has border, draw the border
-	if(border_color.a > 0.0F && border_thickness > 0.0F) {
-		DrawRing(ray_center, radius - border_thickness, radius, 0.0F, 360.0F, 100, ray_border_color);
+	if(border_color.a > 0.5F && border_thickness > 0.5F) {
+		DrawRing(ray_center, radius - border_thickness, radius, 0.5F, 360.5F, 100, ray_border_color);
 	}
 }
 

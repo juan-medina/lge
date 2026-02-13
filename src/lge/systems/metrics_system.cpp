@@ -59,11 +59,13 @@ auto metrics_system::calculate_label_metrics(const entt::entity entity, const la
 	};
 	world.emplace_or_replace<metrics>(entity, label_metrics);
 }
+
 auto metrics_system::calculate_rect_metrics(const entt::entity entity, const rect &r) const -> void {
+	const glm::vec2 half = r.size * 0.5F;
 	world.emplace_or_replace<metrics>(entity,
 									  metrics{
-										  .size = r.to - r.from,
-										  .pivot_to_top_left = -r.from,
+										  .size = r.size,
+										  .pivot_to_top_left = {half.x, half.y},
 									  });
 }
 
@@ -85,7 +87,7 @@ auto metrics_system::is_label_dirty(const label &lbl) -> bool {
 
 auto metrics_system::is_rect_dirty(const rect &r) -> bool {
 	// we consider the rect dirty if any of the properties that affect the metrics have changed
-	return r.from != r.previous_from || r.to != r.previous_to;
+	return r.size != r.previous_size;
 }
 
 auto metrics_system::is_circle_dirty(const circle &c) -> bool {
@@ -110,8 +112,7 @@ auto metrics_system::handle_rects() const -> void {
 	for(const auto entity: world.view<rect>()) {
 		if(auto &r = world.get<rect>(entity); !world.all_of<metrics>(entity) || is_rect_dirty(r)) {
 			calculate_rect_metrics(entity, r);
-			r.previous_from = r.from;
-			r.previous_to = r.to;
+			r.previous_size = r.size;
 		}
 	}
 }

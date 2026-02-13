@@ -9,14 +9,12 @@
 namespace lge {
 
 struct rect {
-	glm::vec2 from;
-	glm::vec2 to;
+	glm::vec2 size;
 	glm::vec4 border_color{1, 1, 1, 1};
 	glm::vec4 fill_color{0, 0, 0, 0};
 	float border_thickness = 1.0F;
 
-	glm::vec2 previous_from;
-	glm::vec2 previous_to;
+	glm::vec2 previous_size;
 };
 
 struct circle {

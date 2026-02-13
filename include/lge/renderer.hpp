@@ -46,11 +46,14 @@ public:
 							 const glm::vec2 &p3,
 							 const glm::vec4 &color) const -> void = 0;
 
-	virtual auto render_rect(const glm::vec2 &from,
-							 const glm::vec2 &to,
+	virtual auto render_rect(const glm::vec2 &center,
+							 const glm::vec2 &size,
+							 float rotation,
 							 const glm::vec4 &border_color,
 							 const glm::vec4 &fill_color,
 							 float border_thickness) const -> void = 0;
+
+
 
 	virtual auto render_circle(const glm::vec2 &center,
 							   float radius,

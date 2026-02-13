@@ -55,17 +55,18 @@ public:
 					 const glm::vec2 &p3,
 					 const glm::vec4 &color) const -> void override;
 
-	auto render_rect(const glm::vec2 &from,
-							 const glm::vec2 &to,
-							 const glm::vec4 &border_color,
-							 const glm::vec4 &fill_color,
-							 float border_thickness) const -> void override;
+	auto render_rect(const glm::vec2 &center,
+					 const glm::vec2 &size,
+					 float rotation,
+					 const glm::vec4 &border_color,
+					 const glm::vec4 &fill_color,
+					 float border_thickness) const -> void override;
 
 	auto render_circle(const glm::vec2 &center,
-							   float radius,
-							   const glm::vec4 &border_color,
-							   const glm::vec4 &fill_color,
-							   float border_thickness) const -> void override;
+					   float radius,
+					   const glm::vec4 &border_color,
+					   const glm::vec4 &fill_color,
+					   float border_thickness) const -> void override;
 
 private:
 	static auto setup_raylib_log() -> void;
@@ -84,7 +85,7 @@ private:
 	[[nodiscard]] auto screen_size_changed(glm::vec2 screen_size) -> result<>;
 
 	static auto color_from_glm(const glm::vec4 &v) -> Color {
-		return ColorFromNormalized({v.r, v.g, v.b, v.a});
+		return ColorFromNormalized({.x = v.r, .y = v.g, .z = v.b, .w = v.a});
 	}
 
 	[[nodiscard]] auto to_screen(const glm::vec2 &p) const -> glm::vec2 {
