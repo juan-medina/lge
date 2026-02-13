@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <lge/components/hierarchy.hpp>
+#include <lge/components/metrics.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/components/transform.hpp>
 #include <lge/result.hpp>
@@ -20,25 +21,34 @@ transform_system::transform_system(const phase p, entt::registry &world): system
 	world.on_destroy<children>().connect<&transform_system::on_parent_children_cleared>();
 }
 
-auto transform_system::compose_transform(const placement &node_placement) -> glm::mat3 {
+auto transform_system::compose_transform(const placement &node_placement, const glm::vec2 &pivot_offset) -> glm::mat3 {
 	const float rad = glm::radians(node_placement.rotation);
 	const float s = glm::sin(rad);
 	const float c = glm::cos(rad);
 
-	const auto root_scale = glm::mat3{{c * node_placement.scale.x, -s * node_placement.scale.y, 0.F},
-									  {s * node_placement.scale.x, c * node_placement.scale.y, 0.F},
-									  {0.F, 0.F, 1.F}};
+	const auto rs = glm::mat3{{c * node_placement.scale.x, -s * node_placement.scale.y, 0.F},
+							  {s * node_placement.scale.x, c * node_placement.scale.y, 0.F},
+							  {0.F, 0.F, 1.F}};
+
+	const auto to_pivot =
+		glm::mat3{{1.F, 0.F, 0.F}, {0.F, 1.F, 0.F}, {-pivot_offset.x, -pivot_offset.y, 1.F}};
+
+	const auto from_pivot =
+		glm::mat3{{1.F, 0.F, 0.F}, {0.F, 1.F, 0.F}, {pivot_offset.x, pivot_offset.y, 1.F}};
 
 	const auto translation =
 		glm::mat3{{1.F, 0.F, 0.F}, {0.F, 1.F, 0.F}, {node_placement.position.x, node_placement.position.y, 1.F}};
 
-	return translation * root_scale;
+	return translation * from_pivot * rs * to_pivot;
 }
 
 auto transform_system::update(const float /*dt*/) -> result<> {
 	for(const auto entity: world.view<placement>(entt::exclude<parent>)) {
 		const auto &local = world.get<placement>(entity);
-		const auto world_mat = compose_transform(local);
+		const auto pivot_offset = world.all_of<metrics>(entity)
+			? local.pivot * world.get<metrics>(entity).size
+			: glm::vec2{0.F, 0.F};
+		const auto world_mat = compose_transform(local, pivot_offset);
 		world.emplace_or_replace<transform>(entity, transform{.world = world_mat});
 		transform_stack_.push_back(entity);
 	}
@@ -52,7 +62,10 @@ auto transform_system::update(const float /*dt*/) -> result<> {
 		if(world.any_of<children>(entity)) {
 			for(const auto &kids = world.get<children>(entity).ids; const auto child: kids) {
 				const auto &local = world.get<placement>(child);
-				const auto local_mat = compose_transform(local);
+				const auto pivot_offset = world.all_of<metrics>(child)
+					? local.pivot * world.get<metrics>(child).size
+					: glm::vec2{0.F, 0.F};
+				const auto local_mat = compose_transform(local, pivot_offset);
 				const auto world_mat = node_transform * local_mat;
 
 				world.emplace_or_replace<transform>(child, transform{.world = world_mat});

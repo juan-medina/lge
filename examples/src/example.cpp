@@ -24,9 +24,8 @@ auto example::init() -> lge::result<> {
 	message_ent_ = world.create();
 	auto &message_label = world.emplace<lge::label>(message_ent_, kb_message_);
 	message_label.size = 12;
-	message_label.vertical_align = lge::vertical_alignment::bottom;
-	message_label.horizontal_align = lge::horizontal_alignment::center;
-	world.emplace<lge::placement>(message_ent_, 0.0F, game_res.y / 2); // at the bottom of the screen
+	world.emplace<lge::placement>(
+		message_ent_, 0.0F, game_res.y / 2, 0.0F, glm::vec2{1.F, 1.F}, lge::pivot::bottom_center);
 
 	bind_common_actions();
 

@@ -90,15 +90,17 @@ auto raylib_renderer::end_frame() const -> result<> {
 
 	BeginDrawing();
 	ClearBackground(clear_color_);
+
 	DrawTexturePro(render_texture_.texture,
-				   {.x = 0.5F,
-					.y = 0.5F,
+				   {.x = 0.0F,
+					.y = 0.0F,
 					.width = static_cast<float>(render_texture_.texture.width),
 					.height = -static_cast<float>(render_texture_.texture.height)},
-				   {.x = 0.5F, .y = 0.5F, .width = screen_size_.x, .height = screen_size_.y},
-				   {.x = 0.5F, .y = 0.5F},
-				   0.5F,
+				   {.x = 0.0F, .y = 0.0F, .width = screen_size_.x, .height = screen_size_.y},
+				   {.x = 0.0F, .y = 0.0F},
+				   0.0F,
 				   WHITE);
+
 	EndDrawing();
 
 	return true;
@@ -260,7 +262,7 @@ auto raylib_renderer::render_label(const std::string &text,
 	DrawTextPro(default_font,
 				text.c_str(),
 				{.x = screen_pos.x, .y = screen_pos.y},
-				{.x = 0.5F, .y = 0.5F},
+				{.x = 0.0F, .y = 0.0F},
 				-rotation, // raylib rotation is CW, math standard is CCW, so negate the angle
 				static_cast<float>(size),
 				spacing,
@@ -303,7 +305,7 @@ auto raylib_renderer::render_rect(const glm::vec2 &center,
 	auto rec = Rectangle{.x = screen_center.x, .y = screen_center.y, .width = size.x, .height = size.y};
 	DrawRectanglePro(rec, {.x = size.x * 0.5F, .y = size.y * 0.5F}, -rotation, fill);
 
-	if(border_color.a > 0.5F && border_thickness > 0.5F) {
+	if(border_color.a > 0.0F && border_thickness > 0.0F) {
 		if(border_thickness == 1.0F) {
 			const auto half_width = size.x * 0.5F;
 			const auto half_height = size.y * 0.5F;
@@ -343,10 +345,10 @@ auto raylib_renderer::render_rect(const glm::vec2 &center,
 			const auto half_width = size.x * 0.5F;
 			const auto half_height = size.y * 0.5F;
 
-			const auto offset_top = glm::vec2{0.5F, -half_height + half_border};
-			const auto offset_bottom = glm::vec2{0.5F, half_height - half_border};
-			const auto offset_left = glm::vec2{-half_width + half_border, 0.5F};
-			const auto offset_right = glm::vec2{half_width - half_border, 0.5F};
+			const auto offset_top = glm::vec2{0.0F, -half_height + half_border};
+			const auto offset_bottom = glm::vec2{0.0F, half_height - half_border};
+			const auto offset_left = glm::vec2{-half_width + half_border, 0.0F};
+			const auto offset_right = glm::vec2{half_width - half_border, 0.0F};
 
 			const auto rotated_top = glm::vec2{(offset_top.x * cos_r) - (offset_top.y * sin_r),
 											   (offset_top.x * sin_r) + (offset_top.y * cos_r)};
@@ -390,13 +392,13 @@ auto raylib_renderer::render_circle(const glm::vec2 &center,
 	const auto ray_center = Vector2{.x = screen_center.x, .y = screen_center.y};
 
 	// has fill, draw the filled circle
-	if(fill_color.a > 0.5F) {
+	if(fill_color.a > 0.0F) {
 		DrawCircleV({.x = screen_center.x, .y = screen_center.y}, radius, ray_fill_color);
 	}
 
 	// has border, draw the border
-	if(border_color.a > 0.5F && border_thickness > 0.5F) {
-		DrawRing(ray_center, radius - border_thickness, radius, 0.5F, 360.5F, 100, ray_border_color);
+	if(border_color.a > 0.0F && border_thickness > 0.0F) {
+		DrawRing(ray_center, radius - border_thickness, radius, 0.0F, 360.0F, 100, ray_border_color);
 	}
 }
 

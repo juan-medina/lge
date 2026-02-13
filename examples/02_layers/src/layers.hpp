@@ -38,7 +38,7 @@ private:
 
 	// randomly interleave colors until we have exactly rect_count_per_color of each
 	std::array<size_t, colors.size()> color_counts_ = {0, 0, 0};
-	static constexpr auto shapes_count_per_color = 1;
+	static constexpr auto shapes_count_per_color = 40;
 	static constexpr auto shapes_border_thickness = 1.0F;
 	static constexpr auto shapes_border_color = glm::vec4{0.7F, 0.7F, 0.7F, 1.0F};
 

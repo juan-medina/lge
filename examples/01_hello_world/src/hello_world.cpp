@@ -49,19 +49,17 @@ auto hello_world::init() -> lge::result<> {
 
 	const auto hello_text_ent = world.create();
 	auto &hello_label = world.emplace<lge::label>(hello_text_ent, "Hello");
-	hello_label.vertical_align = lge::vertical_alignment::bottom;
-	hello_label.horizontal_align = lge::horizontal_alignment::center;
 	hello_label.color = {1, 1, 0, 1};
-	world.emplace<lge::placement>(hello_text_ent, 0, -gap_between_labels / 2); // above center
-	lge::attach(world, center_ent_, hello_text_ent);						   // child of center
+	world.emplace<lge::placement>(
+		hello_text_ent, 0, -gap_between_labels / 2, 0.0F, glm::vec2{1.F, 1.F}, lge::pivot::bottom_center);
+	lge::attach(world, center_ent_, hello_text_ent);
 
 	world_text_ent_ = world.create();
 	auto &world_label = world.emplace<lge::label>(world_text_ent_, "World");
-	world_label.vertical_align = lge::vertical_alignment::top;
-	world_label.horizontal_align = lge::horizontal_alignment::center; // bellow center
 	world_label.color = {0, 1, 1, 1};
-	world.emplace<lge::placement>(world_text_ent_, 0, gap_between_labels / 2);
-	lge::attach(world, center_ent_, world_text_ent_); // child of center
+	world.emplace<lge::placement>(
+		world_text_ent_, 0, gap_between_labels / 2, 0.0F, glm::vec2{1.F, 1.F}, lge::pivot::top_center);
+	lge::attach(world, center_ent_, world_text_ent_);
 
 	register_system<oscillation_system>(lge::phase::game_update);
 

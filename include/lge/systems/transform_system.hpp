@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <lge/components/metrics.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/result.hpp>
 
@@ -17,7 +18,7 @@ namespace lge {
 class transform_system: public system {
 public:
 	explicit transform_system(phase p, entt::registry &world);
-	static auto compose_transform(const placement &node_placement) -> glm::mat3;
+	static auto compose_transform(const placement &node_placement, const glm::vec2 &pivot_offset) -> glm::mat3;
 	auto update(float dt) -> result<> override;
 
 private:

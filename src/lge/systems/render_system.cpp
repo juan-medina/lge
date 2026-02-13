@@ -5,6 +5,7 @@
 #include <lge/components/hidden.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/metrics.hpp>
+#include <lge/components/placement.hpp>
 #include <lge/components/shapes.hpp>
 #include <lge/components/transform.hpp>
 #include <lge/result.hpp>
@@ -69,27 +70,28 @@ auto render_system::get_scale(const glm::mat3 &m) -> glm::vec2 {
 }
 
 auto render_system::handle_label(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
-	// Get the pivot to top left offset from metrics
-	const auto &[size, pivot_to_top_left] = world.get<metrics>(entity);
-
-	// Transform to world space, text is always drawn from the top left corner
-	const auto top_left_world = transform_point(world_transform, -pivot_to_top_left);
-
 	const auto &lbl = world.get<label>(entity);
+	const auto &m = world.get<metrics>(entity);
+	const auto &plc = world.get<placement>(entity);
+
+	const auto pivot_to_top_left = -plc.pivot * m.size;
+	const auto top_left_world = transform_point(world_transform, pivot_to_top_left);
 	const auto rotation = get_rotation(world_transform);
 	const auto world_scale = get_scale(world_transform);
 	const auto final_font_size = lbl.size * world_scale.y;
+
+	// labels are drawn at the top left corner, so we need to offset the position by the pivot and size
 	renderer_.render_label(lbl.text, static_cast<int>(final_font_size), lbl.color, top_left_world, rotation);
 }
 
 auto render_system::handle_rect(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
 	const auto &r = world.get<rect>(entity);
-	const auto &[size, pivot_to_top_left] = world.get<metrics>(entity);
+	const auto &m = world.get<metrics>(entity);
 
 	const auto center = transform_point(world_transform, glm::vec2{0.0F, 0.0F});
 	const auto rotation = get_rotation(world_transform);
 	const auto world_scale = get_scale(world_transform);
-	const auto scaled_size = size * world_scale;
+	const auto scaled_size = m.size * world_scale;
 	const auto scaled_border_thickness = r.border_thickness * ((world_scale.x + world_scale.y) * 0.5F);
 
 	renderer_.render_rect(center, scaled_size, rotation, r.border_color, r.fill_color, scaled_border_thickness);
