@@ -11,6 +11,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <glm/ext/vector_float4.hpp>
+#include <ranges>
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <vector>
@@ -307,6 +308,27 @@ auto raylib_renderer::render_rect(const glm::vec2 &from,
 
 	if(border_color.a > 0.0F && border_thickness > 0.0F) {
 		DrawRectangleLinesEx({screen_from.x, screen_from.y, width, height}, border_thickness, ray_border_color);
+	}
+}
+
+auto raylib_renderer::render_circle(const glm::vec2 &center,
+									const float radius,
+									const glm::vec4 &border_color,
+									const glm::vec4 &fill_color,
+									const float border_thickness) const -> void {
+	const auto screen_center = to_screen(center);
+	const auto ray_border_color = color_from_glm(border_color);
+	const auto ray_fill_color = color_from_glm(fill_color);
+	const auto ray_center = Vector2{screen_center.x, screen_center.y};
+
+	// has fill, draw the filled circle
+	if(fill_color.a > 0.0F) {
+		DrawCircleV({screen_center.x, screen_center.y}, radius, ray_fill_color);
+	}
+
+	// has border, draw the border
+	if(border_color.a > 0.0F && border_thickness > 0.0F) {
+		DrawRing(ray_center, radius - border_thickness, radius, 0.0F, 360.0F, 100, ray_border_color);
 	}
 }
 

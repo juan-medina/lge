@@ -15,25 +15,13 @@ namespace lge {
 
 auto metrics_system::update(const float /*dt*/) -> result<> {
 	// metrics for labels
-	for(const auto entity: world.view<label>()) {
-		// if the entity doesn't have metrics or the label is dirty, calculate the metrics
-		if(auto &lbl = world.get<label>(entity); !world.all_of<metrics>(entity) || is_label_dirty(lbl)) {
-			calculate_label_metrics(entity, lbl);
-			lbl.previous_text = lbl.text;
-			lbl.previous_vertical_align = lbl.vertical_align;
-			lbl.previous_horizontal_align = lbl.horizontal_align;
-			lbl.previous_size = lbl.size;
-		}
-	}
+	handle_labels();
 
 	// metrics for rect
-	for(const auto entity: world.view<rect>()) {
-		if(auto &r = world.get<rect>(entity); !world.all_of<metrics>(entity) || is_rect_dirty(r)) {
-			calculate_rect_metrics(entity, r);
-			r.previous_from = r.from;
-			r.previous_to = r.to;
-		}
-	}
+	handle_rects();
+
+	// metrics for circle
+	handle_circles();
 
 	return true;
 }
@@ -79,6 +67,15 @@ auto metrics_system::calculate_rect_metrics(const entt::entity entity, const rec
 									  });
 }
 
+auto metrics_system::calculate_circle_metrics(const entt::entity entity, const circle &c) const -> void {
+	const auto diameter = c.radius * 2.0F;
+	world.emplace_or_replace<metrics>(entity,
+									  metrics{
+										  .size = {diameter, diameter},
+										  .pivot_to_top_left = {c.radius, c.radius},
+									  });
+}
+
 auto metrics_system::is_label_dirty(const label &lbl) -> bool {
 	// we consider the label dirty if any of the properties that affect the metrics have changed
 	return lbl.text != lbl.previous_text || lbl.size != lbl.previous_size
@@ -89,6 +86,43 @@ auto metrics_system::is_label_dirty(const label &lbl) -> bool {
 auto metrics_system::is_rect_dirty(const rect &r) -> bool {
 	// we consider the rect dirty if any of the properties that affect the metrics have changed
 	return r.from != r.previous_from || r.to != r.previous_to;
+}
+
+auto metrics_system::is_circle_dirty(const circle &c) -> bool {
+	// we consider the circle dirty if any of the properties that affect the metrics have changed
+	return c.radius != c.previous_radius;
+}
+
+auto metrics_system::handle_labels() const -> void {
+	for(const auto entity: world.view<label>()) {
+		// if the entity doesn't have metrics or the label is dirty, calculate the metrics
+		if(auto &lbl = world.get<label>(entity); !world.all_of<metrics>(entity) || is_label_dirty(lbl)) {
+			calculate_label_metrics(entity, lbl);
+			lbl.previous_text = lbl.text;
+			lbl.previous_vertical_align = lbl.vertical_align;
+			lbl.previous_horizontal_align = lbl.horizontal_align;
+			lbl.previous_size = lbl.size;
+		}
+	}
+}
+
+auto metrics_system::handle_rects() const -> void {
+	for(const auto entity: world.view<rect>()) {
+		if(auto &r = world.get<rect>(entity); !world.all_of<metrics>(entity) || is_rect_dirty(r)) {
+			calculate_rect_metrics(entity, r);
+			r.previous_from = r.from;
+			r.previous_to = r.to;
+		}
+	}
+}
+
+auto metrics_system::handle_circles() const -> void {
+	for(const auto entity: world.view<circle>()) {
+		if(auto &c = world.get<circle>(entity); !world.all_of<metrics>(entity) || is_circle_dirty(c)) {
+			calculate_circle_metrics(entity, c);
+			c.previous_radius = c.radius;
+		}
+	}
 }
 
 } // namespace lge

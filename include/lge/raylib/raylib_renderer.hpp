@@ -61,6 +61,12 @@ public:
 							 const glm::vec4 &fill_color,
 							 float border_thickness) const -> void override;
 
+	auto render_circle(const glm::vec2 &center,
+							   float radius,
+							   const glm::vec4 &border_color,
+							   const glm::vec4 &fill_color,
+							   float border_thickness) const -> void override;
+
 private:
 	static auto setup_raylib_log() -> void;
 	static auto log_callback(int log_level, const char *text, va_list args) -> void; // NOLINT(*-include-cleaner)

@@ -19,4 +19,13 @@ struct rect {
 	glm::vec2 previous_to;
 };
 
+struct circle {
+	float radius;
+	glm::vec4 border_color{1, 1, 1, 1};
+	glm::vec4 fill_color{0, 0, 0, 0};
+	float border_thickness = 1.0F;
+
+	float previous_radius;
+};
+
 } // namespace lge

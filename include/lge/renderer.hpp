@@ -52,6 +52,12 @@ public:
 							 const glm::vec4 &fill_color,
 							 float border_thickness) const -> void = 0;
 
+	virtual auto render_circle(const glm::vec2 &center,
+							   float radius,
+							   const glm::vec4 &border_color,
+							   const glm::vec4 &fill_color,
+							   float border_thickness) const -> void = 0;
+
 	virtual auto get_label_size(const std::string &text, const int &size) -> glm::vec2 = 0;
 
 	virtual auto show_cursor(bool show) -> void = 0;

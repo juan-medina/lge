@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <lge/components/shapes.hpp>
 #include <lge/components/label.hpp>
+#include <lge/components/shapes.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
 
@@ -23,8 +23,16 @@ public:
 private:
 	auto calculate_label_metrics(entt::entity entity, const label &lbl) const -> void;
 	auto calculate_rect_metrics(entt::entity entity, const rect &r) const -> void;
+	auto calculate_circle_metrics(entt::entity entity, const circle &c) const -> void;
+
 	static auto is_label_dirty(const label &lbl) -> bool;
 	static auto is_rect_dirty(const rect &r) -> bool;
+	static auto is_circle_dirty(const circle &c) -> bool;
+
+	auto handle_labels() const -> void;
+	auto handle_rects() const -> void;
+	auto handle_circles() const -> void;
+
 	renderer &renderer_;
 };
 

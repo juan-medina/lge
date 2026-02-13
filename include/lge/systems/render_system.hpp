@@ -26,6 +26,11 @@ private:
 	static auto transform_point(const glm::mat3 &m, const glm::vec2 &p) -> glm::vec2;
 	static auto get_rotation(const glm::mat3 &m) -> float;
 	static auto get_scale(const glm::mat3 &m) -> glm::vec2;
+
+	auto handle_label(const entt::entity entity, const glm::mat3 &world_transform) const -> void;
+	auto handle_rect(const entt::entity entity, const glm::mat3 &world_transform) const -> void;
+	auto handle_circle(const entt::entity entity, const glm::mat3 &world_transform) const -> void;
+	auto handle_bounds(const entt::entity entity, const glm::mat3 &world_transform) const -> void;
 };
 
 } // namespace lge
