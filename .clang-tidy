@@ -17,6 +17,8 @@ readability-*,
 llvm-include-cleaner,
 misc-include-cleaner,
 -*-pro-type-union-access
+-*-pro-bounds-avoid-unchecked-container-access
+-*-pro-bounds-constant-array-index
 '
 
 CheckOptions:

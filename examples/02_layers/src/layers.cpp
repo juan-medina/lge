@@ -134,13 +134,11 @@ auto layers::create_random_shapes() -> void {
 	std::uniform_int_distribution<size_t> color_dist{0, 2};
 	std::uniform_int_distribution shape_dist{shape_rect, shape_circle};
 
-	// NOLINTNEXTLINE (*-pro-bounds-avoid-unchecked-container-access)
 	while(color_counts_[0] < shapes_count_per_color || color_counts_[1] < shapes_count_per_color
-		  || color_counts_[2] < shapes_count_per_color) { // NOLINT(*-pro-bounds-avoid-unchecked-container-access)
+		  || color_counts_[2] < shapes_count_per_color) {
 		// pick a random color that hasn't reached its quota yet
 		size_t color_index = color_dist(rng);
-		while(color_counts_[color_index] >= shapes_count_per_color) { // NOLINT(*-pro-bounds-constant-array-index,
-																	  // *-pro-bounds-avoid-unchecked-container-access)
+		while(color_counts_[color_index] >= shapes_count_per_color) {
 			color_index = color_dist(rng);
 		}
 
@@ -149,8 +147,7 @@ auto layers::create_random_shapes() -> void {
 		assert(color_index < colors.size());
 
 		const auto &color = colors.at(color_index);
-		color_counts_[color_index]++; // NOLINT(*-pro-bounds-constant-array-index,
-									  // *-pro-bounds-avoid-unchecked-container-access)
+		color_counts_[color_index]++;
 
 		const auto pos_x = pos_x_dist(rng);
 		const auto pos_y = pos_y_dist(rng);
