@@ -12,6 +12,7 @@
 
 #include <entity/fwd.hpp>
 #include <glm/ext/matrix_float3x3.hpp>
+#include <glm/ext/vector_float2.hpp>
 #include <glm/trigonometric.hpp>
 #include <vector>
 

@@ -6,6 +6,7 @@
 #include <lge/components/placement.hpp>
 #include <lge/internal/components/bounds.hpp>
 #include <lge/internal/components/metrics.hpp>
+#include <lge/result.hpp>
 
 #include <entt/entt.hpp>
 #include <glm/ext/matrix_float3x3.hpp>

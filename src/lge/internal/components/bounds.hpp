@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <glm/vec2.hpp>
+#include <glm/ext/vector_float2.hpp>
 
 namespace lge {
 

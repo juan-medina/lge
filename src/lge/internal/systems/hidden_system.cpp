@@ -8,6 +8,7 @@
 #include <lge/internal/components/effective_hidden.hpp>
 #include <lge/result.hpp>
 
+#include <entity/fwd.hpp>
 #include <entt/entt.hpp>
 #include <vector>
 

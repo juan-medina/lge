@@ -1,8 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
-#include "lge/app.hpp"
-
+#include <lge/app.hpp>
 #include <lge/internal/raylib/raylib_input.hpp>
 #include <lge/internal/raylib/raylib_renderer.hpp>
 #include <lge/internal/systems/bounds_system.hpp>

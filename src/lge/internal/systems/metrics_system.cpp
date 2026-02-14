@@ -4,10 +4,10 @@
 #include "metrics_system.hpp"
 
 #include <lge/components/label.hpp>
-#include <lge/components/placement.hpp>
 #include <lge/components/shapes.hpp>
 #include <lge/internal/components/metrics.hpp>
 #include <lge/internal/components/previous_shapes.hpp>
+#include <lge/internal/components/previous_label.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
 

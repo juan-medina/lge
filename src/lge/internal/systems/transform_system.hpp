@@ -4,12 +4,12 @@
 #pragma once
 
 #include <lge/components/placement.hpp>
-#include <lge/internal/components/metrics.hpp>
 #include <lge/result.hpp>
 #include <lge/systems/system.hpp>
 
 #include <entity/fwd.hpp>
 #include <glm/ext/matrix_float3x3.hpp>
+#include <glm/ext/vector_float2.hpp>
 #include <vector>
 
 namespace lge {

@@ -3,7 +3,6 @@
 
 #include "render_system.hpp"
 
-#include <lge/components/hidden.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/components/shapes.hpp>
