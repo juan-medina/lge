@@ -9,9 +9,11 @@
 #include <lge/components/shapes.hpp>
 #include <lge/internal/components/bounds.hpp>
 #include <lge/internal/components/metrics.hpp>
+#include <lge/internal/components/render_order.hpp>
 #include <lge/internal/components/transform.hpp>
 #include <lge/result.hpp>
 
+#include <algorithm>
 #include <cmath>
 #include <entity/fwd.hpp>
 #include <entt/entt.hpp>
@@ -24,25 +26,37 @@
 namespace lge {
 
 auto render_system::update(const float /*dt*/) -> result<> {
-	for(const auto entity: world.view<transform, metrics>(entt::exclude<global_hidden>)) {
+	render_entries_.clear();
+
+	const auto view = world.view<transform, metrics>(entt::exclude<global_hidden>);
+	render_entries_.reserve(view.size_hint());
+
+	for(const auto entity: view) {
+		if(world.all_of<render_order>(entity)) {
+			const auto &[layer, index] = world.get<render_order>(entity);
+			render_entries_.push_back({.layer = layer, .index = index, .entity = entity});
+		} else {
+			render_entries_.push_back({.layer = 0, .index = 0, .entity = entity});
+		}
+	}
+
+	std::ranges::sort(render_entries_);
+
+	for(const auto &[layer, index, entity]: render_entries_) {
 		const auto &[world_transform] = world.get<transform>(entity);
 
-		// Draw label if present
 		if(world.all_of<label>(entity)) {
 			handle_label(entity, world_transform);
 		}
 
-		// Draw rect if present
 		if(world.all_of<rect>(entity)) {
 			handle_rect(entity, world_transform);
 		}
 
-		// Draw circle if present
 		if(world.all_of<circle>(entity)) {
 			handle_circle(entity, world_transform);
 		}
 
-		// Debug draw bounds if present
 		if(world.all_of<bounds>(entity) && renderer_.is_debug_draw()) {
 			handle_bounds(entity, world_transform);
 		}

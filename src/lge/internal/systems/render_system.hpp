@@ -8,8 +8,10 @@
 #include <lge/systems/system.hpp>
 
 #include <entity/fwd.hpp>
+#include <entt/entt.hpp>
 #include <glm/ext/matrix_float3x3.hpp>
 #include <glm/ext/vector_float2.hpp>
+#include <vector>
 
 namespace lge {
 
@@ -20,7 +22,18 @@ public:
 	auto update(float dt) -> result<> override;
 
 private:
+	struct render_entry {
+		int layer;			 // NOLINT(*-non-private-member-variables-in-classes)
+		int index;			 // NOLINT(*-non-private-member-variables-in-classes)
+		entt::entity entity; // NOLINT(*-non-private-member-variables-in-classes)
+
+		// Lexicographic comparison: sorts by layer (primary), then index (secondary), then entity (tiebreaker)
+		// Lower values render first (back), higher values render last (front/on top)
+		auto operator<=>(const render_entry &) const = default;
+	};
+
 	renderer &renderer_;
+	std::vector<render_entry> render_entries_;
 
 	static auto transform_point(const glm::mat3 &m, const glm::vec2 &p) -> glm::vec2;
 	static auto get_rotation(const glm::mat3 &m) -> float;

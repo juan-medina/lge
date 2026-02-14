@@ -8,6 +8,7 @@
 #include <lge/internal/systems/bounds_system.hpp>
 #include <lge/internal/systems/hidden_system.hpp>
 #include <lge/internal/systems/metrics_system.hpp>
+#include <lge/internal/systems/order_system.hpp>
 #include <lge/internal/systems/render_system.hpp>
 #include <lge/internal/systems/transform_system.hpp>
 #include <lge/log.hpp>
@@ -82,6 +83,7 @@ auto app::init() -> result<> {
 	register_system<bounds_system>(phase::game_update);
 	register_system<hidden_system>(phase::game_update);
 	register_system<transform_system>(phase::global_update);
+	register_system<order_system>(phase::global_update);
 	register_system<render_system>(phase::render, *renderer_);
 	// future post render systems go here
 

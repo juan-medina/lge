@@ -6,6 +6,7 @@
 #include <lge/app.hpp>
 #include <lge/app_config.hpp>
 #include <lge/components/label.hpp>
+#include <lge/components/order.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
@@ -27,6 +28,7 @@ auto example::init() -> lge::result<> {
 	world.emplace<lge::placement>(
 		message_ent_, 0.0F, game_res.y / 2, 0.0F, glm::vec2{1.F, 1.F}, lge::pivot::bottom_center);
 
+	world.emplace<lge::order>(message_ent_, 999); // layer 999: render on top of most things
 	bind_common_actions();
 
 	return true;
