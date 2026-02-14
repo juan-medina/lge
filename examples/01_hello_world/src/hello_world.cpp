@@ -41,8 +41,8 @@ auto hello_world::init() -> lge::result<> {
 	world.emplace<lge::placement>(center_ent_, 0, 0);
 	world.emplace<oscillation_system::effect>(center_ent_,
 											  oscillation_system::effect{
-												  .scale = {.min_ = 1.0F, .max = 3.0F, .period = 8.0F},
-												  .rotation = {.min_ = 0.0F, .max = 360.0F, .period = 4.0F},
+												  .scale = {.min = 1.0F, .max = 3.0F, .period = 8.0F},
+												  .rotation = {.min = 0.0F, .max = 360.0F, .period = 4.0F},
 											  });
 
 	static constexpr auto gap_between_labels = 10.0F;

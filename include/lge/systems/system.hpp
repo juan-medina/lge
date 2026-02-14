@@ -33,7 +33,7 @@ public:
 	}
 
 protected:
-	entt::registry &world; // NOLINT(*-non-private-member-variables-in-classes)
+	entt::registry &world;
 
 private:
 	phase phase_;

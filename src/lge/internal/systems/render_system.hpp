@@ -23,9 +23,9 @@ public:
 
 private:
 	struct render_entry {
-		int layer;			 // NOLINT(*-non-private-member-variables-in-classes)
-		int index;			 // NOLINT(*-non-private-member-variables-in-classes)
-		entt::entity entity; // NOLINT(*-non-private-member-variables-in-classes)
+		int layer;
+		int index;
+		entt::entity entity;
 
 		// Lexicographic comparison: sorts by layer (primary), then index (secondary), then entity (tiebreaker)
 		// Lower values render first (back), higher values render last (front/on top)

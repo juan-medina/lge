@@ -162,33 +162,34 @@ public:
 	};
 
 	void bind(const id bid, const binding &binding) {
-		bindings_[bid] = binding;
+		bindings[bid] = binding;
 	}
 
 	[[nodiscard]] auto is_controller_available() const -> bool {
-		return controller_available_;
+		return controller_available;
 	}
 
 	[[nodiscard]] virtual auto get(id bid) const -> const state & {
 		static auto constexpr empty = state{};
-		if(const auto it = states_.find(bid); it != states_.end()) {
+		if(const auto it = states.find(bid); it != states.end()) {
 			return it->second;
 		}
 		return empty;
 	}
 
 	virtual auto update(float delta_time) -> void = 0;
-protected:
-	std::unordered_map<id, binding> bindings_;
-	std::unordered_map<id, state> states_;
 
-	bool controller_available_{false};
-	float mouse_inactive_time_{0.0F};
-	float controller_inactive_time_{0.0F};
-	int default_controller_{-1};
+protected:
+	std::unordered_map<id, binding> bindings;
+	std::unordered_map<id, state> states;
+
+	bool controller_available{false};
+	float mouse_inactive_time{0.0F};
+	float controller_inactive_time{0.0F};
+	int default_controller{-1};
 
 	auto reset_states() -> void {
-		for(auto &st: states_ | std::views::values) {
+		for(auto &st: states | std::views::values) {
 			st.pressed = false;
 			st.released = false;
 		}

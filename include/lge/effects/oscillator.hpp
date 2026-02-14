@@ -6,14 +6,14 @@
 namespace lge {
 
 struct oscillator {
-    float min_{};
+    float min{};
     float max{};
     float period{};
     float phase = 0.0F;
 };
 
 namespace effects {
-    auto update_oscillator(oscillator& osc, const float dt) -> float;
+    auto update_oscillator(oscillator& osc, float dt) -> float;
 } // namespace effects
 
 
