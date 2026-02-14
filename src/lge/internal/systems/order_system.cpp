@@ -27,7 +27,7 @@ auto order_system::update(const float /*dt*/) -> result<> {
 
 		if(world.any_of<children>(entity)) {
 			for(const auto &kids = world.get<children>(entity).ids; const auto child: kids) {
-				const auto &local = world.get<order>(child);
+				const auto &local = world.get_or_emplace<order>(child);
 				const auto child_layer = parent_render_order.layer;
 				const auto child_index = parent_render_order.index + local.index;
 

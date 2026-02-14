@@ -21,14 +21,29 @@ public:
 
 private:
 	static constexpr auto example_title = "Layers!";
-	static constexpr auto kb_message = "press 1: blue on top, 2: red on top, 3: green on top, "
+	static constexpr auto kb_message = "press 1: change color on top, F5 to toggle debug draw, "
 									   "F11: toggle fullscreen, Esc: exit";
-	static constexpr auto controller_message = "controller A: blue on top, X: red on top, Y: green on top, "
+	static constexpr auto controller_message = "controller A: blue on top, START: debug draw, "
 											   "SELECT: toggle fullscreen, B: exit";
 
-	static constexpr auto blue_action = "blue";
-	static constexpr auto red_action = "red";
-	static constexpr auto green_action = "green";
+	enum class top_color : std::int8_t {
+		none = -1,
+		red = 0,
+		green = 1,
+		blue = 2,
+	};
+
+	top_color top_color_ = top_color::none;
+	entt::entity top_text_entity_ = entt::null;
+	auto change_top_color(top_color new_top_color) -> void;
+
+	static constexpr auto change_top_action = "change_top";
+
+	// root nodes for each color
+	entt::entity red_root_ = entt::null;
+	entt::entity green_root_ = entt::null;
+	entt::entity blue_root_ = entt::null;
+	auto create_root() -> entt::entity;
 
 	// colors for the shapes, with alpha 1.0 for full opacity
 	static constexpr auto red_color = glm::vec4{1.0F, 0.0F, 0.0F, 1.0F};
@@ -58,7 +73,12 @@ private:
 	static constexpr auto circle_min_radius = 15.0F;
 	static constexpr auto circle_max_radius = 50.0F;
 
+	// text area margins
+	static constexpr auto text_area_margin = 15.0F;
+
 	auto create_random_shapes() -> void;
-	auto create_rectangle(float pos_x, float pos_y, const glm::vec4 &color, std::mt19937 &rng) -> void;
-	auto create_circle(float pos_x, float pos_y, const glm::vec4 &color, std::mt19937 &rng) -> void;
+	[[nodiscard]] auto create_rectangle(float pos_x, float pos_y, const glm::vec4 &color, std::mt19937 &rng)
+		-> entt::entity;
+	[[nodiscard]] auto create_circle(float pos_x, float pos_y, const glm::vec4 &color, std::mt19937 &rng)
+		-> entt::entity;
 };
