@@ -14,9 +14,6 @@ add_executable(${PROJECT_NAME} ${APP_SOURCE_FILES} ${COMMON_SOURCE_FILES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE lge)
 
-# Place examples' runtime outputs in the build/examples folder
-set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/examples)
-
 if (WIN32)
     target_link_options(${PROJECT_NAME} PRIVATE
             $<$<CONFIG:Debug>:/SUBSYSTEM:CONSOLE>
@@ -41,6 +38,6 @@ if (EMSCRIPTEN)
             "--bind"
             "-sEXPORTED_RUNTIME_METHODS=['HEAPF32','HEAP32','HEAPU8','requestFullscreen']"
     )
-    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "hello_index")
+    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "index")
     configure_file(../web/favicon.ico favicon.ico COPYONLY)
 endif ()
