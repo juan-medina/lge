@@ -29,6 +29,7 @@ private:
 	[[nodiscard]] auto is_gamepad_input_detected() const -> bool;
 	[[nodiscard]] auto is_mouse_keyboard_active() -> bool;
 
+	// NOLINTNEXTLINE(*-avoid-c-arrays)
 	static constexpr int key_values[] = {KEY_NULL,
 										 KEY_APOSTROPHE,
 										 KEY_COMMA,
@@ -140,9 +141,11 @@ private:
 										 KEY_VOLUME_UP,
 										 KEY_VOLUME_DOWN};
 
-	static constexpr int key_to_raylib(const key k) {
+	static constexpr auto key_to_raylib(const key k) -> int {
 		return key_values[static_cast<int>(k)];
 	}
+
+	// NOLINTNEXTLINE(*-avoid-c-arrays)
 	static constexpr int button_values[] = {GAMEPAD_BUTTON_UNKNOWN,
 											GAMEPAD_BUTTON_LEFT_FACE_UP,
 											GAMEPAD_BUTTON_LEFT_FACE_RIGHT,
@@ -162,7 +165,7 @@ private:
 											GAMEPAD_BUTTON_LEFT_THUMB,
 											GAMEPAD_BUTTON_RIGHT_THUMB};
 
-	static constexpr int button_to_raylib(const button b) {
+	static constexpr auto button_to_raylib(const button b) -> int {
 		return button_values[static_cast<int>(b)];
 	}
 };

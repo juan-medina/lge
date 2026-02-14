@@ -12,9 +12,16 @@ namespace lge {
 
 class input {
 public:
+	input() = default;
 	virtual ~input() = default;
 
-	enum class key : int {
+	// Disable copying and moving — input is not copyable or movable
+	input(const input &) = delete;
+	input(input &&) = delete;
+	auto operator=(const input &) -> input & = delete;
+	auto operator=(input &&) -> input & = delete;
+
+	enum class key : std::uint8_t {
 		null_key,
 		apostrophe,
 		comma,
@@ -127,7 +134,7 @@ public:
 		volume_down
 	};
 
-	enum class button : int {
+	enum class button : std::uint8_t {
 		unknown,
 		left_face_up,
 		left_face_right,
