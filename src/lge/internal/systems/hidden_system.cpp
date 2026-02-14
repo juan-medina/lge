@@ -5,6 +5,7 @@
 
 #include <lge/components/hidden.hpp>
 #include <lge/components/hierarchy.hpp>
+#include <lge/internal/components/global_hidden.hpp>
 #include <lge/result.hpp>
 
 #include <entt/entt.hpp>
