@@ -11,6 +11,114 @@ An little 2D game engine built in C++20 using raylib.
 
 ---
 
+## Using lge in Your Project
+
+### Adding lge as a Submodule
+
+Add lge to your project as a Git submodule:
+
+```bash
+git submodule add https://github.com/juan-medina/lge.git external/lge
+git submodule update --init --recursive
+```
+
+### CMake Integration
+
+In your root `CMakeLists.txt`, add lge as a subdirectory and use the provided helper:
+
+```cmake
+cmake_minimum_required(VERSION 3.28)
+
+project(my_game
+        VERSION 0.1.0.0
+        LANGUAGES CXX
+)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Add lge engine
+add_subdirectory(external/lge)
+
+# Include the lge application helper
+include(external/lge/cmake/LGEApplication.cmake)
+
+# Define your application
+file(GLOB_RECURSE GAME_SOURCES "src/*.cpp")
+
+lge_add_application(my_game
+        SOURCES ${GAME_SOURCES}
+        EMSCRIPTEN_SHELL ${CMAKE_CURRENT_SOURCE_DIR}/web/template.html
+        EMSCRIPTEN_ASSETS ${CMAKE_CURRENT_SOURCE_DIR}/web/favicon.ico
+)
+```
+
+### lge_add_application Options
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `SOURCES` | Yes | List of source files for your application |
+| `EMSCRIPTEN_SHELL` | No | Path to custom HTML shell template for WebAssembly builds |
+| `EMSCRIPTEN_ASSETS` | No | List of asset files to copy for WebAssembly builds |
+
+The function automatically configures:
+- Linking to the lge library
+- Windows subsystem settings (console for Debug, Windows for Release)
+- Emscripten/WebAssembly build options (GLFW, memory growth, exports)
+
+### Minimal Example
+
+**src/my_game.hpp**
+```cpp
+#pragma once
+
+#include <lge/app.hpp>
+#include <lge/result.hpp>
+
+class my_game: public lge::app {
+public:
+    [[nodiscard]] auto configure() -> lge::app_config override;
+    [[nodiscard]] auto init() -> lge::result<> override;
+};
+```
+
+**src/my_game.cpp**
+```cpp
+#include "my_game.hpp"
+
+#include <lge/app_config.hpp>
+#include <lge/components/label.hpp>
+#include <lge/components/placement.hpp>
+#include <lge/main.hpp>
+#include <lge/result.hpp>
+
+LGE_MAIN(my_game);
+
+auto my_game::configure() -> lge::app_config {
+    return {
+        .design_resolution = {640, 360}, // world expands horizontally, but height is fixed
+        .clear_color = {0, 0, 0, 1},
+        .window_title = "My Game"
+    };
+}
+
+auto my_game::init() -> lge::result<> {
+    if (const auto err = app::init().unwrap(); err) {
+        return lge::error("error initializing app", *err);
+    }
+
+    auto& world = get_world();
+
+    const auto label_ent = world.create();
+    world.emplace<lge::label>(label_ent, "Hello, lge!");
+    world.emplace<lge::placement>(label_ent, 0.0F, 0.0F); // center of the screen
+
+    return true;
+}
+```
+
+---
+
 **Credits**
 
 - Developed by [Juan Medina](https://juan-medina.com).
