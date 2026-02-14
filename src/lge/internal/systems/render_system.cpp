@@ -8,7 +8,7 @@
 #include <lge/components/placement.hpp>
 #include <lge/components/shapes.hpp>
 #include <lge/internal/components/bounds.hpp>
-#include <lge/internal/components/global_hidden.hpp>
+#include <lge/internal/components/effective_hidden.hpp>
 #include <lge/internal/components/metrics.hpp>
 #include <lge/internal/components/render_order.hpp>
 #include <lge/internal/components/transform.hpp>
@@ -29,7 +29,7 @@ namespace lge {
 auto render_system::update(const float /*dt*/) -> result<> {
 	render_entries_.clear();
 
-	const auto view = world.view<transform, metrics>(entt::exclude<global_hidden>);
+	const auto view = world.view<transform, metrics>(entt::exclude<effective_hidden>);
 	render_entries_.reserve(view.size_hint());
 
 	for(const auto entity: view) {

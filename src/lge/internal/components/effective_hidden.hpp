@@ -4,7 +4,7 @@
 #pragma once
 
 namespace lge {
-;
-struct global_hidden {};
+
+struct effective_hidden {};
 
 } // namespace lge

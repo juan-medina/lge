@@ -5,7 +5,7 @@
 
 #include <lge/components/hidden.hpp>
 #include <lge/components/hierarchy.hpp>
-#include <lge/internal/components/global_hidden.hpp>
+#include <lge/internal/components/effective_hidden.hpp>
 #include <lge/result.hpp>
 
 #include <entt/entt.hpp>
@@ -16,9 +16,9 @@ namespace lge {
 auto hidden_system::update(const float /*dt*/) -> result<> {
 	for(const auto entity: world.view<entt::entity>(entt::exclude<parent>)) {
 		if(world.any_of<hidden>(entity)) {
-			world.emplace_or_replace<global_hidden>(entity);
+			world.emplace_or_replace<effective_hidden>(entity);
 		} else {
-			world.remove<global_hidden>(entity);
+			world.remove<effective_hidden>(entity);
 		}
 		hidden_stack_.push_back(entity);
 	}
@@ -28,19 +28,19 @@ auto hidden_system::update(const float /*dt*/) -> result<> {
 		hidden_stack_.pop_back();
 
 		// if the parent is hidden, all children are hidden, otherwise we need to check each child
-		const bool parent_hidden = world.any_of<global_hidden>(entity);
+		const bool parent_hidden = world.any_of<effective_hidden>(entity);
 		if(world.any_of<children>(entity)) {
 			if(parent_hidden) {
 				for(auto child: world.get<children>(entity).ids) {
-					world.emplace_or_replace<global_hidden>(child);
+					world.emplace_or_replace<effective_hidden>(child);
 					hidden_stack_.push_back(child);
 				}
 			} else {
 				for(auto child: world.get<children>(entity).ids) {
 					if(world.any_of<hidden>(child)) {
-						world.emplace_or_replace<global_hidden>(child);
+						world.emplace_or_replace<effective_hidden>(child);
 					} else {
-						world.remove<global_hidden>(child);
+						world.remove<effective_hidden>(child);
 					}
 					hidden_stack_.push_back(child);
 				}
