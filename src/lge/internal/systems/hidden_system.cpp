@@ -1,10 +1,11 @@
 ﻿// SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
+#include "hidden_system.hpp"
+
 #include <lge/components/hidden.hpp>
 #include <lge/components/hierarchy.hpp>
 #include <lge/result.hpp>
-#include <lge/systems/hidden_system.hpp>
 
 #include <entt/entt.hpp>
 #include <vector>
@@ -37,7 +38,7 @@ auto hidden_system::update(const float /*dt*/) -> result<> {
 				for(auto child: world.get<children>(entity).ids) {
 					if(world.any_of<hidden>(child)) {
 						world.emplace_or_replace<global_hidden>(child);
-					}else {
+					} else {
 						world.remove<global_hidden>(child);
 					}
 					hidden_stack_.push_back(child);

@@ -1,10 +1,11 @@
 ﻿// SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
-#include <lge/components/bounds.hpp>
-#include <lge/components/metrics.hpp>
+#include "bounds_system.hpp"
+
 #include <lge/components/placement.hpp>
-#include <lge/systems/bounds_system.hpp>
+#include <lge/internal/components/bounds.hpp>
+#include <lge/internal/components/metrics.hpp>
 
 #include <entt/entt.hpp>
 #include <glm/ext/matrix_float3x3.hpp>

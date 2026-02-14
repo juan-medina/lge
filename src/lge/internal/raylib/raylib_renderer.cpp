@@ -1,9 +1,10 @@
 ﻿// SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
+#include "raylib_renderer.hpp"
+
 #include <lge/app_config.hpp>
 #include <lge/log.hpp>
-#include <lge/raylib/raylib_renderer.hpp>
 #include <lge/result.hpp>
 
 #include <raylib.h>

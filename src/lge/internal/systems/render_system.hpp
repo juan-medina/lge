@@ -5,8 +5,7 @@
 
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
-
-#include "system.hpp"
+#include <lge/systems/system.hpp>
 
 #include <entity/fwd.hpp>
 #include <glm/ext/matrix_float3x3.hpp>

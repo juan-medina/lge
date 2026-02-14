@@ -3,11 +3,10 @@
 
 #pragma once
 
-#include <lge/components/metrics.hpp>
 #include <lge/components/placement.hpp>
+#include <lge/internal/components/metrics.hpp>
 #include <lge/result.hpp>
-
-#include "system.hpp"
+#include <lge/systems/system.hpp>
 
 #include <entity/fwd.hpp>
 #include <glm/ext/matrix_float3x3.hpp>

@@ -1,13 +1,14 @@
 ﻿// SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
+#include "metrics_system.hpp"
+
 #include <lge/components/label.hpp>
-#include <lge/components/metrics.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/components/shapes.hpp>
+#include <lge/internal/components/metrics.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
-#include <lge/systems/metrics_system.hpp>
 
 #include <entity/fwd.hpp>
 #include <entt/entt.hpp>

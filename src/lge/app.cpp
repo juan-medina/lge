@@ -3,16 +3,16 @@
 
 #include "lge/app.hpp"
 
+#include <lge/internal/raylib/raylib_input.hpp>
+#include <lge/internal/raylib/raylib_renderer.hpp>
+#include <lge/internal/systems/bounds_system.hpp>
+#include <lge/internal/systems/hidden_system.hpp>
+#include <lge/internal/systems/metrics_system.hpp>
+#include <lge/internal/systems/render_system.hpp>
+#include <lge/internal/systems/transform_system.hpp>
 #include <lge/log.hpp>
-#include <lge/raylib/raylib_input.hpp>
-#include <lge/raylib/raylib_renderer.hpp>
 #include <lge/result.hpp>
-#include <lge/systems/bounds_system.hpp>
-#include <lge/systems/hidden_system.hpp>
-#include <lge/systems/metrics_system.hpp>
-#include <lge/systems/render_system.hpp>
 #include <lge/systems/system.hpp>
-#include <lge/systems/transform_system.hpp>
 
 #include <memory>
 #include <optional>

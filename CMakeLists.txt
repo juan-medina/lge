@@ -20,7 +20,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-file(GLOB_RECURSE LIB_PUBLIC_HEADERS "include/lge/*.hpp")
 file(GLOB_RECURSE LIB_SOURCE_FILES "src/lge/*.cpp")
 
 set(EMSCRIPTEN FALSE)
@@ -30,13 +29,11 @@ endif ()
 
 add_library(${PROJECT_NAME} STATIC ${LIB_SOURCE_FILES})
 
-if (LIB_PUBLIC_HEADERS)
-    target_sources(${PROJECT_NAME} PUBLIC ${LIB_PUBLIC_HEADERS})
-endif ()
-
 target_include_directories(${PROJECT_NAME}
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
 
 if (WIN32)

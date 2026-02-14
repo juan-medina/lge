@@ -4,17 +4,20 @@
 #pragma once
 
 #include <lge/result.hpp>
-
-#include "system.hpp"
+#include <lge/systems/system.hpp>
 
 #include <entity/fwd.hpp>
+#include <vector>
 
 namespace lge {
 
-class bounds_system: public system {
+class hidden_system: public system {
 public:
-	explicit bounds_system(const phase p, entt::registry &world): system(p, world) {}
+	explicit hidden_system(const phase p, entt::registry &world): system(p, world) {}
 	auto update(float dt) -> result<> override;
+
+private:
+	std::vector<entt::entity> hidden_stack_;
 };
 
 } // namespace lge

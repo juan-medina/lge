@@ -1,15 +1,16 @@
 ﻿// SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
-#include <lge/components/bounds.hpp>
+#include "render_system.hpp"
+
 #include <lge/components/hidden.hpp>
 #include <lge/components/label.hpp>
-#include <lge/components/metrics.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/components/shapes.hpp>
-#include <lge/components/transform.hpp>
+#include <lge/internal/components/bounds.hpp>
+#include <lge/internal/components/metrics.hpp>
+#include <lge/internal/components/transform.hpp>
 #include <lge/result.hpp>
-#include <lge/systems/render_system.hpp>
 
 #include <cmath>
 #include <entity/fwd.hpp>
@@ -58,9 +59,9 @@ auto render_system::transform_point(const glm::mat3 &m, const glm::vec2 &p) -> g
 
 auto render_system::get_rotation(const glm::mat3 &m) -> float {
 	// column 0 = rotated + scaled X axis
-	const auto sx = glm::length(glm::vec2{m[0][0], m[1][0]}); // NOLINT(*-pro-bounds-avoid-unchecked-container-access)
+	const auto sx = glm::length(glm::vec2{m[0][0], m[1][0]});  // NOLINT(*-pro-bounds-avoid-unchecked-container-access)
 	const auto angle = std::atan2(m[1][0] / sx, m[0][0] / sx); // NOLINT(*-pro-bounds-avoid-unchecked-container-access)
-	return glm::degrees(angle); // CCW, math standard
+	return glm::degrees(angle);								   // CCW, math standard
 }
 
 auto render_system::get_scale(const glm::mat3 &m) -> glm::vec2 {

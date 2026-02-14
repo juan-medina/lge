@@ -7,8 +7,7 @@
 #include <lge/components/shapes.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
-
-#include "system.hpp"
+#include <lge/systems/system.hpp>
 
 #include <entity/fwd.hpp>
 
