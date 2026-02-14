@@ -18,7 +18,7 @@
 LGE_MAIN(hello_world);
 
 auto hello_world::init() -> lge::result<> {
-	if(const auto err = example::init().unwrap(); err) {
+	if(const auto err = example::init().unwrap(); err) [[unlikely]] {
 		return lge::error("error init the app", *err);
 	}
 

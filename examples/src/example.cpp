@@ -16,7 +16,7 @@ auto example::configure() -> lge::app_config {
 }
 
 auto example::init() -> lge::result<> {
-	if(const auto err = app::init().unwrap(); err) {
+	if(const auto err = app::init().unwrap(); err) [[unlikely]] {
 		return lge::error("error init the app", *err);
 	}
 

@@ -24,7 +24,7 @@
 LGE_MAIN(layers);
 
 auto layers::init() -> lge::result<> {
-	if(const auto err = example::init().unwrap(); err) {
+	if(const auto err = example::init().unwrap(); err) [[unlikely]] {
 		return lge::error("error init the app", *err);
 	}
 

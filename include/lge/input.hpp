@@ -178,7 +178,7 @@ public:
 
 	[[nodiscard]] virtual auto get(id bid) const -> const state & {
 		static auto constexpr empty = state{};
-		if(const auto it = states.find(bid); it != states.end()) {
+		if(const auto it = states.find(bid); it != states.end()) [[likely]] {
 			return it->second;
 		}
 		return empty;

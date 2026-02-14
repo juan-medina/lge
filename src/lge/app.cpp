@@ -39,7 +39,7 @@ auto app::run() -> result<> {
 	emscripten_set_main_loop_arg(
 		[](void *arg) -> void {
 			auto *self = static_cast<app *>(arg);
-			if(const auto err = self->main_loop().unwrap(); err) {
+			if(const auto err = self->main_loop().unwrap(); err) [[unlikely]] {
 				SPDLOG_ERROR("error main_loop: {}", err->get_message());
 				emscripten_cancel_main_loop();
 			}
@@ -54,12 +54,12 @@ auto app::run() -> result<> {
 #	endif
 	while(!should_exit_) {
 		should_exit_ = should_exit_ || renderer_->should_close();
-		if(const auto err = main_loop().unwrap(); err) {
+		if(const auto err = main_loop().unwrap(); err) [[unlikely]] {
 			return error("error during main loop", *err);
 		}
 	}
 
-	if(const auto err = end().unwrap(); err) {
+	if(const auto err = end().unwrap(); err) [[unlikely]] {
 		return error("error ending the application", *err);
 	}
 
