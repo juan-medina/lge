@@ -7,6 +7,10 @@
 
 #include <raylib.h>
 
+#ifdef __EMSCRIPTEN__
+#	include <unordered_set>
+#endif
+
 namespace lge {
 
 class raylib_input: public input {
