@@ -7,6 +7,7 @@
 #include <lge/components/placement.hpp>
 #include <lge/components/shapes.hpp>
 #include <lge/internal/components/metrics.hpp>
+#include <lge/internal/components/previous_shapes.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
 
@@ -43,44 +44,47 @@ auto metrics_system::calculate_circle_metrics(const entt::entity entity, const c
 	world.emplace_or_replace<metrics>(entity, metrics{.size = size});
 }
 
-auto metrics_system::is_label_dirty(const label &lbl) -> bool {
-	return lbl.text != lbl.previous_text || lbl.size != lbl.previous_size;
+auto metrics_system::is_label_dirty(const label &lbl, const previous_label &p) -> bool {
+	return lbl.text != p.text || lbl.size != p.size;
 }
 
-auto metrics_system::is_rect_dirty(const rect &r) -> bool {
+auto metrics_system::is_rect_dirty(const rect &r, const previous_rect &p) -> bool {
 	// we consider the rect dirty if any of the properties that affect the metrics have changed
-	return r.size != r.previous_size;
+	return r.size != p.size;
 }
 
-auto metrics_system::is_circle_dirty(const circle &c) -> bool {
+auto metrics_system::is_circle_dirty(const circle &c, const previous_circle &p) -> bool {
 	// we consider the circle dirty if any of the properties that affect the metrics have changed
-	return c.radius != c.previous_radius;
+	return c.radius != p.radius;
 }
 
 auto metrics_system::handle_labels() const -> void {
 	for(const auto entity: world.view<label>()) {
-		if(auto &lbl = world.get<label>(entity); !world.all_of<metrics>(entity) || is_label_dirty(lbl)) {
+		auto &p = world.get_or_emplace<previous_label>(entity);
+		if(auto &lbl = world.get<label>(entity); !world.all_of<metrics>(entity) || is_label_dirty(lbl, p)) {
 			calculate_label_metrics(entity, lbl);
-			lbl.previous_text = lbl.text;
-			lbl.previous_size = lbl.size;
+			p.text = lbl.text;
+			p.size = lbl.size;
 		}
 	}
 }
 
 auto metrics_system::handle_rects() const -> void {
 	for(const auto entity: world.view<rect>()) {
-		if(auto &r = world.get<rect>(entity); !world.all_of<metrics>(entity) || is_rect_dirty(r)) {
+		auto &p = world.get_or_emplace<previous_rect>(entity);
+		if(auto &r = world.get<rect>(entity); !world.all_of<metrics>(entity) || is_rect_dirty(r, p)) {
 			calculate_rect_metrics(entity, r);
-			r.previous_size = r.size;
+			p.size = r.size;
 		}
 	}
 }
 
 auto metrics_system::handle_circles() const -> void {
 	for(const auto entity: world.view<circle>()) {
-		if(auto &c = world.get<circle>(entity); !world.all_of<metrics>(entity) || is_circle_dirty(c)) {
+		auto &p = world.get_or_emplace<previous_circle>(entity);
+		if(auto &c = world.get<circle>(entity); !world.all_of<metrics>(entity) || is_circle_dirty(c, p)) {
 			calculate_circle_metrics(entity, c);
-			c.previous_radius = c.radius;
+			p.radius = c.radius;
 		}
 	}
 }

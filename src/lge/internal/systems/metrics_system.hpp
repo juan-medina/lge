@@ -5,6 +5,8 @@
 
 #include <lge/components/label.hpp>
 #include <lge/components/shapes.hpp>
+#include <lge/internal/components/previous_label.hpp>
+#include <lge/internal/components/previous_shapes.hpp>
 #include <lge/renderer.hpp>
 #include <lge/result.hpp>
 #include <lge/systems/system.hpp>
@@ -24,9 +26,9 @@ private:
 	auto calculate_rect_metrics(entt::entity entity, const rect &r) const -> void;
 	auto calculate_circle_metrics(entt::entity entity, const circle &c) const -> void;
 
-	static auto is_label_dirty(const label &lbl) -> bool;
-	static auto is_rect_dirty(const rect &r) -> bool;
-	static auto is_circle_dirty(const circle &c) -> bool;
+	static auto is_label_dirty(const label &lbl, const previous_label &p) -> bool;
+	static auto is_rect_dirty(const rect &r, const previous_rect &p) -> bool;
+	static auto is_circle_dirty(const circle &c, const previous_circle &p) -> bool;
 
 	auto handle_labels() const -> void;
 	auto handle_rects() const -> void;

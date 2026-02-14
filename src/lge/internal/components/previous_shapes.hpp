@@ -8,18 +8,12 @@
 
 namespace lge {
 
-struct rect {
+struct previous_rect {
 	glm::vec2 size;
-	glm::vec4 border_color{1, 1, 1, 1};
-	glm::vec4 fill_color{0, 0, 0, 0};
-	float border_thickness = 1.0F;
 };
 
-struct circle {
+struct previous_circle {
 	float radius;
-	glm::vec4 border_color{1, 1, 1, 1};
-	glm::vec4 fill_color{0, 0, 0, 0};
-	float border_thickness = 1.0F;
 };
 
 } // namespace lge

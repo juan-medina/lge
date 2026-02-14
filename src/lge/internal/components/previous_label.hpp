@@ -8,9 +8,8 @@
 
 namespace lge {
 
-struct label {
+struct previous_label {
 	std::string text;
-	glm::vec4 color{1, 1, 1, 1};
 	float size = 16.0F;
 };
 
