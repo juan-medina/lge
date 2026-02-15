@@ -10,6 +10,7 @@ namespace lge {
 struct previous_label {
 	std::string text;
 	float size = 16.0F;
+	font_id font;
 };
 
 } // namespace lge

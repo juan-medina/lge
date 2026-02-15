@@ -6,6 +6,7 @@
 #include <lge/app/app_config.hpp>
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
+#include <lge/interface/resource_manager.hpp>
 
 #include <raylib.h>
 
@@ -152,11 +153,18 @@ auto raylib_renderer::get_delta_time() -> float {
 	return GetFrameTime();
 }
 
-auto raylib_renderer::get_label_size(const std::string &text, const int &size) -> glm::vec2 {
-	const auto default_font = GetFontDefault();
-	const auto spacing = static_cast<float>(size) / static_cast<float>(default_font.baseSize);
+auto raylib_renderer::get_label_size(const font_id font, const std::string &text, const int &size) -> glm::vec2 {
+	auto rl_font = GetFontDefault();
+	if(font != empty_resource) {
+		if(const auto err = resource_manager_.get_raylib_font(font).unwrap(rl_font); err) [[unlikely]] {
+			LGE_ERROR("failed to get font with id {}, rendering label with default font instead", font);
+			return {0, 0};
+		}
+	}
 
-	const auto [width, height] = MeasureTextEx(default_font, text.c_str(), static_cast<float>(size), spacing);
+	const auto spacing = static_cast<float>(size) / static_cast<float>(rl_font.baseSize);
+
+	const auto [width, height] = MeasureTextEx(rl_font, text.c_str(), static_cast<float>(size), spacing);
 	return {width, height};
 }
 
@@ -251,16 +259,24 @@ auto raylib_renderer::screen_size_changed(const glm::vec2 screen_size) -> result
 	return true;
 }
 
-auto raylib_renderer::render_label(const std::string &text,
+auto raylib_renderer::render_label(const font_id font,
+								   const std::string &text,
 								   const int &size,
 								   const glm::vec4 &color,
 								   const glm::vec2 &position,
 								   const float rotation) const -> void {
 	const auto screen_pos = to_screen(position);
-	const auto default_font = GetFontDefault();
-	const auto spacing = static_cast<float>(size) / static_cast<float>(default_font.baseSize);
+	auto rl_font = GetFontDefault();
+	if(font != empty_resource) {
+		if(const auto err = resource_manager_.get_raylib_font(font).unwrap(rl_font); err) [[unlikely]] {
+			LGE_ERROR("failed to get font with id {}, rendering label with default font instead", font);
+			return;
+		}
+	}
 
-	DrawTextPro(default_font,
+	const auto spacing = static_cast<float>(size) / static_cast<float>(rl_font.baseSize);
+
+	DrawTextPro(rl_font,
 				text.c_str(),
 				{.x = screen_pos.x, .y = screen_pos.y},
 				{.x = 0.0F, .y = 0.0F},

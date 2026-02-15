@@ -5,6 +5,7 @@
 
 #include <lge/app/app_config.hpp>
 #include <lge/core/result.hpp>
+#include <lge/interface/resource_manager.hpp>
 
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float4.hpp>
@@ -34,7 +35,8 @@ public:
 	virtual auto set_fullscreen(bool fullscreen) -> void = 0;
 	virtual auto toggle_fullscreen() -> void = 0;
 
-	virtual auto render_label(const std::string &text,
+	virtual auto render_label(font_id font,
+							  const std::string &text,
 							  const int &size,
 							  const glm::vec4 &color,
 							  const glm::vec2 &position,
@@ -59,7 +61,7 @@ public:
 							   const glm::vec4 &fill_color,
 							   float border_thickness) const -> void = 0;
 
-	virtual auto get_label_size(const std::string &text, const int &size) -> glm::vec2 = 0;
+	virtual auto get_label_size(font_id font, const std::string &text, const int &size) -> glm::vec2 = 0;
 
 	virtual auto show_cursor(bool show) -> void = 0;
 

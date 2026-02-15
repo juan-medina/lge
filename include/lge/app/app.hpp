@@ -49,7 +49,8 @@ public:
 	}
 
 protected:
-	virtual auto init() -> result<>;
+	[[nodiscard]] virtual auto init() -> result<>;
+	[[nodiscard]] virtual auto end() -> result<>;
 
 	template<typename T, typename... Args>
 		requires std::is_base_of_v<system, T>
@@ -96,7 +97,6 @@ private:
 	std::shared_ptr<resource_manager> resource_manager_;
 
 	auto setup_log() -> result<>;
-	[[nodiscard]] auto end() const -> result<>;
 	[[nodiscard]] auto main_loop() -> result<>;
 
 	static constexpr auto empty_format = "%v";

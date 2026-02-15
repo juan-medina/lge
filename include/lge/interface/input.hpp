@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <ranges>
 #include <string_view>
 #include <unordered_map>

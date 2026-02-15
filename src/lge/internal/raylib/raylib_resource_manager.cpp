@@ -44,13 +44,21 @@ auto raylib_resource_manager::unload_font(const font_id id) -> result<> {
 		return error("font not found in cache");
 	}
 
-	UnloadFont(handle->raylib_font);
-
 	font_cache_.erase(id);
 
 	LGE_DEBUG("unloading font from uri `{}`", handle->uri);
 
 	return true;
+}
+
+auto raylib_resource_manager::get_raylib_font(font_id id) const -> result<Font> {
+	const auto handle = font_cache_[id]; // NOLINT(*-pro-bounds-avoid-unchecked-container-access)
+	if(!handle) {
+		LGE_ERROR("failed to get raylib font with id `{}`: font not found in cache", id);
+		return error("font not found in cache");
+	}
+
+	return handle->raylib_font;
 }
 
 } // namespace lge

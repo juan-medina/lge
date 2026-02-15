@@ -46,10 +46,14 @@ include(external/lge/cmake/LGEApplication.cmake)
 # Define your application
 file(GLOB_RECURSE GAME_SOURCES "src/*.cpp")
 
+# Optionally specify your own resources folder
+set(GAME_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
+
 lge_add_application(my_game
         SOURCES ${GAME_SOURCES}
         EMSCRIPTEN_SHELL ${CMAKE_CURRENT_SOURCE_DIR}/web/template.html
         EMSCRIPTEN_ASSETS ${CMAKE_CURRENT_SOURCE_DIR}/web/favicon.ico
+        GAME_RESOURCES ${GAME_RESOURCES_DIR}
 )
 ```
 
@@ -60,11 +64,16 @@ lge_add_application(my_game
 | `SOURCES` | Yes | List of source files for your application |
 | `EMSCRIPTEN_SHELL` | No | Path to custom HTML shell template for WebAssembly builds |
 | `EMSCRIPTEN_ASSETS` | No | List of asset files to copy for WebAssembly builds |
+| `GAME_RESOURCES` | No | Path to your game's resources folder (merged with engine resources) |
 
 The function automatically configures:
 - Linking to the lge library
 - Windows subsystem settings (console for Debug, Windows for Release)
 - Emscripten/WebAssembly build options (GLFW, memory growth, exports)
+- Merges engine resources and your game resources into the build output directory:
+  - `resources/lge` (engine)
+  - `resources/game` (your game, if provided)
+- For Emscripten, preloads the merged resources folder for use in the browser
 
 ### Minimal Example
 

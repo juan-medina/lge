@@ -19,6 +19,13 @@ struct font {
 	Font raylib_font;
 	resource_uri uri;
 	explicit font(const Font &f, const resource_uri &uri): raylib_font(f), uri(uri) {}
+	~font() {
+		UnloadFont(raylib_font);
+	}
+	font(const font &) = delete;
+	font(font &&) = delete;
+	auto operator=(const font &) -> font & = delete;
+	auto operator=(font &&) -> font & = delete;
 };
 
 struct font_loader: entt::resource_loader<font> {
@@ -34,6 +41,7 @@ struct font_loader: entt::resource_loader<font> {
 			LGE_ERROR("failed to load font from uri: {}", uri);
 			return nullptr;
 		}
+		SetTextureFilter(rl.texture, TEXTURE_FILTER_POINT);
 		return std::make_shared<font>(rl, uri);
 	}
 };
@@ -42,8 +50,11 @@ class raylib_resource_manager final: public resource_manager {
 public:
 	[[nodiscard]] auto init() -> result<> override;
 	[[nodiscard]] auto end() -> result<> override;
+
 	[[nodiscard]] auto load_font(const resource_uri &uri) -> result<font_id> override;
 	[[nodiscard]] auto unload_font(font_id id) -> result<> override;
+
+	[[nodiscard]] auto get_raylib_font(font_id id) const -> result<Font>;
 
 private:
 	using font_cache = entt::resource_cache<font, font_loader>;

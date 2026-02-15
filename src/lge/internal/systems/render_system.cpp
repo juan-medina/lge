@@ -96,7 +96,7 @@ auto render_system::handle_label(const entt::entity entity, const glm::mat3 &wor
 	const auto final_font_size = lbl.size * world_scale.y;
 
 	// labels are drawn at the top left corner, so we need to offset the position by the pivot and size
-	renderer_.render_label(lbl.text, static_cast<int>(final_font_size), lbl.color, top_left_world, rotation);
+	renderer_.render_label(lbl.font, lbl.text, static_cast<int>(final_font_size), lbl.color, top_left_world, rotation);
 }
 
 auto render_system::handle_rect(const entt::entity entity, const glm::mat3 &world_transform) const -> void {

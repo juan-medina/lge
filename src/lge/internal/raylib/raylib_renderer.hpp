@@ -6,6 +6,8 @@
 #include <lge/app/app_config.hpp>
 #include <lge/core/result.hpp>
 #include <lge/interface/renderer.hpp>
+#include <lge/interface/resource_manager.hpp>
+#include <lge/internal/raylib/raylib_resource_manager.hpp>
 
 #include <raylib.h>
 
@@ -17,7 +19,7 @@ namespace lge {
 
 class raylib_renderer: public renderer {
 public:
-	explicit raylib_renderer() = default;
+	explicit raylib_renderer(raylib_resource_manager &rm): resource_manager_{rm} {};
 	~raylib_renderer() override = default;
 
 	raylib_renderer(const raylib_renderer &) = delete;
@@ -37,13 +39,14 @@ public:
 	auto set_fullscreen(bool fullscreen) -> void override;
 	auto toggle_fullscreen() -> void override;
 
-	auto get_label_size(const std::string &text, const int &size) -> glm::vec2 override;
+	auto get_label_size(font_id font, const std::string &text, const int &size) -> glm::vec2 override;
 
 	auto show_cursor(bool show) -> void override;
 
 	auto get_delta_time() -> float override;
 
-	auto render_label(const std::string &text,
+	auto render_label(font_id font,
+					  const std::string &text,
 					  const int &size,
 					  const glm::vec4 &color,
 					  const glm::vec2 &position,
@@ -69,6 +72,7 @@ public:
 					   float border_thickness) const -> void override;
 
 private:
+	raylib_resource_manager &resource_manager_;
 	static auto setup_raylib_log() -> void;
 	static auto log_callback(int log_level, const char *text, va_list args) -> void; // NOLINT(*-include-cleaner)
 

@@ -6,8 +6,10 @@
 #include <lge/app/app.hpp>
 #include <lge/app/app_config.hpp>
 #include <lge/core/result.hpp>
+#include <lge/interface/resource_manager.hpp>
 
 #include <entity/entity.hpp>
+#include <entity/fwd.hpp>
 #include <string>
 #include <utility>
 
@@ -20,13 +22,19 @@ public:
 		: game_title_(std::move(game_title)), kb_message_(std::move(kb_message)),
 		  controller_message_(std::move(controller_message)) {}
 
-	[[nodiscard]] auto init() -> lge::result<> override;
 	[[nodiscard]] auto update(float dt) -> lge::result<> override;
 	[[nodiscard]] auto configure() -> lge::app_config override;
 
 protected:
+	[[nodiscard]] auto init() -> lge::result<> override;
+	[[nodiscard]] auto end() -> lge::result<> override;
+
 	[[nodiscard]] static constexpr auto get_game_res() -> glm::vec2 {
 		return game_res;
+	}
+
+	[[nodiscard]] auto get_font_id() const -> lge::resource_id {
+		return font_id_;
 	}
 
 private:
@@ -47,4 +55,6 @@ private:
 	std::string game_title_;
 	std::string kb_message_;
 	std::string controller_message_;
+
+	lge::resource_id font_id_ = lge::empty_resource;
 };

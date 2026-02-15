@@ -9,21 +9,25 @@
 
 #include <array>
 #include <cstddef>
-#include <glm/ext/vector_float2.hpp>
+#include <cstdint>
+#include <entity/entity.hpp>
+#include <entity/fwd.hpp>
 #include <random>
 
 class layers: public example {
 public:
 	explicit layers(): example(example_title, kb_message, controller_message) {}
 
-	[[nodiscard]] auto init() -> lge::result<> override;
 	[[nodiscard]] auto update(float dt) -> lge::result<> override;
+
+protected:
+	[[nodiscard]] auto init() -> lge::result<> override;
 
 private:
 	static constexpr auto example_title = "Layers!";
-	static constexpr auto kb_message = "press 1: change color on top, F5 to toggle debug draw, "
+	static constexpr auto kb_message = "press 1: change color on top, F5 to toggle debug draw,\n"
 									   "F11: toggle fullscreen, Esc: exit";
-	static constexpr auto controller_message = "controller A: blue on top, START: debug draw, "
+	static constexpr auto controller_message = "controller A: blue on top, START: debug draw,\n"
 											   "SELECT: toggle fullscreen, B: exit";
 
 	enum class top_color : std::int8_t {

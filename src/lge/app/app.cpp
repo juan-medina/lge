@@ -27,9 +27,9 @@
 namespace lge {
 
 app::app() {
-	renderer_ = std::make_unique<raylib_renderer>();
-	input_ = std::make_unique<raylib_input>();
 	resource_manager_ = std::make_unique<raylib_resource_manager>();
+	renderer_ = std::make_unique<raylib_renderer>(dynamic_cast<raylib_resource_manager &>(*resource_manager_));
+	input_ = std::make_unique<raylib_input>();
 }
 
 auto app::run() -> result<> {
@@ -112,7 +112,7 @@ auto app::setup_log() -> result<> { // NOLINT(*-convert-member-functions-to-stat
 	return true;
 }
 
-auto app::end() const -> result<> {
+auto app::end() -> result<> {
 	if(const auto err = resource_manager_->end().unwrap(); err) [[unlikely]] {
 		return error("failed to shutdown resource manager", *err);
 	}

@@ -16,4 +16,5 @@ lge_add_application(${PROJECT_NAME}
         SOURCES ${APP_SOURCE_FILES} ${COMMON_SOURCE_FILES}
         EMSCRIPTEN_SHELL ${CMAKE_CURRENT_SOURCE_DIR}/../web/template.html
         EMSCRIPTEN_ASSETS ${CMAKE_CURRENT_SOURCE_DIR}/../web/favicon.ico
+        GAME_RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../resources
 )

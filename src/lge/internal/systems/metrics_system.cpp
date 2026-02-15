@@ -30,7 +30,7 @@ auto metrics_system::update(const float /*dt*/) -> result<> {
 }
 
 auto metrics_system::calculate_label_metrics(const entt::entity entity, const label &lbl) const -> void {
-	const auto text_size = renderer_.get_label_size(lbl.text, static_cast<int>(lbl.size));
+	const auto text_size = renderer_.get_label_size(lbl.font, lbl.text, static_cast<int>(lbl.size));
 	world.emplace_or_replace<metrics>(entity, metrics{.size = text_size});
 }
 

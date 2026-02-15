@@ -21,6 +21,7 @@ misc-include-cleaner,
 -*-pro-bounds-constant-array-index,
 -*-non-private-member-variables-in-classes,
 -*-pro-type-union-access,
+-*-pro-bounds-avoid-unchecked-container-access,
 '
 
 CheckOptions:
