@@ -9,7 +9,6 @@
 #include <lge/components/label.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/core/result.hpp>
-#include <lge/interface/renderer.hpp>
 #include <lge/systems/system.hpp>
 
 #include "../../src/example.hpp"
@@ -21,6 +20,12 @@ auto hello_world::init() -> lge::result<> {
 	if(const auto err = example::init().unwrap(); err) [[unlikely]] {
 		return lge::error("error init the app", *err);
 	}
+
+	/*
+	auto &rm = get_resource_manager();
+	if(const auto err = rm.load_font("res/JetBrainsMono-Regular.ttf").unwrap(); err) [[unlikely]] {
+		return lge::error("failed to load font", *err);
+	}*/
 
 	auto &input = get_input();
 	input.bind(hide_hello_world_action,

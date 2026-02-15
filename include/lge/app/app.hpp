@@ -9,6 +9,7 @@
 #include <lge/core/types.hpp>
 #include <lge/interface/input.hpp>
 #include <lge/interface/renderer.hpp>
+#include <lge/interface/resource_manager.hpp>
 #include <lge/systems/system.hpp>
 
 #include <entity/fwd.hpp>
@@ -75,6 +76,14 @@ protected:
 		return *input_;
 	}
 
+	[[nodiscard]] auto get_resource_manager() -> resource_manager & {
+		return *resource_manager_;
+	}
+
+	[[nodiscard]] auto get_resource_manager() const -> const resource_manager & {
+		return *resource_manager_;
+	}
+
 	auto exit() -> void {
 #ifndef __EMSCRIPTEN__
 		should_exit_ = true;
@@ -84,6 +93,8 @@ protected:
 private:
 	std::unique_ptr<renderer> renderer_;
 	std::shared_ptr<input> input_;
+	std::shared_ptr<resource_manager> resource_manager_;
+
 	auto setup_log() -> result<>;
 	[[nodiscard]] auto end() const -> result<>;
 	[[nodiscard]] auto main_loop() -> result<>;

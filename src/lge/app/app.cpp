@@ -6,6 +6,7 @@
 #include <lge/core/result.hpp>
 #include <lge/internal/raylib/raylib_input.hpp>
 #include <lge/internal/raylib/raylib_renderer.hpp>
+#include <lge/internal/raylib/raylib_resource_manager.hpp>
 #include <lge/internal/systems/bounds_system.hpp>
 #include <lge/internal/systems/hidden_system.hpp>
 #include <lge/internal/systems/metrics_system.hpp>
@@ -28,6 +29,7 @@ namespace lge {
 app::app() {
 	renderer_ = std::make_unique<raylib_renderer>();
 	input_ = std::make_unique<raylib_input>();
+	resource_manager_ = std::make_unique<raylib_resource_manager>();
 }
 
 auto app::run() -> result<> {
@@ -77,6 +79,10 @@ auto app::init() -> result<> {
 		return error("failed to initialize renderer", *err);
 	}
 
+	if(const auto err = resource_manager_->init().unwrap(); err) [[unlikely]] {
+		return error("failed to initialize resource manager", *err);
+	}
+
 	// phase::game_update systems go here
 	register_system<metrics_system>(phase::local_update, *renderer_);
 	register_system<bounds_system>(phase::game_update);
@@ -106,8 +112,11 @@ auto app::setup_log() -> result<> { // NOLINT(*-convert-member-functions-to-stat
 	return true;
 }
 
-// ReSharper disable once CppMemberFunctionMayBeStatic
-auto app::end() const -> result<> { // NOLINT(*-convert-member-functions-to-static)
+auto app::end() const -> result<> {
+	if(const auto err = resource_manager_->end().unwrap(); err) [[unlikely]] {
+		return error("failed to shutdown resource manager", *err);
+	}
+
 	if(const auto err = renderer_->end().unwrap(); err) [[unlikely]] {
 		return error("failed to shutdown renderer", *err);
 	}
