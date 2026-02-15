@@ -75,25 +75,31 @@ public:
 	result(const Value &value): std::variant<Value, Error>(value) {}
 
 	// NOLINTNEXTLINE(google-explicit-constructor)
+	result(Value &&value): std::variant<Value, Error>(std::move(value)) {}
+
+	// NOLINTNEXTLINE(google-explicit-constructor)
 	result(const Error &error): std::variant<Value, Error>(error) {}
 
-	[[maybe_unused]] auto has_error() const noexcept {
+	// NOLINTNEXTLINE(google-explicit-constructor)
+	result(Error &&error): std::variant<Value, Error>(std::move(error)) {}
+
+	[[nodiscard]] auto has_error() const noexcept -> bool {
 		return std::holds_alternative<Error>(*this);
 	}
 
-	[[maybe_unused]] auto has_value() const noexcept {
+	[[nodiscard]] auto has_value() const noexcept -> bool {
 		return std::holds_alternative<Value>(*this);
 	}
 
-	[[maybe_unused]] [[nodiscard]] auto get_error() const noexcept {
+	[[nodiscard]] auto get_error() const noexcept -> Error {
 		return std::get<Error>(*this);
 	}
 
-	[[maybe_unused]] [[nodiscard]] auto get_value() const noexcept {
+	[[nodiscard]] auto get_value() const noexcept -> Value {
 		return std::get<Value>(*this);
 	}
 
-	auto unwrap(Value &value) const noexcept -> std::optional<Error> {
+	[[nodiscard]] auto unwrap(Value &value) const noexcept -> std::optional<Error> {
 		if(has_error()) {
 			return std::get<Error>(*this);
 		}
@@ -101,15 +107,7 @@ public:
 		return std::nullopt;
 	}
 
-	auto unwrap(const Value &value) const noexcept -> std::optional<Error> {
-		if(has_error()) {
-			return std::get<Error>(*this);
-		}
-		value = std::get<Value>(*this);
-		return std::nullopt;
-	}
-
-	auto unwrap() const noexcept -> std::optional<Error> {
+	[[nodiscard]] auto unwrap() const noexcept -> std::optional<Error> {
 		if(has_error()) {
 			return std::get<Error>(*this);
 		}
