@@ -50,7 +50,7 @@ public:
 	[[nodiscard]] virtual auto init() -> result<> = 0;
 	[[nodiscard]] virtual auto end() -> result<> = 0;
 
-	[[nodiscard]] virtual auto load_font(resource_uri uri) -> result<font_id> = 0;
+	[[nodiscard]] virtual auto load_font(const resource_uri &uri) -> result<font_id> = 0;
 	[[nodiscard]] virtual auto unload_font(font_id id) -> result<> = 0;
 };
 

@@ -21,9 +21,10 @@ auto hello_world::init() -> lge::result<> {
 		return lge::error("error init the app", *err);
 	}
 
+
 	/*
 	auto &rm = get_resource_manager();
-	if(const auto err = rm.load_font("res/JetBrainsMono-Regular.ttf").unwrap(); err) [[unlikely]] {
+	if(const auto err = rm.load_font("resources/lge/font/peaberry_mono.fnt").unwrap(); err) [[unlikely]] {
 		return lge::error("failed to load font", *err);
 	}*/
 
