@@ -1,7 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
-#include <lge/app.hpp>
+#include <lge/app/app.hpp>
+#include <lge/core/log.hpp>
+#include <lge/core/result.hpp>
 #include <lge/internal/raylib/raylib_input.hpp>
 #include <lge/internal/raylib/raylib_renderer.hpp>
 #include <lge/internal/systems/bounds_system.hpp>
@@ -10,8 +12,6 @@
 #include <lge/internal/systems/order_system.hpp>
 #include <lge/internal/systems/render_system.hpp>
 #include <lge/internal/systems/transform_system.hpp>
-#include <lge/log.hpp>
-#include <lge/result.hpp>
 #include <lge/systems/system.hpp>
 
 #include <memory>

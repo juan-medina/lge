@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <lge/app_config.hpp>
-#include <lge/renderer.hpp>
-#include <lge/result.hpp>
+#include <lge/app/app_config.hpp>
+#include <lge/core/result.hpp>
+#include <lge/interface/renderer.hpp>
 
 #include <raylib.h>
 

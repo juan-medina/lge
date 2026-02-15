@@ -5,8 +5,8 @@
 
 #include <lge/components/hierarchy.hpp>
 #include <lge/components/order.hpp>
+#include <lge/core/result.hpp>
 #include <lge/internal/components/render_order.hpp>
-#include <lge/result.hpp>
 
 #include <entity/fwd.hpp>
 #include <entt/entt.hpp>

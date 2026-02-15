@@ -3,13 +3,13 @@
 
 #include "hello_world.hpp"
 
+#include <lge/app/main.hpp>
 #include <lge/components/hidden.hpp>
 #include <lge/components/hierarchy.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/placement.hpp>
-#include <lge/main.hpp>
-#include <lge/renderer.hpp>
-#include <lge/result.hpp>
+#include <lge/core/result.hpp>
+#include <lge/interface/renderer.hpp>
 #include <lge/systems/system.hpp>
 
 #include "../../src/example.hpp"

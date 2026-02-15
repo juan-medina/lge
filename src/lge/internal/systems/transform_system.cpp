@@ -5,9 +5,9 @@
 
 #include <lge/components/hierarchy.hpp>
 #include <lge/components/placement.hpp>
+#include <lge/core/result.hpp>
 #include <lge/internal/components/metrics.hpp>
 #include <lge/internal/components/transform.hpp>
-#include <lge/result.hpp>
 #include <lge/systems/system.hpp>
 
 #include <entity/fwd.hpp>

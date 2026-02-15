@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <lge/app_config.hpp>
-#include <lge/input.hpp>
-#include <lge/log.hpp>
-#include <lge/renderer.hpp>
-#include <lge/result.hpp>
+#include <lge/app/app_config.hpp>
+#include <lge/core/log.hpp>
+#include <lge/core/result.hpp>
+#include <lge/core/types.hpp>
+#include <lge/interface/input.hpp>
+#include <lge/interface/renderer.hpp>
 #include <lge/systems/system.hpp>
-#include <lge/types.hpp>
 
 #include <entity/fwd.hpp>
 #include <entt/entt.hpp>

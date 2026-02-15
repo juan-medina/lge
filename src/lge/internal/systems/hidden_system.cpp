@@ -5,8 +5,8 @@
 
 #include <lge/components/hidden.hpp>
 #include <lge/components/hierarchy.hpp>
+#include <lge/core/result.hpp>
 #include <lge/internal/components/effective_hidden.hpp>
-#include <lge/result.hpp>
 
 #include <entity/fwd.hpp>
 #include <entt/entt.hpp>

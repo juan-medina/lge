@@ -3,13 +3,13 @@
 
 #include "example.hpp"
 
-#include <lge/app.hpp>
-#include <lge/app_config.hpp>
+#include <lge/app/app.hpp>
+#include <lge/app/app_config.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/order.hpp>
 #include <lge/components/placement.hpp>
-#include <lge/renderer.hpp>
-#include <lge/result.hpp>
+#include <lge/core/result.hpp>
+#include <lge/interface/renderer.hpp>
 
 auto example::configure() -> lge::app_config {
 	return {.design_resolution = game_res, .clear_color = clear_color, .window_title = game_title_};

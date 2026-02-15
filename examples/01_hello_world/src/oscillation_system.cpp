@@ -5,8 +5,8 @@
 
 #include <lge/components/hidden.hpp>
 #include <lge/components/placement.hpp>
+#include <lge/core/result.hpp>
 #include <lge/effects/oscillator.hpp>
-#include <lge/result.hpp>
 
 #include <entity/fwd.hpp>
 #include <entt/entt.hpp>

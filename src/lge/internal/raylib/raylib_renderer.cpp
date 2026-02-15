@@ -3,9 +3,9 @@
 
 #include "raylib_renderer.hpp"
 
-#include <lge/app_config.hpp>
-#include <lge/log.hpp>
-#include <lge/result.hpp>
+#include <lge/app/app_config.hpp>
+#include <lge/core/log.hpp>
+#include <lge/core/result.hpp>
 
 #include <raylib.h>
 

@@ -4,7 +4,7 @@
 #pragma once
 
 #include <lge/components/placement.hpp>
-#include <lge/result.hpp>
+#include <lge/core/result.hpp>
 #include <lge/systems/system.hpp>
 
 #include <entity/fwd.hpp>

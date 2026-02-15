@@ -5,11 +5,11 @@
 
 #include <lge/components/label.hpp>
 #include <lge/components/shapes.hpp>
+#include <lge/core/result.hpp>
+#include <lge/interface/renderer.hpp>
 #include <lge/internal/components/metrics.hpp>
-#include <lge/internal/components/previous_shapes.hpp>
 #include <lge/internal/components/previous_label.hpp>
-#include <lge/renderer.hpp>
-#include <lge/result.hpp>
+#include <lge/internal/components/previous_shapes.hpp>
 
 #include <entity/fwd.hpp>
 #include <entt/entt.hpp>

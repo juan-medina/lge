@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <lge/renderer.hpp>
-#include <lge/result.hpp>
+#include <lge/core/result.hpp>
+#include <lge/interface/renderer.hpp>
 #include <lge/systems/system.hpp>
 
 #include <entity/fwd.hpp>

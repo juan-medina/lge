@@ -3,13 +3,13 @@
 
 #include "layers.hpp"
 
+#include <lge/app/main.hpp>
 #include <lge/components/hierarchy.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/order.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/components/shapes.hpp>
-#include <lge/main.hpp>
-#include <lge/result.hpp>
+#include <lge/core/result.hpp>
 
 #include "../../src/example.hpp"
 

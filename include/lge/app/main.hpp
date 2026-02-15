@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <lge/app.hpp>
-#include <lge/log.hpp>
+#include <lge/app/app.hpp>
+#include <lge/core/log.hpp>
 
 #ifndef __EMSCRIPTEN__
 #	include <boxer/boxer.h>

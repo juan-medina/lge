@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <lge/result.hpp>
+#include <lge/core/result.hpp>
 
 #include <cstdint>
 #include <entity/fwd.hpp>

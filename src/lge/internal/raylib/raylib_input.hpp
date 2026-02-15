@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <lge/input.hpp>
-
 #include <raylib.h>
+
+#include <lge/interface/input.hpp>
 
 #ifdef __EMSCRIPTEN__
 #	include <unordered_set>

@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <lge/app.hpp>
-#include <lge/app_config.hpp>
-#include <lge/result.hpp>
+#include <lge/app/app.hpp>
+#include <lge/app/app_config.hpp>
+#include <lge/core/result.hpp>
 
 #include <entity/entity.hpp>
 #include <string>

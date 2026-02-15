@@ -3,8 +3,8 @@
 
 #pragma once
 
+#include <lge/core/result.hpp>
 #include <lge/effects/oscillator.hpp>
-#include <lge/result.hpp>
 #include <lge/systems/system.hpp>
 
 #include <entity/fwd.hpp>

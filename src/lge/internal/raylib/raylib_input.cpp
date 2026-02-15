@@ -3,7 +3,7 @@
 
 #include "raylib_input.hpp"
 
-#include <lge/log.hpp>
+#include <lge/core/log.hpp>
 
 #include <raylib.h>
 

@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <lge/app_config.hpp>
-#include <lge/result.hpp>
+#include <lge/app/app_config.hpp>
+#include <lge/core/result.hpp>
 
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float4.hpp>
@@ -52,8 +52,6 @@ public:
 							 const glm::vec4 &border_color,
 							 const glm::vec4 &fill_color,
 							 float border_thickness) const -> void = 0;
-
-
 
 	virtual auto render_circle(const glm::vec2 &center,
 							   float radius,

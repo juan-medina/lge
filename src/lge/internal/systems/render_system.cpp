@@ -6,12 +6,12 @@
 #include <lge/components/label.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/components/shapes.hpp>
+#include <lge/core/result.hpp>
 #include <lge/internal/components/bounds.hpp>
 #include <lge/internal/components/effective_hidden.hpp>
 #include <lge/internal/components/metrics.hpp>
 #include <lge/internal/components/render_order.hpp>
 #include <lge/internal/components/transform.hpp>
-#include <lge/result.hpp>
 
 #include <algorithm>
 #include <cmath>
