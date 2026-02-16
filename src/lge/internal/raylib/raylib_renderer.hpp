@@ -95,6 +95,9 @@ private:
 	[[nodiscard]] auto to_screen(const glm::vec2 &p) const -> glm::vec2 {
 		return {p.x + (drawing_resolution_.x * 0.5F), p.y + (drawing_resolution_.y * 0.5F)};
 	}
+
+	font_handle default_font_{};
+	static constexpr auto default_font_path = "resources/lge/font/peaberry_mono.fnt";
 };
 
 } // namespace lge

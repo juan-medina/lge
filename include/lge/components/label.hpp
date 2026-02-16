@@ -13,7 +13,7 @@ namespace lge {
 struct label {
 	std::string text;
 	glm::vec4 color{1, 1, 1, 1};
-	float size = 16.0F;
+	float size = 17.0F;
 	font_handle font = invalid_font;
 };
 

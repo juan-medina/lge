@@ -32,9 +32,7 @@ auto layers::init() -> lge::result<> {
 	static constexpr auto game_res = get_game_res();
 
 	top_text_entity_ = world.create();
-	auto &message_label = world.emplace<lge::label>(top_text_entity_, "");
-	message_label.size = 17;
-	message_label.font = get_font_id();
+	world.emplace<lge::label>(top_text_entity_, "");
 	world.emplace<lge::placement>(
 		top_text_entity_, 0.0F, -game_res.y / 2, 0.0F, glm::vec2{1.F, 1.F}, lge::pivot::top_center);
 

@@ -27,17 +27,10 @@ auto example::init() -> lge::result<> {
 		return lge::error("error init the app", *err);
 	}
 
-	auto &rm = get_resource_manager();
-	if(const auto err = rm.load_font("resources/lge/font/peaberry_mono.fnt").unwrap(font_id_); err) [[unlikely]] {
-		return lge::error("failed to load font", *err);
-	}
-
 	auto &world = get_world();
 
 	message_ent_ = world.create();
-	auto &message_label = world.emplace<lge::label>(message_ent_, kb_message_);
-	message_label.size = 17;
-	message_label.font = font_id_;
+	world.emplace<lge::label>(message_ent_, kb_message_);
 	world.emplace<lge::placement>(
 		message_ent_, 0.0F, game_res.y / 2, 0.0F, glm::vec2{1.F, 1.F}, lge::pivot::bottom_center);
 
@@ -45,15 +38,6 @@ auto example::init() -> lge::result<> {
 	bind_common_actions();
 
 	return true;
-}
-
-auto example::end() -> lge::result<> {
-	auto &rm = get_resource_manager();
-	if(const auto err = rm.unload_font(font_id_).unwrap(); err) [[unlikely]] {
-		return lge::error("failed to unload font", *err);
-	}
-
-	return app::end();
 }
 
 auto example::bind_common_actions() -> void {

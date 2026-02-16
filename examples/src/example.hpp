@@ -6,7 +6,6 @@
 #include <lge/app/app.hpp>
 #include <lge/app/app_config.hpp>
 #include <lge/core/result.hpp>
-#include <lge/interface/resource_manager.hpp>
 
 #include <entity/entity.hpp>
 #include <entity/fwd.hpp>
@@ -28,14 +27,9 @@ public:
 
 protected:
 	[[nodiscard]] auto init() -> lge::result<> override;
-	[[nodiscard]] auto end() -> lge::result<> override;
 
 	[[nodiscard]] static constexpr auto get_game_res() -> glm::vec2 {
 		return game_res;
-	}
-
-	[[nodiscard]] auto get_font_id() const -> lge::font_handle {
-		return font_id_;
 	}
 
 private:
@@ -56,6 +50,4 @@ private:
 	std::string game_title_;
 	std::string kb_message_;
 	std::string controller_message_;
-
-	lge::font_handle font_id_ = lge::invalid_font;
 };

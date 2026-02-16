@@ -45,6 +45,10 @@ auto raylib_renderer::init(const app_config &config) -> result<> {
 
 	initialized_ = true;
 
+	if(const auto err = resource_manager_.load_font(default_font_path).unwrap(default_font_); err) [[unlikely]] {
+		return error("failed to load default font", *err);
+	}
+
 	LGE_INFO("raylib_renderer initialized");
 	return true;
 }
@@ -52,6 +56,12 @@ auto raylib_renderer::init(const app_config &config) -> result<> {
 auto raylib_renderer::end() -> result<> {
 	if(!initialized_) [[unlikely]] {
 		return true;
+	}
+
+	if(default_font_.is_valid()) [[likely]] {
+		if(const auto err = resource_manager_.unload_font(default_font_).unwrap(); err) [[unlikely]] {
+			return error("failed to unload default font", *err);
+		}
 	}
 
 	CloseWindow();
@@ -155,9 +165,10 @@ auto raylib_renderer::get_delta_time() -> float {
 
 auto raylib_renderer::get_label_size(const font_handle font, const std::string &text, const int &size) -> glm::vec2 {
 	auto rl_font = GetFontDefault();
-	if(font.is_valid()) {
-		if(const auto err = resource_manager_.get_raylib_font(font).unwrap(rl_font); err) [[unlikely]] {
-			LGE_ERROR("failed to get font with id {}, rendering label with default font instead", font);
+
+	if(const auto font_to_use = font.is_valid() ? font : default_font_; font_to_use.is_valid()) {
+		if(const auto err = resource_manager_.get_raylib_font(font_to_use).unwrap(rl_font); err) [[unlikely]] {
+			LGE_ERROR("failed to get font with id {}, rendering label with default font instead", font_to_use);
 		}
 	}
 
@@ -266,9 +277,9 @@ auto raylib_renderer::render_label(const font_handle font,
 								   const float rotation) const -> void {
 	const auto screen_pos = to_screen(position);
 	auto rl_font = GetFontDefault();
-	if(font.is_valid()) {
-		if(const auto err = resource_manager_.get_raylib_font(font).unwrap(rl_font); err) [[unlikely]] {
-			LGE_ERROR("failed to get font with id {}, rendering label with default font instead", font);
+	if(const auto font_to_use = font.is_valid() ? font : default_font_; font_to_use.is_valid()) {
+		if(const auto err = resource_manager_.get_raylib_font(font_to_use).unwrap(rl_font); err) [[unlikely]] {
+			LGE_ERROR("failed to get font with id {}, rendering label with default font instead", font_to_use);
 		}
 	}
 
