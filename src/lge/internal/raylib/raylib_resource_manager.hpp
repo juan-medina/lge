@@ -29,6 +29,33 @@ struct font {
 	auto operator=(font &&) -> font & = delete;
 };
 
+struct texture {
+	Texture2D raylib_texture;
+	resource_uri uri;
+	explicit texture(const Texture2D &t, const resource_uri &uri): raylib_texture(t), uri(uri) {}
+	~texture() {
+		UnloadTexture(raylib_texture);
+	}
+	texture(const texture &) = delete;
+	texture(texture &&) = delete;
+	auto operator=(const texture &) -> texture & = delete;
+	auto operator=(texture &&) -> texture & = delete;
+};
+
+struct texture_loader: entt::resource_loader<texture> {
+	using result_type = std::shared_ptr<texture>;
+
+	auto operator()(const resource_uri &uri) const -> result_type {
+		const auto rl = LoadTexture(std::string(uri).c_str());
+		if(rl.id == 0) [[unlikely]] {
+			log::error("failed to load texture from uri: {}", uri);
+			return nullptr;
+		}
+		SetTextureFilter(rl, TEXTURE_FILTER_POINT);
+		return std::make_shared<texture>(rl, uri);
+	}
+};
+
 struct font_loader: entt::resource_loader<font> {
 	using result_type = std::shared_ptr<font>;
 
@@ -57,9 +84,16 @@ public:
 	[[nodiscard]] auto is_font_loaded(font_handle handle) const noexcept -> bool override;
 	[[nodiscard]] auto get_raylib_font(font_handle handle) const -> result<Font>;
 
+	[[nodiscard]] auto load_texture(const resource_uri &uri) -> result<texture_handle> override;
+	[[nodiscard]] auto unload_texture(texture_handle handle) -> result<> override;
+	[[nodiscard]] auto is_texture_loaded(texture_handle handle) const noexcept -> bool override;
+	[[nodiscard]] auto get_raylib_texture(texture_handle handle) const -> result<Texture2D>;
+
 private:
 	using font_cache = entt::resource_cache<font, font_loader>;
+	using texture_cache = entt::resource_cache<texture, texture_loader>;
 	font_cache font_cache_;
+	texture_cache texture_cache_;
 
 	static auto uri_to_key(const resource_uri &uri) noexcept -> entt::id_type {
 		return entt::hashed_string{static_cast<std::string>(uri).c_str()}.value();

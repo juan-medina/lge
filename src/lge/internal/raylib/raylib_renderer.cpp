@@ -151,7 +151,7 @@ auto raylib_renderer::toggle_fullscreen() -> void {
 }
 
 auto raylib_renderer::setup_raylib_log() -> void {
-	switch(LGE_ACTIVE_LOG_LEVEL) {
+	switch(LGE_ACTIVE_LOG_LEVEL) { // NOLINT(*-include-cleaner)
 	case LGE_LOG_LEVEL_TRACE:
 		SetTraceLogLevel(LOG_TRACE);
 		break;
@@ -282,6 +282,39 @@ auto raylib_renderer::screen_size_changed(const glm::vec2 screen_size) -> result
 			   render_texture_.texture.height);
 
 	return true;
+}
+
+auto raylib_renderer::get_texture_size(const texture_handle texture) -> glm::vec2 {
+	Texture2D rl_texture{};
+	if(const auto err = resource_manager_.get_raylib_texture(texture).unwrap(rl_texture); err) [[unlikely]] {
+		log::error("failed to get texture with id {}", texture);
+		return {0.0F, 0.0F};
+	}
+	return {static_cast<float>(rl_texture.width), static_cast<float>(rl_texture.height)};
+}
+
+auto raylib_renderer::render_sprite(const texture_handle texture,
+									const glm::vec2 &center,
+									const glm::vec2 &size,
+									const float rotation) const -> void {
+	const auto screen_center = to_screen(center);
+
+	Texture2D rl_texture{};
+	if(const auto err = resource_manager_.get_raylib_texture(texture).unwrap(rl_texture); err) [[unlikely]] {
+		log::error("failed to get texture with id {}, skipping sprite render", texture);
+		return;
+	}
+
+	const auto source = Rectangle{.x = 0.0F,
+								  .y = 0.0F,
+								  .width = static_cast<float>(rl_texture.width),
+								  .height = static_cast<float>(rl_texture.height)};
+
+	const auto dest = Rectangle{.x = screen_center.x, .y = screen_center.y, .width = size.x, .height = size.y};
+
+	const auto origin = Vector2{.x = size.x * 0.5F, .y = size.y * 0.5F};
+
+	DrawTexturePro(rl_texture, source, dest, origin, -rotation, WHITE);
 }
 
 auto raylib_renderer::render_label(const font_handle font,

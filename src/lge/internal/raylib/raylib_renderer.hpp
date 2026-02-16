@@ -40,6 +40,7 @@ public:
 	auto toggle_fullscreen() -> void override;
 
 	auto get_label_size(font_handle font, const std::string &text, const int &size) -> glm::vec2 override;
+	auto get_texture_size(texture_handle texture) -> glm::vec2 override;
 
 	auto show_cursor(bool show) -> void override;
 
@@ -51,6 +52,11 @@ public:
 					  const glm::vec4 &color,
 					  const glm::vec2 &position,
 					  float rotation) const -> void override;
+
+	auto render_sprite(texture_handle texture,
+					   const glm::vec2 &center,
+					   const glm::vec2 &size,
+					   float rotation) const -> void override;
 
 	auto render_quad(const glm::vec2 &p0,
 					 const glm::vec2 &p1,

@@ -5,11 +5,13 @@
 
 #include <lge/components/label.hpp>
 #include <lge/components/shapes.hpp>
+#include <lge/components/sprite.hpp>
 #include <lge/core/result.hpp>
 #include <lge/interface/renderer.hpp>
 #include <lge/internal/components/metrics.hpp>
 #include <lge/internal/components/previous_label.hpp>
 #include <lge/internal/components/previous_shapes.hpp>
+#include <lge/internal/components/previous_sprite.hpp>
 
 #include <entity/fwd.hpp>
 #include <entt/entt.hpp>
@@ -25,6 +27,9 @@ auto metrics_system::update(const float /*dt*/) -> result<> {
 
 	// metrics for circle
 	handle_circles();
+
+	// metrics for sprite
+	handle_sprites();
 
 	return true;
 }
@@ -56,6 +61,25 @@ auto metrics_system::is_rect_dirty(const rect &r, const previous_rect &p) -> boo
 auto metrics_system::is_circle_dirty(const circle &c, const previous_circle &p) -> bool {
 	// we consider the circle dirty if any of the properties that affect the metrics have changed
 	return c.radius != p.radius;
+}
+
+auto metrics_system::calculate_sprite_metrics(const entt::entity entity, const sprite &spr) const -> void {
+	const auto texture_size = renderer_.get_texture_size(spr.texture);
+	world.emplace_or_replace<metrics>(entity, metrics{.size = texture_size});
+}
+
+auto metrics_system::is_sprite_dirty(const sprite &spr, const previous_sprite &p) -> bool {
+	return spr.texture != p.texture;
+}
+
+auto metrics_system::handle_sprites() const -> void {
+	for(const auto entity: world.view<sprite>()) {
+		auto &p = world.get_or_emplace<previous_sprite>(entity);
+		if(auto &spr = world.get<sprite>(entity); !world.all_of<metrics>(entity) || is_sprite_dirty(spr, p)) {
+			calculate_sprite_metrics(entity, spr);
+			p.texture = spr.texture;
+		}
+	}
 }
 
 auto metrics_system::handle_labels() const -> void {

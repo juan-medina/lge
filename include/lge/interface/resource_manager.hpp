@@ -41,6 +41,10 @@ struct font_tag {};
 using font_handle = resource_handle<font_tag>;
 inline constexpr font_handle invalid_font{};
 
+struct texture_tag {};
+using texture_handle = resource_handle<texture_tag>;
+inline constexpr texture_handle invalid_texture{};
+
 class resource_uri {
 public:
 	consteval resource_uri(const char *s): value_(s) {}				// NOLINT(*-explicit-constructor)
@@ -75,6 +79,10 @@ public:
 	[[nodiscard]] virtual auto load_font(const resource_uri &uri) -> result<font_handle> = 0;
 	[[nodiscard]] virtual auto unload_font(font_handle handle) -> result<> = 0;
 	[[nodiscard]] virtual auto is_font_loaded(font_handle handle) const noexcept -> bool = 0;
+
+	[[nodiscard]] virtual auto load_texture(const resource_uri &uri) -> result<texture_handle> = 0;
+	[[nodiscard]] virtual auto unload_texture(texture_handle handle) -> result<> = 0;
+	[[nodiscard]] virtual auto is_texture_loaded(texture_handle handle) const noexcept -> bool = 0;
 };
 
 } //  namespace lge

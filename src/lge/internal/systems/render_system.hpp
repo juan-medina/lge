@@ -42,6 +42,7 @@ private:
 	auto handle_label(entt::entity entity, const glm::mat3 &world_transform) const -> void;
 	auto handle_rect(entt::entity entity, const glm::mat3 &world_transform) const -> void;
 	auto handle_circle(entt::entity entity, const glm::mat3 &world_transform) const -> void;
+	auto handle_sprite(entt::entity entity, const glm::mat3 &world_transform) const -> void;
 	auto handle_bounds(entt::entity entity, const glm::mat3 &world_transform) const -> void;
 };
 
