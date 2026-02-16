@@ -81,8 +81,8 @@ The function automatically configures:
 ```cpp
 #pragma once
 
-#include <lge/app.hpp>
-#include <lge/result.hpp>
+#include <lge/app/app.hpp>
+#include <lge/core/result.hpp>
 
 class my_game: public lge::app {
 public:
@@ -95,11 +95,11 @@ public:
 ```cpp
 #include "my_game.hpp"
 
-#include <lge/app_config.hpp>
+#include <lge/app/app_config.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/placement.hpp>
-#include <lge/main.hpp>
-#include <lge/result.hpp>
+#include <lge/app/main.hpp>
+#include <lge/core/result.hpp>
 
 LGE_MAIN(my_game);
 
