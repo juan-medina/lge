@@ -7,7 +7,7 @@
 - Const-Correctness: Use `const` and `[[nodiscard]]` where appropriate for getters and pure functions.
 - Template Usage: Templates are used for generic event and scene registration APIs, defined inline in the header.
 - Error Handling: All functions returning a result use `lge::result` and propagate errors up, never exceptions.
-- Logging: Use LGE_DEBUG,LGE_INFO  macros for debug/info logging etc, never for error propagation (errors are handled via result/error).
+- Logging: Use the `lge::log` class for logging (e.g., `log::debug("msg: {}", val)`, `log::info(...)`, `log::warn(...)`, `log::error(...)`), never for error propagation (errors are handled via result/error).
 - Naming Conventions: Use snake_case for variables and methods, PascalCase for types/classes, and trailing underscores for private members (e.g., `name_`).
 
 - Method Decomposition: Break down large or complex methods into smaller, focused helpers that each express a single idea.
@@ -36,7 +36,7 @@
 ## Development Philosophy
 - The codebase follows the YAGNI (You Aren't Gonna Need It) principle: only implement features when they are truly needed.
 - Avoid speculative abstractions or overengineering; keep systems minimal until requirements demand more.
-- Example: No ECS system is present—just a vector of components—because a full ECS is not currently required.
+- Example: The engine uses entt for ECS rather than building a custom implementation.
 
 ## Modern C++ Practices
 - Do not use old C++ or C patterns (e.g., no raw pointers, no custom vector/collection types, no manual memory management).
@@ -105,7 +105,7 @@
 - All error and result handling uses `lge::result` and `lge::error` (similar to C++23 `expected`, but project-specific).
 - Do not use exceptions; avoid code that throws or relies on exception handling.
 - When propagating errors, construct new errors from previous ones using the error constructor, but do not extract or log the previous error's message directly.
-- Logging is done via spdlog. Use debug logs for development information, and only minimal info-level logs for user-facing events.
+- Logging is done via the `lge::log` class (which wraps spdlog). Use `log::debug(...)` for development information, and only `log::info(...)` for user-facing events.
 - Do not log errors directly; errors are propagated via result/error and logged at the top engine/stack with stack trace included.
 - Error handling paths are not performance-critical; clarity and proper error propagation take priority over micro-optimizations.
 
