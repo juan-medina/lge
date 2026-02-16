@@ -72,7 +72,7 @@ auto raylib_input::update_controller_mode(const float delta_time) -> void {
 				if(raylib_input_detected) {
 					validated_controllers_.insert(name_str);
 					is_validated = true;
-					SPDLOG_DEBUG("validated controller: {}", name_str);
+					log::debug("validated controller: {}", name_str);
 				}
 			}
 
@@ -86,8 +86,8 @@ auto raylib_input::update_controller_mode(const float delta_time) -> void {
 	}
 
 	if(default_controller != -1 && was_no_controller) {
-		LGE_INFO("using controller: {}", GetGamepadName(default_controller));
-		LGE_INFO("controller has {} axis", GetGamepadAxisCount(default_controller));
+		log::info("using controller: {}", GetGamepadName(default_controller));
+		log::info("controller has {} axis", GetGamepadAxisCount(default_controller));
 		controller_available = true;
 	}
 
@@ -96,7 +96,7 @@ auto raylib_input::update_controller_mode(const float delta_time) -> void {
 		mouse_inactive_time = 0.0F;
 		controller_inactive_time = 0.0F;
 		if(!was_no_controller) {
-			LGE_INFO("controller disconnected");
+			log::info("controller disconnected");
 		}
 		return;
 	}

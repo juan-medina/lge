@@ -65,7 +65,7 @@ protected:
 		auto system = std::make_unique<T>(p, world_, std::forward<Args>(args)...);
 		const auto type_name = get_type_name<T>();
 		systems_.push_back(std::move(system));
-		LGE_DEBUG("system of type `{}` registered", type_name);
+		log::debug("system of type `{}` registered", type_name);
 	}
 
 	// =============================================================================
@@ -130,18 +130,8 @@ private:
 	// Internal methods
 	// =============================================================================
 
-	[[nodiscard]] auto setup_log() -> result<>;
 	[[nodiscard]] auto main_loop() -> result<>;
 	[[nodiscard]] auto update_system(phase p, float dt) const -> result<>;
-
-	// =============================================================================
-	// Constants
-	// =============================================================================
-
-	static constexpr auto empty_format = "%v";
-	static constexpr auto color_line_format = "[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v %@";
-	static constexpr auto banner = "\033[38;2;0;255;0ml\033[38;2;128;128;128m[\033[38;2;0;0;255mg\033[38;2;128;128;"
-								   "128m]\033[38;2;255;0;0me\033[0m";
 };
 
 } // namespace lge

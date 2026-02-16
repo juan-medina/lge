@@ -28,7 +28,7 @@ auto run_app() -> int {
 	try {
 		App_Type application;
 		if(const auto error = application.run().unwrap(); error) {
-			LGE_ERROR("{}", error->to_string());
+			log::error("{}", error->to_string());
 #ifndef __EMSCRIPTEN__
 			boxer::show(error->get_message().c_str(), "Error!", boxer::Style::Error);
 #endif

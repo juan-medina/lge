@@ -49,7 +49,7 @@ auto raylib_renderer::init(const app_config &config) -> result<> {
 		return error("failed to load default font", *err);
 	}
 
-	LGE_INFO("raylib_renderer initialized");
+	log::info("raylib_renderer initialized");
 	return true;
 }
 
@@ -71,7 +71,7 @@ auto raylib_renderer::end() -> result<> {
 		UnloadRenderTexture(render_texture_);
 	}
 
-	LGE_INFO("raylib_renderer ended");
+	log::info("raylib_renderer ended");
 	return true;
 }
 
@@ -183,7 +183,7 @@ auto raylib_renderer::get_label_size(const font_handle font, const std::string &
 
 	if(const auto font_to_use = font.is_valid() ? font : default_font_; font_to_use.is_valid()) {
 		if(const auto err = resource_manager_.get_raylib_font(font_to_use).unwrap(rl_font); err) [[unlikely]] {
-			LGE_ERROR("failed to get font with id {}, rendering label with default font instead", font_to_use);
+			log::error("failed to get font with id {}, rendering label with default font instead", font_to_use);
 		}
 	}
 
@@ -212,7 +212,7 @@ auto raylib_renderer::log_callback(const int log_level, const char *text, va_lis
 	va_end(args_copy);												   // NOLINT(*-pro-bounds-array-to-pointer-decay)
 
 	if(needed < 0) [[unlikely]] {
-		LGE_INFO("[raylib] log formatting error in log callback");
+		log::info("[raylib] log formatting error in log callback");
 		return;
 	}
 
@@ -245,7 +245,7 @@ auto raylib_renderer::log_callback(const int log_level, const char *text, va_lis
 		break;
 	}
 
-	spdlog::log(level, "[raylib] " + std::string(buffer.data()));
+	spdlog::log(level, "[raylib] " + std::string(buffer.data())); // raylib does not output a line number
 }
 
 auto raylib_renderer::screen_size_changed(const glm::vec2 screen_size) -> result<> {
@@ -255,15 +255,15 @@ auto raylib_renderer::screen_size_changed(const glm::vec2 screen_size) -> result
 	drawing_resolution_.y = design_resolution_.y;
 	drawing_resolution_.x = static_cast<float>(static_cast<int>(screen_size_.x / scale_factor_));
 
-	LGE_DEBUG("display resized, design resolution ({},{}) real resolution ({}x{}), drawing resolution ({}x{}), "
-			  "scale factor {}",
-			  design_resolution_.x,
-			  design_resolution_.y,
-			  screen_size_.x,
-			  screen_size_.y,
-			  drawing_resolution_.x,
-			  drawing_resolution_.y,
-			  scale_factor_);
+	log::debug("display resized, design resolution ({},{}) real resolution ({}x{}), drawing resolution ({}x{}), "
+			   "scale factor {}",
+			   design_resolution_.x,
+			   design_resolution_.y,
+			   screen_size_.x,
+			   screen_size_.y,
+			   drawing_resolution_.x,
+			   drawing_resolution_.y,
+			   scale_factor_);
 
 	if(render_texture_.id != 0) {
 		UnloadRenderTexture(render_texture_);
@@ -276,10 +276,10 @@ auto raylib_renderer::screen_size_changed(const glm::vec2 screen_size) -> result
 	}
 	SetTextureFilter(render_texture_.texture, TEXTURE_FILTER_POINT);
 
-	LGE_DEBUG("render texture created with id {}, size ({}x{})",
-			  render_texture_.id,
-			  render_texture_.texture.width,
-			  render_texture_.texture.height);
+	log::debug("render texture created with id {}, size ({}x{})",
+			   render_texture_.id,
+			   render_texture_.texture.width,
+			   render_texture_.texture.height);
 
 	return true;
 }
@@ -294,7 +294,7 @@ auto raylib_renderer::render_label(const font_handle font,
 	auto rl_font = GetFontDefault();
 	if(const auto font_to_use = font.is_valid() ? font : default_font_; font_to_use.is_valid()) {
 		if(const auto err = resource_manager_.get_raylib_font(font_to_use).unwrap(rl_font); err) [[unlikely]] {
-			LGE_ERROR("failed to get font with id {}, rendering label with default font instead", font_to_use);
+			log::error("failed to get font with id {}, rendering label with default font instead", font_to_use);
 		}
 	}
 

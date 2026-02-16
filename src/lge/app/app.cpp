@@ -14,8 +14,6 @@
 #include <lge/systems/system.hpp>
 
 #include <memory>
-#include <spdlog/common.h>
-#include <spdlog/spdlog.h>
 #include <utility>
 
 #ifdef __EMSCRIPTEN__
@@ -64,15 +62,13 @@ auto app::run() -> result<> {
 		return error("error ending the application", *err);
 	}
 
-	LGE_INFO("application ended");
+	log::info("application ended");
 #endif
 	return true;
 }
 
 auto app::init() -> result<> {
-	if(const auto err = setup_log().unwrap(); err) [[unlikely]] {
-		return error("failed to setup log", *err);
-	}
+	log::init();
 
 	if(const auto err = renderer_->init(configure()).unwrap(); err) [[unlikely]] {
 		return error("failed to initialize renderer", *err);
@@ -89,22 +85,8 @@ auto app::init() -> result<> {
 	register_system<order_system>(phase::global_update);
 	register_system<render_system>(phase::render, *renderer_);
 
-	LGE_INFO("application initialized successfully");
+	log::info("application initialized successfully");
 
-	return true;
-}
-
-auto app::setup_log() -> result<> { // NOLINT(*-convert-member-functions-to-static)
-#ifdef NDEBUG
-	spdlog::set_level(spdlog::level::err);
-#else
-	spdlog::set_level(spdlog::level::debug);
-#endif
-	spdlog::set_pattern(empty_format);
-	LGE_INFO(banner);
-	spdlog::set_pattern(color_line_format);
-
-	LGE_INFO("log setup complete");
 	return true;
 }
 

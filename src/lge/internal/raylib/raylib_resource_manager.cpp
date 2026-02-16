@@ -14,17 +14,17 @@
 namespace lge {
 
 auto raylib_resource_manager::init() -> result<> {
-	LGE_DEBUG("initializing raylib resource manager");
+	log::debug("initializing raylib resource manager");
 	return true;
 }
 
 auto raylib_resource_manager::end() -> result<> {
-	LGE_DEBUG("ending raylib resource manager");
+	log::debug("ending raylib resource manager");
 	return true;
 }
 
 auto raylib_resource_manager::load_font(const resource_uri &uri) -> result<font_handle> {
-	LGE_DEBUG("loading font from uri `{}`", uri);
+	log::debug("loading font from uri `{}`", uri);
 
 	if(!uri.exists()) [[unlikely]] {
 		return error("font file does not exist: " + std::string(uri));
@@ -50,7 +50,7 @@ auto raylib_resource_manager::unload_font(const font_handle handle) -> result<> 
 		return error("font not found in cache");
 	}
 
-	LGE_DEBUG("unloading font with id `{}`", handle);
+	log::debug("unloading font with id `{}`", handle);
 	font_cache_.erase(handle.raw());
 
 	return true;

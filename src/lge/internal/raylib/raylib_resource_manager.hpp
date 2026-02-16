@@ -39,7 +39,7 @@ struct font_loader: entt::resource_loader<font> {
 		// raylib returns the default font if it fails to load a font, so we check if the texture id is
 		// the same as the default font's texture id to determine if loading failed.
 		if(rl.texture.id == raylib_default_font_texture_id) [[unlikely]] {
-			LGE_ERROR("failed to load font from uri: {}", uri);
+			log::error("failed to load font from uri: {}", uri);
 			return nullptr;
 		}
 		SetTextureFilter(rl.texture, TEXTURE_FILTER_POINT);
