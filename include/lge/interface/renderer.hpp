@@ -35,7 +35,7 @@ public:
 	virtual auto set_fullscreen(bool fullscreen) -> void = 0;
 	virtual auto toggle_fullscreen() -> void = 0;
 
-	virtual auto render_label(font_id font,
+	virtual auto render_label(font_handle font,
 							  const std::string &text,
 							  const int &size,
 							  const glm::vec4 &color,
@@ -61,7 +61,7 @@ public:
 							   const glm::vec4 &fill_color,
 							   float border_thickness) const -> void = 0;
 
-	virtual auto get_label_size(font_id font, const std::string &text, const int &size) -> glm::vec2 = 0;
+	virtual auto get_label_size(font_handle font, const std::string &text, const int &size) -> glm::vec2 = 0;
 
 	virtual auto show_cursor(bool show) -> void = 0;
 

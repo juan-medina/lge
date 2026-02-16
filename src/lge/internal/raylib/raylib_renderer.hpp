@@ -39,13 +39,13 @@ public:
 	auto set_fullscreen(bool fullscreen) -> void override;
 	auto toggle_fullscreen() -> void override;
 
-	auto get_label_size(font_id font, const std::string &text, const int &size) -> glm::vec2 override;
+	auto get_label_size(font_handle font, const std::string &text, const int &size) -> glm::vec2 override;
 
 	auto show_cursor(bool show) -> void override;
 
 	auto get_delta_time() -> float override;
 
-	auto render_label(font_id font,
+	auto render_label(font_handle font,
 					  const std::string &text,
 					  const int &size,
 					  const glm::vec4 &color,

@@ -45,7 +45,7 @@ auto metrics_system::calculate_circle_metrics(const entt::entity entity, const c
 }
 
 auto metrics_system::is_label_dirty(const label &lbl, const previous_label &p) -> bool {
-	return lbl.text != p.text || lbl.size != p.size;
+	return lbl.text != p.text || lbl.size != p.size || lbl.font != p.font;
 }
 
 auto metrics_system::is_rect_dirty(const rect &r, const previous_rect &p) -> bool {
@@ -65,6 +65,7 @@ auto metrics_system::handle_labels() const -> void {
 			calculate_label_metrics(entity, lbl);
 			p.text = lbl.text;
 			p.size = lbl.size;
+			p.font = lbl.font;
 		}
 	}
 }

@@ -10,6 +10,7 @@
 
 #include <entity/entity.hpp>
 #include <entity/fwd.hpp>
+#include <glm/ext/vector_float2.hpp>
 #include <string>
 #include <utility>
 
@@ -33,7 +34,7 @@ protected:
 		return game_res;
 	}
 
-	[[nodiscard]] auto get_font_id() const -> lge::resource_id {
+	[[nodiscard]] auto get_font_id() const -> lge::font_handle {
 		return font_id_;
 	}
 
@@ -56,5 +57,5 @@ private:
 	std::string kb_message_;
 	std::string controller_message_;
 
-	lge::resource_id font_id_ = lge::empty_resource;
+	lge::font_handle font_id_ = lge::invalid_font;
 };

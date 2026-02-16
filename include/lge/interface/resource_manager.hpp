@@ -14,10 +14,32 @@
 
 namespace lge {
 
-using resource_id = entt::id_type;
-inline constexpr resource_id empty_resource = entt::null;
+// =============================================================================
+// Type-Safe Resource Handles
+// =============================================================================
 
-using font_id = resource_id;
+template<typename Tag>
+struct resource_handle {
+	entt::id_type id = entt::null;
+
+	[[nodiscard]] constexpr auto is_valid() const noexcept -> bool {
+		return id != entt::null;
+	}
+
+	constexpr auto operator==(const resource_handle &other) const noexcept -> bool = default;
+
+	[[nodiscard]] constexpr auto raw() const noexcept -> entt::id_type {
+		return id;
+	}
+
+	static constexpr auto from_id(entt::id_type id) noexcept -> resource_handle {
+		return resource_handle{id};
+	}
+};
+
+struct font_tag {};
+using font_handle = resource_handle<font_tag>;
+inline constexpr font_handle invalid_font{};
 
 class resource_uri {
 public:
@@ -50,8 +72,9 @@ public:
 	[[nodiscard]] virtual auto init() -> result<> = 0;
 	[[nodiscard]] virtual auto end() -> result<> = 0;
 
-	[[nodiscard]] virtual auto load_font(const resource_uri &uri) -> result<font_id> = 0;
-	[[nodiscard]] virtual auto unload_font(font_id id) -> result<> = 0;
+	[[nodiscard]] virtual auto load_font(const resource_uri &uri) -> result<font_handle> = 0;
+	[[nodiscard]] virtual auto unload_font(font_handle handle) -> result<> = 0;
+	[[nodiscard]] virtual auto is_font_loaded(font_handle handle) const noexcept -> bool = 0;
 };
 
 } //  namespace lge
@@ -67,5 +90,16 @@ struct std::formatter<lge::resource_uri> {
 	auto format(const lge::resource_uri &uri, std::format_context &ctx) const {
 		const auto &str = static_cast<const std::string>(uri);
 		return std::ranges::copy(str, ctx.out()).out;
+	}
+};
+
+template<typename Tag>
+struct std::formatter<lge::resource_handle<Tag>> {
+	constexpr auto parse(std::format_parse_context &ctx) {
+		return ctx.begin();
+	}
+
+	auto format(const lge::resource_handle<Tag> &handle, std::format_context &ctx) const {
+		return std::format_to(ctx.out(), "{}", handle.raw());
 	}
 };

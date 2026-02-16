@@ -9,6 +9,7 @@
 
 #include <raylib.h>
 
+#include <entt/core/fwd.hpp>
 #include <entt/entt.hpp>
 #include <memory>
 #include <string>
@@ -51,14 +52,18 @@ public:
 	[[nodiscard]] auto init() -> result<> override;
 	[[nodiscard]] auto end() -> result<> override;
 
-	[[nodiscard]] auto load_font(const resource_uri &uri) -> result<font_id> override;
-	[[nodiscard]] auto unload_font(font_id id) -> result<> override;
-
-	[[nodiscard]] auto get_raylib_font(font_id id) const -> result<Font>;
+	[[nodiscard]] auto load_font(const resource_uri &uri) -> result<font_handle> override;
+	[[nodiscard]] auto unload_font(font_handle handle) -> result<> override;
+	[[nodiscard]] auto is_font_loaded(font_handle handle) const noexcept -> bool override;
+	[[nodiscard]] auto get_raylib_font(font_handle handle) const -> result<Font>;
 
 private:
 	using font_cache = entt::resource_cache<font, font_loader>;
 	font_cache font_cache_;
+
+	static auto uri_to_key(const resource_uri &uri) noexcept -> entt::id_type {
+		return entt::hashed_string{static_cast<std::string>(uri).c_str()}.value();
+	}
 };
 
 } // namespace lge

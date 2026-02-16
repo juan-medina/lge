@@ -153,12 +153,11 @@ auto raylib_renderer::get_delta_time() -> float {
 	return GetFrameTime();
 }
 
-auto raylib_renderer::get_label_size(const font_id font, const std::string &text, const int &size) -> glm::vec2 {
+auto raylib_renderer::get_label_size(const font_handle font, const std::string &text, const int &size) -> glm::vec2 {
 	auto rl_font = GetFontDefault();
-	if(font != empty_resource) {
+	if(font.is_valid()) {
 		if(const auto err = resource_manager_.get_raylib_font(font).unwrap(rl_font); err) [[unlikely]] {
 			LGE_ERROR("failed to get font with id {}, rendering label with default font instead", font);
-			return {0, 0};
 		}
 	}
 
@@ -259,7 +258,7 @@ auto raylib_renderer::screen_size_changed(const glm::vec2 screen_size) -> result
 	return true;
 }
 
-auto raylib_renderer::render_label(const font_id font,
+auto raylib_renderer::render_label(const font_handle font,
 								   const std::string &text,
 								   const int &size,
 								   const glm::vec4 &color,
@@ -267,10 +266,9 @@ auto raylib_renderer::render_label(const font_id font,
 								   const float rotation) const -> void {
 	const auto screen_pos = to_screen(position);
 	auto rl_font = GetFontDefault();
-	if(font != empty_resource) {
+	if(font.is_valid()) {
 		if(const auto err = resource_manager_.get_raylib_font(font).unwrap(rl_font); err) [[unlikely]] {
 			LGE_ERROR("failed to get font with id {}, rendering label with default font instead", font);
-			return;
 		}
 	}
 

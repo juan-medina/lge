@@ -23,42 +23,54 @@ auto raylib_resource_manager::end() -> result<> {
 	return true;
 }
 
-auto raylib_resource_manager::load_font(const resource_uri &uri) -> result<font_id> {
+auto raylib_resource_manager::load_font(const resource_uri &uri) -> result<font_handle> {
 	LGE_DEBUG("loading font from uri `{}`", uri);
+
 	if(!uri.exists()) [[unlikely]] {
 		return error("font file does not exist: " + std::string(uri));
 	}
 
-	const auto key = entt::hashed_string{static_cast<std::string>(uri).c_str()}.value();
-	if(auto [it, inserted] = font_cache_.load(key, uri); it == font_cache_.end() || !it->second) {
+	const auto key = uri_to_key(uri);
+	auto [it, inserted] = font_cache_.load(key, uri);
+
+	if(it == font_cache_.end() || !it->second) [[unlikely]] {
 		return error("failed to load font from uri: " + std::string(uri));
 	}
 
-	return key;
+	return font_handle::from_id(key);
 }
 
-auto raylib_resource_manager::unload_font(const font_id id) -> result<> {
-	const auto handle = font_cache_[id]; // NOLINT(*-pro-bounds-avoid-unchecked-container-access)
-	if(!handle) {
-		LGE_ERROR("failed to unload font with id `{}`: font not found in cache", id);
+auto raylib_resource_manager::unload_font(const font_handle handle) -> result<> {
+	if(!handle.is_valid()) [[unlikely]] {
+		return error("invalid font handle");
+	}
+
+	const auto resource = font_cache_[handle.raw()];
+	if(!resource) [[unlikely]] {
 		return error("font not found in cache");
 	}
 
-	font_cache_.erase(id);
-
-	LGE_DEBUG("unloading font from uri `{}`", handle->uri);
+	LGE_DEBUG("unloading font with id `{}`", handle);
+	font_cache_.erase(handle.raw());
 
 	return true;
 }
 
-auto raylib_resource_manager::get_raylib_font(font_id id) const -> result<Font> {
-	const auto handle = font_cache_[id]; // NOLINT(*-pro-bounds-avoid-unchecked-container-access)
-	if(!handle) {
-		LGE_ERROR("failed to get raylib font with id `{}`: font not found in cache", id);
+auto raylib_resource_manager::is_font_loaded(const font_handle handle) const noexcept -> bool {
+	return handle.is_valid() && font_cache_[handle.raw()];
+}
+
+auto raylib_resource_manager::get_raylib_font(const font_handle handle) const -> result<Font> {
+	if(!handle.is_valid()) [[unlikely]] {
+		return error("invalid font handle");
+	}
+
+	const auto resource = font_cache_[handle.raw()];
+	if(!resource) [[unlikely]] {
 		return error("font not found in cache");
 	}
 
-	return handle->raylib_font;
+	return resource->raylib_font;
 }
 
 } // namespace lge

@@ -14,7 +14,7 @@ struct label {
 	std::string text;
 	glm::vec4 color{1, 1, 1, 1};
 	float size = 16.0F;
-	font_id font{empty_resource};
+	font_handle font = invalid_font;
 };
 
 } // namespace lge
