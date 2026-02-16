@@ -4,9 +4,7 @@
 #include <lge/app/app.hpp>
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
-#include <lge/internal/raylib/raylib_input.hpp>
-#include <lge/internal/raylib/raylib_renderer.hpp>
-#include <lge/internal/raylib/raylib_resource_manager.hpp>
+#include <lge/internal/raylib/raylib_backend.hpp>
 #include <lge/internal/systems/bounds_system.hpp>
 #include <lge/internal/systems/hidden_system.hpp>
 #include <lge/internal/systems/metrics_system.hpp>
@@ -16,9 +14,9 @@
 #include <lge/systems/system.hpp>
 
 #include <memory>
-#include <optional>
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
+#include <utility>
 
 #ifdef __EMSCRIPTEN__
 #	include <emscripten/emscripten.h>
@@ -27,9 +25,10 @@
 namespace lge {
 
 app::app() {
-	resource_manager_ = std::make_unique<raylib_resource_manager>();
-	renderer_ = std::make_unique<raylib_renderer>(dynamic_cast<raylib_resource_manager &>(*resource_manager_));
-	input_ = std::make_unique<raylib_input>();
+	auto [resource_manager, renderer, input] = raylib_backend::create();
+	resource_manager_ = std::move(resource_manager);
+	renderer_ = std::move(renderer);
+	input_ = std::move(input);
 }
 
 auto app::run() -> result<> {
@@ -83,21 +82,18 @@ auto app::init() -> result<> {
 		return error("failed to initialize resource manager", *err);
 	}
 
-	// phase::game_update systems go here
 	register_system<metrics_system>(phase::local_update, *renderer_);
 	register_system<bounds_system>(phase::game_update);
 	register_system<hidden_system>(phase::game_update);
 	register_system<transform_system>(phase::global_update);
 	register_system<order_system>(phase::global_update);
 	register_system<render_system>(phase::render, *renderer_);
-	// future post render systems go here
 
 	LGE_INFO("application initialized successfully");
 
 	return true;
 }
 
-// ReSharper disable once CppMemberFunctionMayBeStatic
 auto app::setup_log() -> result<> { // NOLINT(*-convert-member-functions-to-static)
 #ifdef NDEBUG
 	spdlog::set_level(spdlog::level::err);
@@ -124,13 +120,12 @@ auto app::end() -> result<> {
 	return true;
 }
 
-// ReSharper disable once CppMemberFunctionMayBeStatic
-auto app::main_loop() -> result<> { // NOLINT(*-convert-member-functions-to-static)
+auto app::main_loop() -> result<> {
 	if(const auto err = renderer_->begin_frame().unwrap(); err) [[unlikely]] {
 		return error("failed to begin frame", *err);
 	}
 
-	auto const delta_time = renderer_->get_delta_time();
+	const auto delta_time = renderer_->get_delta_time();
 
 	input_->update(delta_time);
 
@@ -141,7 +136,7 @@ auto app::main_loop() -> result<> { // NOLINT(*-convert-member-functions-to-stat
 	}
 
 	if(const auto err = update_system(phase::game_update, delta_time).unwrap(); err) [[unlikely]] {
-		return error("failed to update systems in local update phase", *err);
+		return error("failed to update systems in game update phase", *err);
 	}
 
 	if(const auto err = update_system(phase::local_update, delta_time).unwrap(); err) [[unlikely]] {
