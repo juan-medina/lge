@@ -51,11 +51,21 @@ else ()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)
 endif ()
 
+# Set default log level if not defined
+if(NOT DEFINED LGE_ACTIVE_LOG_LEVEL)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(LGE_ACTIVE_LOG_LEVEL "LGE_LOG_LEVEL_DEBUG")
+    elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+        set(LGE_ACTIVE_LOG_LEVEL "LGE_LOG_LEVEL_ERROR")
+    else()
+        set(LGE_ACTIVE_LOG_LEVEL "LGE_LOG_LEVEL_DEBUG")
+    endif()
+endif()
+
 # spdlog
 add_subdirectory(external/spdlog)
 target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog_header_only)
-target_compile_definitions(${PROJECT_NAME} PUBLIC SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
-target_compile_definitions(${PROJECT_NAME} PUBLIC SPDLOG_USE_STD_FORMAT)
+target_compile_definitions(${PROJECT_NAME} PRIVATE SPDLOG_USE_STD_FORMAT)
 
 # raylib
 add_subdirectory(external/raylib)

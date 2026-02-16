@@ -151,11 +151,26 @@ auto raylib_renderer::toggle_fullscreen() -> void {
 }
 
 auto raylib_renderer::setup_raylib_log() -> void {
-#ifdef NDEBUG
-	SetTraceLogLevel(LOG_ERROR);
-#else
-	SetTraceLogLevel(LOG_DEBUG);
-#endif
+	switch(LGE_ACTIVE_LOG_LEVEL) {
+	case LGE_LOG_LEVEL_TRACE:
+		SetTraceLogLevel(LOG_TRACE);
+		break;
+	case LGE_LOG_LEVEL_DEBUG:
+		SetTraceLogLevel(LOG_DEBUG);
+		break;
+	case LGE_LOG_LEVEL_INFO:
+		SetTraceLogLevel(LOG_INFO);
+		break;
+	case LGE_LOG_LEVEL_WARN:
+		SetTraceLogLevel(LOG_WARNING);
+		break;
+	case LGE_LOG_LEVEL_ERROR:
+		SetTraceLogLevel(LOG_ERROR);
+		break;
+	default:
+		SetTraceLogLevel(LOG_NONE);
+		break;
+	}
 	SetTraceLogCallback(log_callback);
 }
 

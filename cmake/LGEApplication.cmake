@@ -44,6 +44,10 @@ function(lge_add_application TARGET_NAME)
         message(FATAL_ERROR "lge_add_application: SOURCES must be specified")
     endif ()
 
+    # Set log levels
+    target_compile_definitions(lge PUBLIC LGE_ACTIVE_LOG_LEVEL=${LGE_ACTIVE_LOG_LEVEL})
+    target_compile_definitions(lge PUBLIC SPDLOG_ACTIVE_LEVEL=${LGE_ACTIVE_LOG_LEVEL})
+
     # Create executable
     add_executable(${TARGET_NAME})
     target_sources(${TARGET_NAME} PRIVATE ${LGE_APP_SOURCES})
