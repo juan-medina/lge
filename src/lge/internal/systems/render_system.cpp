@@ -7,6 +7,7 @@
 #include <lge/components/placement.hpp>
 #include <lge/components/shapes.hpp>
 #include <lge/components/sprite.hpp>
+#include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
 #include <lge/internal/components/bounds.hpp>
 #include <lge/internal/components/effective_hidden.hpp>
@@ -107,8 +108,9 @@ auto render_system::handle_label(const entt::entity entity, const glm::mat3 &wor
 auto render_system::handle_rect(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
 	const auto &r = world.get<rect>(entity);
 	const auto &m = world.get<metrics>(entity);
+	const auto &plc = world.get<placement>(entity);
 
-	const auto center = transform_point(world_transform, glm::vec2{0.0F, 0.0F});
+	const auto center = transform_point(world_transform, plc.pivot * m.size);
 	const auto rotation = get_rotation(world_transform);
 	const auto world_scale = get_scale(world_transform);
 	const auto scaled_size = m.size * world_scale;
@@ -116,7 +118,6 @@ auto render_system::handle_rect(const entt::entity entity, const glm::mat3 &worl
 
 	renderer_.render_rect(center, scaled_size, rotation, r.border_color, r.fill_color, scaled_border_thickness);
 }
-
 auto render_system::handle_circle(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
 	const auto c = world.get<circle>(entity);
 	const auto center_world = transform_point(world_transform, {0.F, 0.F});
@@ -142,11 +143,26 @@ auto render_system::handle_sprite(const entt::entity entity, const glm::mat3 &wo
 
 auto render_system::handle_bounds(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
 	const auto &[p0, p1, p2, p3] = world.get<bounds>(entity);
-	renderer_.render_quad(transform_point(world_transform, p0),
-						  transform_point(world_transform, p1),
-						  transform_point(world_transform, p2),
-						  transform_point(world_transform, p3),
-						  {1, 0, 0, 0.5F});
+	const auto &m = world.get<metrics>(entity);
+	const auto &plc = world.get<placement>(entity);
+
+	const auto pivot_world = transform_point(world_transform, plc.pivot * m.size);
+	const auto rotation_rad = glm::radians(get_rotation(world_transform));
+	const auto cr = glm::cos(rotation_rad);
+	const auto sr = glm::sin(rotation_rad);
+	const auto world_scale = get_scale(world_transform);
+
+	const auto transform_local = [&](const glm::vec2 &local) -> glm::vec2 {
+		const auto scaled = local * world_scale;
+		return pivot_world + glm::vec2{scaled.x * cr - scaled.y * sr, scaled.x * sr + scaled.y * cr};
+	};
+
+	renderer_.render_quad(
+		transform_local(p0),
+		transform_local(p1),
+		transform_local(p2),
+		transform_local(p3),
+		{1, 0, 0, 0.5F});
 }
 
 } // namespace lge

@@ -24,22 +24,22 @@ transform_system::transform_system(const phase p, entt::registry &world): system
 }
 
 auto transform_system::compose_transform(const placement &node_placement, const glm::vec2 &pivot_offset) -> glm::mat3 {
+	static constexpr auto x = glm::vec3{1.F, 0.F, 0.F};
+	static constexpr auto y = glm::vec3{0.F, 1.F, 0.F};
+	static constexpr auto z = glm::vec3{0.F, 0.F, 1.F};
+
 	const float rad = glm::radians(node_placement.rotation);
 	const float s = glm::sin(rad);
 	const float c = glm::cos(rad);
 
-	const auto rs = glm::mat3{{c * node_placement.scale.x, -s * node_placement.scale.y, 0.F},
-							  {s * node_placement.scale.x, c * node_placement.scale.y, 0.F},
-							  {0.F, 0.F, 1.F}};
+	const auto rotation_scale = glm::mat3{{c * node_placement.scale.x, s * node_placement.scale.y, 0.F},
+										  {-s * node_placement.scale.x, c * node_placement.scale.y, 0.F},
+										  z};
 
-	const auto to_pivot = glm::mat3{{1.F, 0.F, 0.F}, {0.F, 1.F, 0.F}, {-pivot_offset.x, -pivot_offset.y, 1.F}};
+	const auto to_pivot = glm::mat3{x, y, {-pivot_offset.x, -pivot_offset.y, 1.F}};
+	const auto translation = glm::mat3{x, y, {node_placement.position.x, node_placement.position.y, 1.F}};
 
-	const auto from_pivot = glm::mat3{{1.F, 0.F, 0.F}, {0.F, 1.F, 0.F}, {pivot_offset.x, pivot_offset.y, 1.F}};
-
-	const auto translation =
-		glm::mat3{{1.F, 0.F, 0.F}, {0.F, 1.F, 0.F}, {node_placement.position.x, node_placement.position.y, 1.F}};
-
-	return translation * from_pivot * rs * to_pivot;
+	return translation * rotation_scale * to_pivot;
 }
 
 auto transform_system::update(const float /*dt*/) -> result<> {
