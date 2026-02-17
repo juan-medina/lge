@@ -53,10 +53,8 @@ public:
 					  const glm::vec2 &position,
 					  float rotation) const -> void override;
 
-	auto render_sprite(texture_handle texture,
-					   const glm::vec2 &center,
-					   const glm::vec2 &size,
-					   float rotation) const -> void override;
+	auto render_sprite(texture_handle texture, const glm::vec2 &center, const glm::vec2 &size, float rotation) const
+		-> void override;
 
 	auto render_quad(const glm::vec2 &p0,
 					 const glm::vec2 &p1,

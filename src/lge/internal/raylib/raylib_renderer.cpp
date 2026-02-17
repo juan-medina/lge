@@ -13,7 +13,6 @@
 #include <cstdarg>
 #include <cstdio>
 #include <glm/ext/vector_float4.hpp>
-#include <glm/trigonometric.hpp>
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <vector>
@@ -376,82 +375,37 @@ auto raylib_renderer::render_rect(const glm::vec2 &center,
 	const auto fill = color_from_glm(fill_color);
 	const auto border = color_from_glm(border_color);
 
-	auto rec = Rectangle{.x = screen_center.x, .y = screen_center.y, .width = size.x, .height = size.y};
-	DrawRectanglePro(rec, {.x = size.x * 0.5F, .y = size.y * 0.5F}, -rotation, fill);
+	const auto half_size = size * 0.5F;
+	const auto top_left = screen_center - half_size;
+
+	if(fill_color.a > 0.0F) {
+		const auto rec = Rectangle{.x = top_left.x, .y = top_left.y, .width = size.x, .height = size.y};
+		DrawRectanglePro(rec, {.x = 0.0F, .y = 0.0F}, -rotation, fill);
+	}
 
 	if(border_color.a > 0.0F && border_thickness > 0.0F) {
-		if(border_thickness == 1.0F) {
-			const auto half_width = size.x * 0.5F;
-			const auto half_height = size.y * 0.5F;
-			const auto rotation_rad = glm::radians(-rotation);
-			const auto cos_r = glm::cos(rotation_rad);
-			const auto sin_r = glm::sin(rotation_rad);
+		// All border rects use rec.xy = top_left as the shared rotation pivot.
+		// origin offsets each border rect to its correct edge position.
 
-			const auto local_p0 = glm::vec2{-half_width, -half_height};
-			const auto local_p1 = glm::vec2{half_width, -half_height};
-			const auto local_p2 = glm::vec2{half_width, half_height};
-			const auto local_p3 = glm::vec2{-half_width, half_height};
+		// Top border: top-left is at top_left → origin {0, 0}
+		DrawRectanglePro(
+			Rectangle{.x = top_left.x, .y = top_left.y, .width = size.x, .height = border_thickness},
+			{.x = 0.0F, .y = 0.0F}, -rotation, border);
 
-			const auto rotated_p0 =
-				glm::vec2{(local_p0.x * cos_r) - (local_p0.y * sin_r), (local_p0.x * sin_r) + (local_p0.y * cos_r)};
-			const auto rotated_p1 =
-				glm::vec2{(local_p1.x * cos_r) - (local_p1.y * sin_r), (local_p1.x * sin_r) + (local_p1.y * cos_r)};
-			const auto rotated_p2 =
-				glm::vec2{(local_p2.x * cos_r) - (local_p2.y * sin_r), (local_p2.x * sin_r) + (local_p2.y * cos_r)};
-			const auto rotated_p3 =
-				glm::vec2{(local_p3.x * cos_r) - (local_p3.y * sin_r), (local_p3.x * sin_r) + (local_p3.y * cos_r)};
+		// Bottom border: top-left is at top_left + {0, size.y - border_thickness} → origin {0, -(size.y - border_thickness)}
+		DrawRectanglePro(
+			Rectangle{.x = top_left.x, .y = top_left.y, .width = size.x, .height = border_thickness},
+			{.x = 0.0F, .y = -(size.y - border_thickness)}, -rotation, border);
 
-			const auto screen_p0 = screen_center + rotated_p0;
-			const auto screen_p1 = screen_center + rotated_p1;
-			const auto screen_p2 = screen_center + rotated_p2;
-			const auto screen_p3 = screen_center + rotated_p3;
+		// Left border: top-left is at top_left → origin {0, 0}
+		DrawRectanglePro(
+			Rectangle{.x = top_left.x, .y = top_left.y, .width = border_thickness, .height = size.y},
+			{.x = 0.0F, .y = 0.0F}, -rotation, border);
 
-			DrawLineV({.x = screen_p0.x, .y = screen_p0.y}, {.x = screen_p1.x, .y = screen_p1.y}, border);
-			DrawLineV({.x = screen_p1.x, .y = screen_p1.y}, {.x = screen_p2.x, .y = screen_p2.y}, border);
-			DrawLineV({.x = screen_p2.x, .y = screen_p2.y}, {.x = screen_p3.x, .y = screen_p3.y}, border);
-			DrawLineV({.x = screen_p3.x, .y = screen_p3.y}, {.x = screen_p0.x, .y = screen_p0.y}, border);
-		} else {
-			const auto rotation_rad = glm::radians(-rotation);
-			const auto cos_r = glm::cos(rotation_rad);
-			const auto sin_r = glm::sin(rotation_rad);
-
-			const auto half_border = border_thickness * 0.5F;
-			const auto half_width = size.x * 0.5F;
-			const auto half_height = size.y * 0.5F;
-
-			const auto offset_top = glm::vec2{0.0F, -half_height + half_border};
-			const auto offset_bottom = glm::vec2{0.0F, half_height - half_border};
-			const auto offset_left = glm::vec2{-half_width + half_border, 0.0F};
-			const auto offset_right = glm::vec2{half_width - half_border, 0.0F};
-
-			const auto rotated_top = glm::vec2{(offset_top.x * cos_r) - (offset_top.y * sin_r),
-											   (offset_top.x * sin_r) + (offset_top.y * cos_r)};
-			const auto rotated_bottom = glm::vec2{(offset_bottom.x * cos_r) - (offset_bottom.y * sin_r),
-												  (offset_bottom.x * sin_r) + (offset_bottom.y * cos_r)};
-			const auto rotated_left = glm::vec2{(offset_left.x * cos_r) - (offset_left.y * sin_r),
-												(offset_left.x * sin_r) + (offset_left.y * cos_r)};
-			const auto rotated_right = glm::vec2{(offset_right.x * cos_r) - (offset_right.y * sin_r),
-												 (offset_right.x * sin_r) + (offset_right.y * cos_r)};
-
-			const auto top_center = screen_center + rotated_top;
-			const auto bottom_center = screen_center + rotated_bottom;
-			const auto left_center = screen_center + rotated_left;
-			const auto right_center = screen_center + rotated_right;
-
-			const auto top_rect =
-				Rectangle{.x = top_center.x, .y = top_center.y, .width = size.x, .height = border_thickness};
-			const auto bottom_rect =
-				Rectangle{.x = bottom_center.x, .y = bottom_center.y, .width = size.x, .height = border_thickness};
-			const auto left_rect =
-				Rectangle{.x = left_center.x, .y = left_center.y, .width = border_thickness, .height = size.y};
-			const auto right_rect =
-				Rectangle{.x = right_center.x, .y = right_center.y, .width = border_thickness, .height = size.y};
-
-			DrawRectanglePro(top_rect, {.x = half_width, .y = half_border}, -rotation, border);
-			DrawRectanglePro(bottom_rect, {.x = half_width, .y = half_border}, -rotation, border);
-			DrawRectanglePro(left_rect, {.x = half_border, .y = half_height}, -rotation, border);
-			DrawRectanglePro(right_rect, {.x = half_border, .y = half_height}, -rotation, border);
-		}
+		// Right border: top-left is at top_left + {size.x - border_thickness, 0} → origin {-(size.x - border_thickness), 0}
+		DrawRectanglePro(
+			Rectangle{.x = top_left.x, .y = top_left.y, .width = border_thickness, .height = size.y},
+			{.x = -(size.x - border_thickness), .y = 0.0F}, -rotation, border);
 	}
 }
 
