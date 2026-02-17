@@ -322,9 +322,11 @@ auto raylib_renderer::render_label(const font_handle font,
 								   const std::string &text,
 								   const int &size,
 								   const glm::vec4 &color,
-								   const glm::vec2 &position,
+								   const glm::vec2 &pivot_position,
+								   const glm::vec2 &pivot_to_top_left,
 								   const float rotation) const -> void {
-	const auto screen_pos = to_screen(position);
+	const auto screen_pivot = to_screen(pivot_position);
+
 	auto rl_font = GetFontDefault();
 	if(const auto font_to_use = font.is_valid() ? font : default_font_; font_to_use.is_valid()) {
 		if(const auto err = resource_manager_.get_raylib_font(font_to_use).unwrap(rl_font); err) [[unlikely]] {
@@ -336,9 +338,9 @@ auto raylib_renderer::render_label(const font_handle font,
 
 	DrawTextPro(rl_font,
 				text.c_str(),
-				{.x = screen_pos.x, .y = screen_pos.y},
-				{.x = 0.0F, .y = 0.0F},
-				-rotation, // raylib rotation is CW, math standard is CCW, so negate the angle
+				{.x = screen_pivot.x, .y = screen_pivot.y},
+				{.x = -pivot_to_top_left.x, .y = -pivot_to_top_left.y},
+				rotation,
 				static_cast<float>(size),
 				spacing,
 				color_from_glm(color));

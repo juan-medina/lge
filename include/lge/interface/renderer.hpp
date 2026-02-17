@@ -39,7 +39,8 @@ public:
 							  const std::string &text,
 							  const int &size,
 							  const glm::vec4 &color,
-							  const glm::vec2 &position,
+							  const glm::vec2 &pivot_position,
+							  const glm::vec2 &rotated_offset,
 							  float rotation) const -> void = 0;
 
 	virtual auto render_quad(const glm::vec2 &p0,

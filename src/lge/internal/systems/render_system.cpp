@@ -95,16 +95,21 @@ auto render_system::handle_label(const entt::entity entity, const glm::mat3 &wor
 	const auto &m = world.get<metrics>(entity);
 	const auto &plc = world.get<placement>(entity);
 
-	const auto pivot_to_top_left = -plc.pivot * m.size;
-	const auto top_left_world = transform_point(world_transform, pivot_to_top_left);
+	const auto pivot_world = transform_point(world_transform, plc.pivot * m.size);
 	const auto rotation = get_rotation(world_transform);
 	const auto world_scale = get_scale(world_transform);
 	const auto final_font_size = lbl.size * world_scale.y;
 
-	// labels are drawn at the top left corner, so we need to offset the position by the pivot and size
-	renderer_.render_label(lbl.font, lbl.text, static_cast<int>(final_font_size), lbl.color, top_left_world, rotation);
-}
+	const auto pivot_to_top_left_local = -plc.pivot * m.size * world_scale;
 
+	renderer_.render_label(lbl.font,
+						   lbl.text,
+						   static_cast<int>(final_font_size),
+						   lbl.color,
+						   pivot_world,
+						   pivot_to_top_left_local,
+						   rotation);
+}
 auto render_system::handle_rect(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
 	const auto &r = world.get<rect>(entity);
 	const auto &m = world.get<metrics>(entity);
@@ -118,9 +123,13 @@ auto render_system::handle_rect(const entt::entity entity, const glm::mat3 &worl
 
 	renderer_.render_rect(center, scaled_size, rotation, r.border_color, r.fill_color, scaled_border_thickness);
 }
+
 auto render_system::handle_circle(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
 	const auto c = world.get<circle>(entity);
-	const auto center_world = transform_point(world_transform, {0.F, 0.F});
+	const auto &m = world.get<metrics>(entity);
+	const auto &plc = world.get<placement>(entity);
+
+	const auto center_world = transform_point(world_transform, plc.pivot * m.size);
 	const auto world_scale = get_scale(world_transform);
 	const auto avg_scale = (world_scale.x + world_scale.y) * 0.5F;
 	const auto scaled_radius = c.radius * avg_scale;
@@ -128,7 +137,6 @@ auto render_system::handle_circle(const entt::entity entity, const glm::mat3 &wo
 
 	renderer_.render_circle(center_world, scaled_radius, c.border_color, c.fill_color, scaled_border_thickness);
 }
-
 auto render_system::handle_sprite(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
 	const auto &spr = world.get<sprite>(entity);
 	const auto &m = world.get<metrics>(entity);
@@ -158,11 +166,7 @@ auto render_system::handle_bounds(const entt::entity entity, const glm::mat3 &wo
 	};
 
 	renderer_.render_quad(
-		transform_local(p0),
-		transform_local(p1),
-		transform_local(p2),
-		transform_local(p3),
-		{1, 0, 0, 0.5F});
+		transform_local(p0), transform_local(p1), transform_local(p2), transform_local(p3), {1, 0, 0, 0.5F});
 }
 
 } // namespace lge

@@ -50,7 +50,8 @@ public:
 					  const std::string &text,
 					  const int &size,
 					  const glm::vec4 &color,
-					  const glm::vec2 &position,
+					  const glm::vec2 &pivot_position,
+					  const glm::vec2 &rotated_offset,
 					  float rotation) const -> void override;
 
 	auto render_sprite(texture_handle texture, const glm::vec2 &center, const glm::vec2 &size, float rotation) const

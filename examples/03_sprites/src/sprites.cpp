@@ -5,9 +5,8 @@
 
 #include <lge/app/main.hpp>
 #include <lge/components/placement.hpp>
-#include <lge/components/sprite.hpp>
+#include <lge/components/shapes.hpp>
 #include <lge/core/result.hpp>
-#include <lge/interface/resource_manager.hpp>
 
 #include "../../src/example.hpp"
 
@@ -21,25 +20,9 @@ auto sprites::init() -> lge::result<> {
 		return lge::error("error init the app", *err);
 	}
 
-	auto &world = get_world();
-	auto &resource_mgr = get_resource_manager();
-
-	if(const auto err = resource_mgr.load_texture(sprite_path).unwrap(sprite_texture_); err) [[unlikely]] {
-		return lge::error("failed to load sprite texture", *err);
-	}
-
-	const auto sprite_entity = world.create();
-	world.emplace<lge::sprite>(sprite_entity, sprite_texture_);
-	world.emplace<lge::placement>(sprite_entity, 0.0F, 0.0F);
-
 	return true;
 }
 
-auto sprites::end() -> lge::result<> {
-	auto &resource_mgr = get_resource_manager();
-	if(const auto err = resource_mgr.unload_texture(sprite_texture_).unwrap(); err) [[unlikely]] {
-		return lge::error("failed to unload sprite texture", *err);
-	}
-
-	return example::end();
+auto sprites::update(float dt) -> lge::result<> {
+	return example::update(dt);
 }
