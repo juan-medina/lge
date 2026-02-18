@@ -45,7 +45,7 @@ auto render_system::update(const float /*dt*/) -> result<> {
 	std::ranges::sort(render_entries_);
 
 	for(const auto &[layer, index, entity]: render_entries_) {
-		const auto &[world_transform] = world.get<transform>(entity);
+		const auto &world_transform = world.get<transform>(entity).world;
 
 		if(world.all_of<label>(entity)) {
 			handle_label(entity, world_transform);

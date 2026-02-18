@@ -10,6 +10,7 @@ namespace lge {
 // full 2D affine transform
 struct transform {
 	glm::mat3 world;
+	glm::mat3 attachment;
 };
 
 } // namespace lge
