@@ -143,7 +143,11 @@ auto my_game::init() -> lge::result<> {
 
 **Graphics**
 
+*Engine assets:*
 - [Peaberry Pixel Font by emhuo](https://emhuo.itch.io/peaberry-pixel-font) (licensed under Open Font License Version 1.1).
+
+*Example assets:*
+- [Pixelart Hiker by Chroma Dave](https://chroma-dave.itch.io/pixelart-hiker) (free to use in any project per the author).
 
 **License**
 

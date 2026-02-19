@@ -5,6 +5,7 @@
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
 #include <lge/internal/raylib/raylib_backend.hpp>
+#include <lge/internal/systems/animation_system.hpp>
 #include <lge/internal/systems/bounds_system.hpp>
 #include <lge/internal/systems/hidden_system.hpp>
 #include <lge/internal/systems/metrics_system.hpp>
@@ -79,6 +80,7 @@ auto app::init() -> result<> {
 	}
 
 	register_system<metrics_system>(phase::local_update, *renderer_);
+	register_system<animation_system>(phase::game_update);
 	register_system<bounds_system>(phase::game_update);
 	register_system<hidden_system>(phase::game_update);
 	register_system<transform_system>(phase::global_update);
