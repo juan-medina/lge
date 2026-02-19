@@ -1,0 +1,27 @@
+{
+	"sheet": "hiker_sheet.json",
+	"animations": {
+		"idle": {
+			"frames": [
+				"idle_1.png",
+				"idle_2.png",
+				"idle_3.png",
+				"idle_4.png",
+				"idle_5.png",
+				"idle_6.png"
+			],
+			"fps": 6
+		},
+		"run": {
+			"frames": [
+				"run_1.png",
+				"run_2.png",
+				"run_3.png",
+				"run_4.png",
+				"run_5.png",
+				"run_6.png"
+			],
+			"fps": 10
+		}
+	}
+}

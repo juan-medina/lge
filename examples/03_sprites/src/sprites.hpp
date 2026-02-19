@@ -30,17 +30,10 @@ private:
 	static constexpr auto controller_message = "Press controller A: to change animation,\n"
 											   "START: debug draw, SELECT: toggle fullscreen, B: exit";
 
-	static constexpr auto sheet_path = "resources/game/sprites/hiker.json";
+	static constexpr auto anim_path = "resources/game/sprites/hiker_anim.json";
 
-	static constexpr auto idle_frame_name = "idle_";
-	static constexpr auto idle_frames = 6;
-	static constexpr auto idle_fps = 4.F;
-	std::vector<std::string> idle_frames_ = lge::make_frames(idle_frame_name, idle_frames);
-
-	static constexpr auto run_frame_name = "run_";
-	static constexpr auto run_frames = 6;
-	static constexpr auto run_fps = 8.F;
-	std::vector<std::string> run_frames_ = lge::make_frames(run_frame_name, run_frames);
+	static constexpr auto idle_anim = "idle";
+	static constexpr auto run_anim = "run";
 
 	static constexpr auto change_anim_action = "change_anim";
 
@@ -50,5 +43,8 @@ private:
 	} anim_state_ = animation_state::idle;
 
 	lge::sprite_sheet_handle sheet_{lge::invalid_sprite_sheet};
+
+	lge::animation_library_handle animation_library_{lge::invalid_animation_library};
+
 	entt::entity sprite_{entt::null};
 };

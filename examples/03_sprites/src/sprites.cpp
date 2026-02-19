@@ -31,13 +31,12 @@ auto sprites::init() -> lge::result<> {
 	auto &world = get_world();
 	auto &resource_mgr = get_resource_manager();
 
-	if(const auto err = resource_mgr.load_sprite_sheet(sheet_path).unwrap(sheet_); err) [[unlikely]] {
-		return lge::error("failed to load sprite sheet", *err);
+	if(const auto err = resource_mgr.load_animation_library(anim_path).unwrap(animation_library_); err) [[unlikely]] {
+		return lge::error("failed to load animation library", *err);
 	}
 
 	sprite_ = world.create();
-	auto &anim = world.emplace<lge::sprite_animation>(sprite_, sheet_);
-	lge::play(anim, idle_frames_, idle_fps);
+	world.emplace<lge::sprite_animation>(sprite_, animation_library_, idle_anim);
 	auto &p = world.emplace<lge::placement>(sprite_, 0.0F, 0.0F);
 	p.pivot = lge::pivot::bottom_center;
 
@@ -52,15 +51,10 @@ auto sprites::update(const float dt) -> lge::result<> {
 		} else {
 			anim_state_ = animation_state::idle;
 		}
-		auto &world = get_world();
 
+		auto &world = get_world();
 		auto &anim = world.get<lge::sprite_animation>(sprite_);
-		anim.current_frame = 0;
-		if(anim_state_ == animation_state::idle) {
-			lge::play(anim, idle_frames_, idle_fps);
-		} else {
-			lge::play(anim, run_frames_, run_fps);
-		}
+		lge::play(anim, anim_state_ == animation_state::idle ? idle_anim : run_anim);
 	}
 
 	return example::update(dt);
@@ -68,8 +62,9 @@ auto sprites::update(const float dt) -> lge::result<> {
 
 auto sprites::end() -> lge::result<> {
 	auto &resource_mgr = get_resource_manager();
-	if(const auto err = resource_mgr.unload_sprite_sheet(sheet_).unwrap(); err) [[unlikely]] {
-		return lge::error("failed to unload sprite sheet", *err);
+
+	if(const auto err = resource_mgr.unload_animation_library(animation_library_).unwrap(); err) [[unlikely]] {
+		return lge::error("failed to unload animation library", *err);
 	}
 
 	return example::end();

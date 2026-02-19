@@ -7,26 +7,16 @@
 
 #include <string>
 #include <string_view>
-#include <vector>
 
 namespace lge {
 
 struct sprite_animation {
-	sprite_sheet_handle sheet;
-	std::vector<std::string> frames;
-	float fps;
+	animation_library_handle handle;
+	std::string name;
 	int current_frame = 0;
 	float elapsed = 0.F;
 };
 
-[[nodiscard]] auto frame(std::string_view prefix, int number, std::string_view suffix = ".png") -> std::string;
-
-[[nodiscard]] auto make_frames(std::string_view prefix, int start, int count, std::string_view suffix = ".png")
-	-> std::vector<std::string>;
-
-[[nodiscard]] auto make_frames(std::string_view prefix, int count, std::string_view suffix = ".png")
-	-> std::vector<std::string>;
-
-auto play(sprite_animation &anim, std::vector<std::string> frames, float fps = 0) -> void;
+auto play(sprite_animation &anim, std::string_view name) -> void;
 
 } // namespace lge

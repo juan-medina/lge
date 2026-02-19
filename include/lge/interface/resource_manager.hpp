@@ -12,6 +12,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <vector>
 
 namespace lge {
 
@@ -50,14 +51,29 @@ struct sprite_sheet_tag {};
 using sprite_sheet_handle = resource_handle<sprite_sheet_tag>;
 inline constexpr sprite_sheet_handle invalid_sprite_sheet{};
 
+struct animation_library_tag {};
+using animation_library_handle = resource_handle<animation_library_tag>;
+inline constexpr animation_library_handle invalid_animation_library{};
+
 // =============================================================================
-// Sprite Sheet Frame
+// Data
 // =============================================================================
 
 struct sprite_sheet_frame {
 	glm::vec2 source_pos;
 	glm::vec2 source_size;
 	glm::vec2 pivot;
+};
+
+struct animation_library_anim {
+	std::vector<std::string> frames;
+	float fps;
+};
+
+struct animation_library_data {
+	std::string uri;
+	sprite_sheet_handle sprite_sheet;
+	std::unordered_map<std::string, animation_library_anim> animations;
 };
 
 // =============================================================================
@@ -107,16 +123,34 @@ public:
 		-> result<sprite_sheet_frame>;
 	[[nodiscard]] auto get_sprite_sheet_texture(sprite_sheet_handle handle) const -> result<texture_handle>;
 
+	// =============================================================================
+	// Animation Library
+	// =============================================================================
+	[[nodiscard]] virtual auto load_animation_library(std::string_view uri) -> result<animation_library_handle>;
+	[[nodiscard]] virtual auto unload_animation_library(animation_library_handle handle) -> result<>;
+	[[nodiscard]] virtual auto get_animation(animation_library_handle handle, std::string_view anim_name) const -> result<animation_library_anim>;
+	[[nodiscard]] virtual auto get_animation_sprite_sheet(animation_library_handle handle) const
+		-> result<sprite_sheet_handle>;
+
 private:
+	// =============================================================================
+	// Sprite Sheet Data
+	// =============================================================================
+
 	struct sprite_sheet_data {
 		texture_handle texture;
 		std::unordered_map<std::string, sprite_sheet_frame> frames;
 	};
-
 	std::unordered_map<entt::id_type, sprite_sheet_data> sprite_sheets_;
 
+	// =============================================================================
+	// Animation Library Data
+	// =============================================================================
+
+	std::unordered_map<entt::id_type, animation_library_data> animation_libraries_;
+
 	static auto uri_to_key(const std::string_view uri) noexcept -> entt::id_type {
-		return entt::hashed_string{static_cast<std::string>(uri).c_str()}.value();
+		return entt::hashed_string{uri.data()}.value(); // NOLINT(*-suspicious-stringview-data-usage)
 	}
 };
 
