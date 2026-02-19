@@ -55,16 +55,7 @@ public:
 	template<typename... Args>
 	trace(spdlog::format_string_t<Args...> fmt, Args &&...) -> trace<Args...>;
 #else
-	template<typename... Args>
-	struct trace {
-		explicit trace(spdlog::format_string_t<Args...> fmt,
-					   Args &&...args,
-					   const std::source_location &location = std::source_location::current()) {
-			(void)fmt;
-			(void)location;
-			(void(args), ...);
-		}
-	};
+	static void trace(...) {} // NOLINT(*-avoid-variadic-functions)
 #endif
 
 #if LGE_ACTIVE_LOG_LEVEL <= LGE_LOG_LEVEL_DEBUG
@@ -81,16 +72,7 @@ public:
 	template<typename... Args>
 	debug(spdlog::format_string_t<Args...> fmt, Args &&...) -> debug<Args...>;
 #else
-	template<typename... Args>
-	struct debug {
-		explicit debug(spdlog::format_string_t<Args...> fmt,
-					   Args &&...args,
-					   const std::source_location &location = std::source_location::current()) {
-			(void)fmt;
-			(void)location;
-			(void(args), ...);
-		}
-	};
+	static void debug(...) {} // NOLINT(*-avoid-variadic-functions)
 #endif
 
 #if LGE_ACTIVE_LOG_LEVEL <= LGE_LOG_LEVEL_INFO
@@ -107,16 +89,7 @@ public:
 	template<typename... Args>
 	info(spdlog::format_string_t<Args...> fmt, Args &&...) -> info<Args...>;
 #else
-	template<typename... Args>
-	struct info {
-		explicit info(spdlog::format_string_t<Args...> fmt,
-					  Args &&...args,
-					  const std::source_location &location = std::source_location::current()) {
-			(void)fmt;
-			(void)location;
-			(void(args), ...);
-		}
-	};
+	static void info(...) {} // NOLINT(*-avoid-variadic-functions)
 #endif
 
 #if LGE_ACTIVE_LOG_LEVEL <= LGE_LOG_LEVEL_WARN
@@ -133,16 +106,7 @@ public:
 	template<typename... Args>
 	warn(spdlog::format_string_t<Args...> fmt, Args &&...) -> warn<Args...>;
 #else
-	template<typename... Args>
-	struct warn {
-		explicit warn(spdlog::format_string_t<Args...> fmt,
-					  Args &&...args,
-					  const std::source_location &location = std::source_location::current()) {
-			(void)fmt;
-			(void)location;
-			(void(args), ...);
-		}
-	};
+	static void warn(...) {} // NOLINT(*-avoid-variadic-functions)
 #endif
 
 #if LGE_ACTIVE_LOG_LEVEL <= LGE_LOG_LEVEL_ERROR
@@ -159,16 +123,7 @@ public:
 	template<typename... Args>
 	error(spdlog::format_string_t<Args...> fmt, Args &&...) -> error<Args...>;
 #else
-	template<typename... Args>
-	struct error {
-		explicit error(spdlog::format_string_t<Args...> fmt,
-					   Args &&...args,
-					   const std::source_location &location = std::source_location::current()) {
-			(void)fmt;
-			(void)location;
-			(void(args), ...);
-		}
-	};
+	static void error(...) {} // NOLINT(*-avoid-variadic-functions)
 #endif
 
 private:
