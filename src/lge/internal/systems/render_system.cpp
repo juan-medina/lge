@@ -137,11 +137,13 @@ auto render_system::handle_circle(const entt::entity entity, const glm::mat3 &wo
 
 	renderer_.render_circle(center_world, scaled_radius, c.border_color, c.fill_color, scaled_border_thickness);
 }
+
 auto render_system::handle_sprite(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
 	const auto &spr = world.get<sprite>(entity);
 	const auto &m = world.get<metrics>(entity);
+	const auto &plc = world.get<placement>(entity);
 
-	const auto center = transform_point(world_transform, glm::vec2{0.0F, 0.0F});
+	const auto center = transform_point(world_transform, plc.pivot * m.size);
 	const auto rotation = get_rotation(world_transform);
 	const auto world_scale = get_scale(world_transform);
 	const auto scaled_size = m.size * world_scale;

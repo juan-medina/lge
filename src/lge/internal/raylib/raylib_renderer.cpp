@@ -315,7 +315,7 @@ auto raylib_renderer::render_sprite(const texture_handle texture,
 
 	const auto origin = Vector2{.x = size.x * 0.5F, .y = size.y * 0.5F};
 
-	DrawTexturePro(rl_texture, source, dest, origin, -rotation, WHITE);
+	DrawTexturePro(rl_texture, source, dest, origin, rotation, WHITE);
 }
 
 auto raylib_renderer::render_label(const font_handle font,
