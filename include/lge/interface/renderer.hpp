@@ -65,8 +65,9 @@ public:
 
 	virtual auto render_sprite(sprite_sheet_handle sheet,
 							   std::string_view frame,
-							   const glm::vec2 &center,
+							   const glm::vec2 &pivot_position,
 							   const glm::vec2 &size,
+							   const glm::vec2 &pivot,
 							   float rotation) const -> void = 0;
 
 	virtual auto get_label_size(font_handle font, const std::string &text, const int &size) -> glm::vec2 = 0;

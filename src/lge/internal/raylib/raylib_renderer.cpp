@@ -308,8 +308,9 @@ auto raylib_renderer::get_sprite_frame_size(const sprite_sheet_handle sheet, con
 
 auto raylib_renderer::render_sprite(const sprite_sheet_handle sheet,
 									const std::string_view frame,
-									const glm::vec2 &center,
+									const glm::vec2 &pivot_position,
 									const glm::vec2 &size,
+									const glm::vec2 &pivot,
 									const float rotation) const -> void {
 	sprite_sheet_frame f{};
 	if(const auto err = resource_manager_.get_sprite_sheet_frame(sheet, frame).unwrap(f); err) [[unlikely]] {
@@ -323,11 +324,11 @@ auto raylib_renderer::render_sprite(const sprite_sheet_handle sheet,
 		return;
 	}
 
-	const auto screen_center = to_screen(center);
 	const auto source =
 		Rectangle{.x = f.source_pos.x, .y = f.source_pos.y, .width = f.source_size.x, .height = f.source_size.y};
-	const auto dest = Rectangle{.x = screen_center.x, .y = screen_center.y, .width = size.x, .height = size.y};
-	const auto origin = Vector2{.x = size.x * 0.5F, .y = size.y * 0.5F};
+	const auto screen_pos = to_screen(pivot_position);
+	const auto dest = Rectangle{.x = screen_pos.x, .y = screen_pos.y, .width = size.x, .height = size.y};
+	const auto origin = Vector2{.x = pivot.x * size.x, .y = pivot.y * size.y};
 
 	DrawTexturePro(rl_texture, source, dest, origin, rotation, WHITE);
 }

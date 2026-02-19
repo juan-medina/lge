@@ -142,12 +142,12 @@ auto render_system::handle_sprite(const entt::entity entity, const glm::mat3 &wo
 	const auto &m = world.get<metrics>(entity);
 	const auto &plc = world.get<placement>(entity);
 
-	const auto center = transform_point(world_transform, plc.pivot * m.size);
+	const auto pivot_world = transform_point(world_transform, plc.pivot * m.size);
 	const auto rotation = get_rotation(world_transform);
 	const auto world_scale = get_scale(world_transform);
 	const auto scaled_size = m.size * world_scale;
 
-	renderer_.render_sprite(spr.sheet, spr.frame, center, scaled_size, rotation);
+	renderer_.render_sprite(spr.sheet, spr.frame, pivot_world, scaled_size, plc.pivot, rotation);
 }
 
 auto render_system::handle_bounds(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
