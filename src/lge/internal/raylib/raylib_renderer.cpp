@@ -318,15 +318,21 @@ auto raylib_renderer::render_sprite(const sprite_sheet_handle sheet,
 		return;
 	}
 
-	Texture2D rl_texture{};
-	if(const auto err = resource_manager_.get_sprite_sheet_texture(sheet).unwrap(rl_texture); err) [[unlikely]] {
+	texture_handle tex_handle{};
+	if(const auto err = resource_manager_.get_sprite_sheet_texture(sheet).unwrap(tex_handle); err) [[unlikely]] {
 		log::error("failed to get sprite sheet texture for sheet {}, skipping sprite render", sheet);
 		return;
 	}
 
+	Texture2D rl_texture{};
+	if(const auto err = resource_manager_.get_raylib_texture(tex_handle).unwrap(rl_texture); err) [[unlikely]] {
+		log::error("failed to resolve raylib texture for sheet {}, skipping sprite render", sheet);
+		return;
+	}
+
+	const auto screen_pos = to_screen(pivot_position);
 	const auto source =
 		Rectangle{.x = f.source_pos.x, .y = f.source_pos.y, .width = f.source_size.x, .height = f.source_size.y};
-	const auto screen_pos = to_screen(pivot_position);
 	const auto dest = Rectangle{.x = screen_pos.x, .y = screen_pos.y, .width = size.x, .height = size.y};
 	const auto origin = Vector2{.x = pivot.x * size.x, .y = pivot.y * size.y};
 

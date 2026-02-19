@@ -5,12 +5,13 @@
 
 #include <lge/core/result.hpp>
 
-#include <algorithm>
 #include <core/fwd.hpp>
 #include <entt/entt.hpp>
-#include <filesystem>
 #include <format>
+#include <glm/ext/vector_float2.hpp>
 #include <string>
+#include <string_view>
+#include <unordered_map>
 
 namespace lge {
 
@@ -49,22 +50,19 @@ struct sprite_sheet_tag {};
 using sprite_sheet_handle = resource_handle<sprite_sheet_tag>;
 inline constexpr sprite_sheet_handle invalid_sprite_sheet{};
 
-class resource_uri {
-public:
-	consteval resource_uri(const char *s): value_(s) {}				// NOLINT(*-explicit-constructor)
-	consteval resource_uri(const std::string_view &s): value_(s) {} // NOLINT(*-explicit-constructor)
+// =============================================================================
+// Sprite Sheet Frame
+// =============================================================================
 
-	explicit operator std::string() const {
-		return std::string(value_);
-	}
-
-	[[nodiscard]] auto exists() const -> bool {
-		return std::filesystem::exists(value_);
-	}
-
-private:
-	std::string_view value_;
+struct sprite_sheet_frame {
+	glm::vec2 source_pos;
+	glm::vec2 source_size;
+	glm::vec2 pivot;
 };
+
+// =============================================================================
+// Resource Manager
+// =============================================================================
 
 class resource_manager {
 public:
@@ -80,34 +78,52 @@ public:
 	[[nodiscard]] virtual auto init() -> result<> = 0;
 	[[nodiscard]] virtual auto end() -> result<> = 0;
 
-	[[nodiscard]] virtual auto load_font(const resource_uri &uri) -> result<font_handle> = 0;
+	// =============================================================================
+	// Common
+	// =============================================================================
+	[[nodiscard]] virtual auto exists(std::string_view uri) const -> bool;
+
+	// =============================================================================
+	// Font
+	// =============================================================================
+
+	[[nodiscard]] virtual auto load_font(std::string_view uri) -> result<font_handle> = 0;
 	[[nodiscard]] virtual auto unload_font(font_handle handle) -> result<> = 0;
 	[[nodiscard]] virtual auto is_font_loaded(font_handle handle) const noexcept -> bool = 0;
 
-	[[nodiscard]] virtual auto load_texture(const resource_uri &uri) -> result<texture_handle> = 0;
+	// =============================================================================
+	// Texture
+	// =============================================================================
+
+	[[nodiscard]] virtual auto load_texture(std::string_view uri) -> result<texture_handle> = 0;
 	[[nodiscard]] virtual auto unload_texture(texture_handle handle) -> result<> = 0;
 	[[nodiscard]] virtual auto is_texture_loaded(texture_handle handle) const noexcept -> bool = 0;
 
-	[[nodiscard]] virtual auto load_sprite_sheet(const resource_uri &uri) -> result<sprite_sheet_handle> = 0;
-	[[nodiscard]] virtual auto unload_sprite_sheet(sprite_sheet_handle handle) -> result<> = 0;
-	[[nodiscard]] virtual auto is_sprite_sheet_loaded(sprite_sheet_handle handle) const noexcept -> bool = 0;
+	// =============================================================================
+	// Sprite Sheet
+	// =============================================================================
+
+	[[nodiscard]] auto load_sprite_sheet(std::string_view uri) -> result<sprite_sheet_handle>;
+	[[nodiscard]] auto unload_sprite_sheet(sprite_sheet_handle handle) -> result<>;
+	[[nodiscard]] auto is_sprite_sheet_loaded(sprite_sheet_handle handle) const noexcept -> bool;
+	[[nodiscard]] auto get_sprite_sheet_frame(sprite_sheet_handle handle, std::string_view frame_name) const
+		-> result<sprite_sheet_frame>;
+	[[nodiscard]] auto get_sprite_sheet_texture(sprite_sheet_handle handle) const -> result<texture_handle>;
+
+private:
+	struct sprite_sheet_data {
+		texture_handle texture;
+		std::unordered_map<std::string, sprite_sheet_frame> frames;
+	};
+
+	std::unordered_map<entt::id_type, sprite_sheet_data> sprite_sheets_;
+
+	static auto uri_to_key(const std::string_view uri) noexcept -> entt::id_type {
+		return entt::hashed_string{static_cast<std::string>(uri).c_str()}.value();
+	}
 };
 
 } //  namespace lge
-
-template<>
-struct std::formatter<lge::resource_uri> {
-	// NOLINTNEXTLINE(*-convert-member-functions-to-static)
-	constexpr auto parse(std::format_parse_context &ctx) {
-		return ctx.begin();
-	}
-
-	// NOLINTNEXTLINE(*-convert-member-functions-to-static)
-	auto format(const lge::resource_uri &uri, std::format_context &ctx) const {
-		const auto &str = static_cast<const std::string>(uri);
-		return std::ranges::copy(str, ctx.out()).out;
-	}
-};
 
 template<typename Tag>
 struct std::formatter<lge::resource_handle<Tag>> {
