@@ -8,6 +8,7 @@
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
 #include <lge/interface/resource_manager.hpp>
+#include <lge/internal/components/previous_sprite_animation.hpp>
 
 #include <cstddef>
 #include <entity/fwd.hpp>
@@ -16,6 +17,29 @@
 namespace lge {
 
 auto animation_system::advance_animation(const entt::entity entity, sprite_animation &anim, const float dt) -> void {
+	auto &spr = world.get_or_emplace<sprite>(entity);
+	auto &previous_anim = world.get_or_emplace<previous_sprite_animation>(entity);
+	const auto anim_library_changed = previous_anim.handle != anim.handle;
+	const auto anim_named_changed = previous_anim.name != anim.name;
+
+	if(anim_library_changed || anim_named_changed) [[likely]] {
+		// Animation has changed, so we need to reset it
+		anim.current_frame = 0;
+		anim.elapsed = 0.F;
+		previous_anim.handle = anim.handle;
+		previous_anim.name = anim.name;
+		
+		// We need to update the sprite sheet only if we change the animation library, since the sprite sheet is
+		//  shared across all animations in the library
+		if(anim_library_changed) [[unlikely]] {
+			if(const auto err = resource_manager_.get_animation_sprite_sheet(anim.handle).unwrap(spr.sheet); err)
+				[[unlikely]] {
+				log::error("failed to get sprite sheet for animation library, skipping");
+				return;
+			}
+		}
+	}
+
 	animation_library_anim clip{};
 	if(const auto err = resource_manager_.get_animation(anim.handle, anim.name).unwrap(clip); err) [[unlikely]] {
 		log::error("animation clip '{}' not found, skipping", anim.name);
@@ -31,14 +55,6 @@ auto animation_system::advance_animation(const entt::entity entity, sprite_anima
 	anim.elapsed -= frame_duration;
 	anim.current_frame = (anim.current_frame + 1) % static_cast<int>(clip.frames.size());
 
-	sprite_sheet_handle sheet{};
-	if(const auto err = resource_manager_.get_animation_sprite_sheet(anim.handle).unwrap(sheet); err) [[unlikely]] {
-		log::error("failed to get sprite sheet for animation library, skipping");
-		return;
-	}
-
-	auto &spr = world.get_or_emplace<sprite>(entity);
-	spr.sheet = sheet;
 	spr.frame = clip.frames[static_cast<std::size_t>(anim.current_frame)];
 }
 

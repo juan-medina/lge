@@ -54,7 +54,7 @@ auto sprites::update(const float dt) -> lge::result<> {
 
 		auto &world = get_world();
 		auto &anim = world.get<lge::sprite_animation>(sprite_);
-		lge::play(anim, anim_state_ == animation_state::idle ? idle_anim : run_anim);
+		anim.name = anim_state_ == animation_state::idle ? idle_anim : run_anim;
 	}
 
 	return example::update(dt);

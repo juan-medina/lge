@@ -9,11 +9,10 @@
 
 namespace lge {
 
-struct sprite_animation {
-	animation_library_handle handle;
+struct previous_sprite_animation {
+	animation_library_handle handle = invalid_animation_library;
 	std::string name;
-	int current_frame = 0;
-	float elapsed = 0.F;
 };
+
 
 } // namespace lge
