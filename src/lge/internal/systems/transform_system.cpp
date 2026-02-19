@@ -62,9 +62,9 @@ auto transform_system::update(const float /*dt*/) -> result<> {
 
 		const auto &parent_world = world.get<transform>(entity).world;
 		const auto &parent_placement = world.get<placement>(entity);
-		const auto parent_pivot_offset =
-			world.all_of<metrics>(entity) ? parent_placement.pivot * world.get<metrics>(entity).size
-										  : glm::vec2{0.F, 0.F};
+		const auto parent_pivot_offset = world.all_of<metrics>(entity)
+											 ? parent_placement.pivot * world.get<metrics>(entity).size
+											 : glm::vec2{0.F, 0.F};
 
 		// The parent's pivot in world space — same calculation render_system uses
 		const auto pv = parent_world * glm::vec3{parent_pivot_offset.x, parent_pivot_offset.y, 1.F};
@@ -75,32 +75,35 @@ auto transform_system::update(const float /*dt*/) -> result<> {
 			const auto child_pivot_offset =
 				world.all_of<metrics>(child) ? local.pivot * world.get<metrics>(child).size : glm::vec2{0.F, 0.F};
 
-			// Parent rotation matrix
+			// Parent rotation
 			const float parent_rad = glm::radians(parent_placement.rotation);
 			const float ps = glm::sin(parent_rad);
 			const float pc = glm::cos(parent_rad);
 
-			// Child pivot in world space = parent pivot + child local position rotated by parent rotation
-			const auto child_pivot_world = parent_pos
-				+ glm::vec2{pc * local.position.x + ps * local.position.y,
-							-ps * local.position.x + pc * local.position.y};
+			// Parent scale from world matrix column lengths
+			const auto parent_scale = glm::vec2{glm::length(glm::vec2{parent_world[0][0], parent_world[0][1]}),
+												glm::length(glm::vec2{parent_world[1][0], parent_world[1][1]})};
 
-			// Combined rotation for rendering
+			// Child pivot in world space: scale local position by parent scale, then rotate
+			const auto scaled_pos = local.position * parent_scale;
+			const auto child_pivot_world =
+				parent_pos + glm::vec2{pc * scaled_pos.x + ps * scaled_pos.y, -ps * scaled_pos.x + pc * scaled_pos.y};
+
+			// Combined rotation and scale for child
 			const float combined_rad = glm::radians(parent_placement.rotation + local.rotation);
 			const float s = glm::sin(combined_rad);
 			const float c = glm::cos(combined_rad);
+			const auto child_scale = parent_scale * local.scale;
 
-			// Render pos = child pivot world - RS * child_pivot_offset
-			// RS cols are {c,s} and {-s,c}, so RS*p = (c*px - s*py, s*px + c*py)
-			const auto render_pos = child_pivot_world
-				- glm::vec2{c * child_pivot_offset.x - s * child_pivot_offset.y,
-							s * child_pivot_offset.x + c * child_pivot_offset.y};
+			// Render pos = child pivot world - RS * child_pivot_offset (RS includes child_scale)
+			const auto render_pos =
+				child_pivot_world
+				- glm::vec2{c * child_scale.x * child_pivot_offset.x - s * child_scale.y * child_pivot_offset.y,
+							s * child_scale.x * child_pivot_offset.x + c * child_scale.y * child_pivot_offset.y};
 
-			const auto child_world_mat = glm::mat3{
-				glm::vec3{c * local.scale.x,  s * local.scale.y, 0.F},
-				glm::vec3{-s * local.scale.x, c * local.scale.y, 0.F},
-				glm::vec3{render_pos, 1.F}
-			};
+			const auto child_world_mat = glm::mat3{glm::vec3{c * child_scale.x, s * child_scale.y, 0.F},
+												   glm::vec3{-s * child_scale.x, c * child_scale.y, 0.F},
+												   glm::vec3{render_pos, 1.F}};
 
 			world.emplace_or_replace<transform>(child, transform{.world = child_world_mat});
 			transform_stack_.push_back(child);
