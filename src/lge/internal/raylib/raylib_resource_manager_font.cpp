@@ -54,10 +54,6 @@ auto raylib_resource_manager::unload_font(const font_handle handle) -> result<> 
 	return true;
 }
 
-auto raylib_resource_manager::is_font_loaded(const font_handle handle) const noexcept -> bool {
-	return handle.is_valid() && font_cache_[handle.raw()];
-}
-
 auto raylib_resource_manager::get_raylib_font(const font_handle handle) const -> result<Font> {
 	if(!handle.is_valid()) [[unlikely]] {
 		return error("invalid font handle");

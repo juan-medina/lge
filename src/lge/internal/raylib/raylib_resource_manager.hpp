@@ -82,12 +82,10 @@ public:
 
 	[[nodiscard]] auto load_font(std::string_view uri) -> result<font_handle> override;
 	[[nodiscard]] auto unload_font(font_handle handle) -> result<> override;
-	[[nodiscard]] auto is_font_loaded(font_handle handle) const noexcept -> bool override;
 	[[nodiscard]] auto get_raylib_font(font_handle handle) const -> result<Font>;
 
 	[[nodiscard]] auto load_texture(std::string_view uri) -> result<texture_handle> override;
 	[[nodiscard]] auto unload_texture(texture_handle handle) -> result<> override;
-	[[nodiscard]] auto is_texture_loaded(texture_handle handle) const noexcept -> bool override;
 	[[nodiscard]] auto get_raylib_texture(texture_handle handle) const -> result<Texture2D>;
 
 private:

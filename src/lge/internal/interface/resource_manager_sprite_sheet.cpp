@@ -154,10 +154,6 @@ auto resource_manager::unload_sprite_sheet(const sprite_sheet_handle handle) -> 
 	return true;
 }
 
-auto resource_manager::is_sprite_sheet_loaded(const sprite_sheet_handle handle) const noexcept -> bool {
-	return handle.is_valid() && sprite_sheets_.contains(handle.raw());
-}
-
 auto resource_manager::get_sprite_sheet_frame(const sprite_sheet_handle handle, const std::string_view frame_name) const
 	-> result<sprite_sheet_frame> {
 	if(!handle.is_valid()) [[unlikely]] {

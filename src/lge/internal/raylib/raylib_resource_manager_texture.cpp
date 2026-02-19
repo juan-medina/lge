@@ -51,10 +51,6 @@ auto raylib_resource_manager::unload_texture(const texture_handle handle) -> res
 	return true;
 }
 
-auto raylib_resource_manager::is_texture_loaded(const texture_handle handle) const noexcept -> bool {
-	return handle.is_valid() && texture_cache_[handle.raw()];
-}
-
 auto raylib_resource_manager::get_raylib_texture(const texture_handle handle) const -> result<Texture2D> {
 	if(!handle.is_valid()) [[unlikely]] {
 		return error("invalid texture handle");

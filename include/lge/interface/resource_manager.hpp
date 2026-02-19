@@ -89,7 +89,6 @@ public:
 
 	[[nodiscard]] virtual auto load_font(std::string_view uri) -> result<font_handle> = 0;
 	[[nodiscard]] virtual auto unload_font(font_handle handle) -> result<> = 0;
-	[[nodiscard]] virtual auto is_font_loaded(font_handle handle) const noexcept -> bool = 0;
 
 	// =============================================================================
 	// Texture
@@ -97,7 +96,6 @@ public:
 
 	[[nodiscard]] virtual auto load_texture(std::string_view uri) -> result<texture_handle> = 0;
 	[[nodiscard]] virtual auto unload_texture(texture_handle handle) -> result<> = 0;
-	[[nodiscard]] virtual auto is_texture_loaded(texture_handle handle) const noexcept -> bool = 0;
 
 	// =============================================================================
 	// Sprite Sheet
@@ -105,7 +103,6 @@ public:
 
 	[[nodiscard]] auto load_sprite_sheet(std::string_view uri) -> result<sprite_sheet_handle>;
 	[[nodiscard]] auto unload_sprite_sheet(sprite_sheet_handle handle) -> result<>;
-	[[nodiscard]] auto is_sprite_sheet_loaded(sprite_sheet_handle handle) const noexcept -> bool;
 	[[nodiscard]] auto get_sprite_sheet_frame(sprite_sheet_handle handle, std::string_view frame_name) const
 		-> result<sprite_sheet_frame>;
 	[[nodiscard]] auto get_sprite_sheet_texture(sprite_sheet_handle handle) const -> result<texture_handle>;
