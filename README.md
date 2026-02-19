@@ -134,11 +134,12 @@ auto my_game::init() -> lge::result<> {
 
 **Third-party libraries:**
 
-- [raylib](https://www.raylib.com/) (licensed under zlib/libpng)
-- [entt](https://github.com/skypjack/entt) (licensed under MIT)
+- [raylib](https://www.raylib.com/) (licensed under zlib/libpng License)
+- [entt](https://github.com/skypjack/entt) (licensed under MIT License)
 - [glm](https://github.com/g-truc/glm) (licensed under The Happy Bunny License (Modified MIT License))
-- [spdlog](https://github.com/gabime/spdlog) (licensed under MIT)
-- [Boxer](https://github.com/aaronmjacobs/Boxer) (licensed under MIT)
+- [spdlog](https://github.com/gabime/spdlog) (licensed under MIT License)
+- [Boxer](https://github.com/aaronmjacobs/Boxer) (licensed under MIT License)
+- [jsoncons](https://github.com/danielaparker/jsoncons) (licensed under Boost Software License)
 
 **Graphics**
 
