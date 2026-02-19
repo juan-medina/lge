@@ -8,15 +8,17 @@
 #include <lge/core/result.hpp>
 #include <lge/interface/resource_manager.hpp>
 
-#include "glm/trigonometric.hpp"
+#include "raylib_resource_manager.hpp"
 
 #include <raylib.h>
 
 #include <cstdarg>
 #include <cstdio>
 #include <glm/ext/vector_float4.hpp>
+#include <glm/trigonometric.hpp>
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
+#include <string_view>
 #include <vector>
 
 namespace lge {
@@ -294,25 +296,37 @@ auto raylib_renderer::get_texture_size(const texture_handle texture) -> glm::vec
 	return {static_cast<float>(rl_texture.width), static_cast<float>(rl_texture.height)};
 }
 
-auto raylib_renderer::render_sprite(const texture_handle texture,
+auto raylib_renderer::get_sprite_frame_size(const sprite_sheet_handle sheet, const std::string_view frame)
+	-> glm::vec2 {
+	sprite_sheet_frame f{};
+	if(const auto err = resource_manager_.get_sprite_sheet_frame(sheet, frame).unwrap(f); err) [[unlikely]] {
+		log::error("failed to get sprite sheet frame '{}' from sheet {}", frame, sheet);
+		return {0.0F, 0.0F};
+	}
+	return f.source_size;
+}
+
+auto raylib_renderer::render_sprite(const sprite_sheet_handle sheet,
+									const std::string_view frame,
 									const glm::vec2 &center,
 									const glm::vec2 &size,
 									const float rotation) const -> void {
-	const auto screen_center = to_screen(center);
-
-	Texture2D rl_texture{};
-	if(const auto err = resource_manager_.get_raylib_texture(texture).unwrap(rl_texture); err) [[unlikely]] {
-		log::error("failed to get texture with id {}, skipping sprite render", texture);
+	sprite_sheet_frame f{};
+	if(const auto err = resource_manager_.get_sprite_sheet_frame(sheet, frame).unwrap(f); err) [[unlikely]] {
+		log::error("failed to get sprite sheet frame '{}', skipping sprite render", frame);
 		return;
 	}
 
-	const auto source = Rectangle{.x = 0.0F,
-								  .y = 0.0F,
-								  .width = static_cast<float>(rl_texture.width),
-								  .height = static_cast<float>(rl_texture.height)};
+	Texture2D rl_texture{};
+	if(const auto err = resource_manager_.get_sprite_sheet_texture(sheet).unwrap(rl_texture); err) [[unlikely]] {
+		log::error("failed to get sprite sheet texture for sheet {}, skipping sprite render", sheet);
+		return;
+	}
 
+	const auto screen_center = to_screen(center);
+	const auto source =
+		Rectangle{.x = f.source_pos.x, .y = f.source_pos.y, .width = f.source_size.x, .height = f.source_size.y};
 	const auto dest = Rectangle{.x = screen_center.x, .y = screen_center.y, .width = size.x, .height = size.y};
-
 	const auto origin = Vector2{.x = size.x * 0.5F, .y = size.y * 0.5F};
 
 	DrawTexturePro(rl_texture, source, dest, origin, rotation, WHITE);

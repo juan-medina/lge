@@ -7,7 +7,6 @@
 #include <lge/components/placement.hpp>
 #include <lge/components/shapes.hpp>
 #include <lge/components/sprite.hpp>
-#include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
 #include <lge/internal/components/bounds.hpp>
 #include <lge/internal/components/effective_hidden.hpp>
@@ -148,7 +147,7 @@ auto render_system::handle_sprite(const entt::entity entity, const glm::mat3 &wo
 	const auto world_scale = get_scale(world_transform);
 	const auto scaled_size = m.size * world_scale;
 
-	renderer_.render_sprite(spr.texture, center, scaled_size, rotation);
+	renderer_.render_sprite(spr.sheet, spr.frame, center, scaled_size, rotation);
 }
 
 auto render_system::handle_bounds(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
@@ -164,7 +163,7 @@ auto render_system::handle_bounds(const entt::entity entity, const glm::mat3 &wo
 
 	const auto transform_local = [&](const glm::vec2 &local) -> glm::vec2 {
 		const auto scaled = local * world_scale;
-		return pivot_world + glm::vec2{scaled.x * cr - scaled.y * sr, scaled.x * sr + scaled.y * cr};
+		return pivot_world + glm::vec2{(scaled.x * cr) - (scaled.y * sr), (scaled.x * sr) + (scaled.y * cr)};
 	};
 
 	renderer_.render_quad(

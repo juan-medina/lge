@@ -45,6 +45,10 @@ struct texture_tag {};
 using texture_handle = resource_handle<texture_tag>;
 inline constexpr texture_handle invalid_texture{};
 
+struct sprite_sheet_tag {};
+using sprite_sheet_handle = resource_handle<sprite_sheet_tag>;
+inline constexpr sprite_sheet_handle invalid_sprite_sheet{};
+
 class resource_uri {
 public:
 	consteval resource_uri(const char *s): value_(s) {}				// NOLINT(*-explicit-constructor)
@@ -83,6 +87,10 @@ public:
 	[[nodiscard]] virtual auto load_texture(const resource_uri &uri) -> result<texture_handle> = 0;
 	[[nodiscard]] virtual auto unload_texture(texture_handle handle) -> result<> = 0;
 	[[nodiscard]] virtual auto is_texture_loaded(texture_handle handle) const noexcept -> bool = 0;
+
+	[[nodiscard]] virtual auto load_sprite_sheet(const resource_uri &uri) -> result<sprite_sheet_handle> = 0;
+	[[nodiscard]] virtual auto unload_sprite_sheet(sprite_sheet_handle handle) -> result<> = 0;
+	[[nodiscard]] virtual auto is_sprite_sheet_loaded(sprite_sheet_handle handle) const noexcept -> bool = 0;
 };
 
 } //  namespace lge

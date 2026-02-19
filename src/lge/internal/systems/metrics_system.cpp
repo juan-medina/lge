@@ -64,12 +64,12 @@ auto metrics_system::is_circle_dirty(const circle &c, const previous_circle &p) 
 }
 
 auto metrics_system::calculate_sprite_metrics(const entt::entity entity, const sprite &spr) const -> void {
-	const auto texture_size = renderer_.get_texture_size(spr.texture);
-	world.emplace_or_replace<metrics>(entity, metrics{.size = texture_size});
+	const auto frame_size = renderer_.get_sprite_frame_size(spr.sheet, spr.frame);
+	world.emplace_or_replace<metrics>(entity, metrics{.size = frame_size});
 }
 
 auto metrics_system::is_sprite_dirty(const sprite &spr, const previous_sprite &p) -> bool {
-	return spr.texture != p.texture;
+	return spr.sheet != p.sheet || spr.frame != p.frame;
 }
 
 auto metrics_system::handle_sprites() const -> void {
@@ -77,7 +77,8 @@ auto metrics_system::handle_sprites() const -> void {
 		auto &p = world.get_or_emplace<previous_sprite>(entity);
 		if(auto &spr = world.get<sprite>(entity); !world.all_of<metrics>(entity) || is_sprite_dirty(spr, p)) {
 			calculate_sprite_metrics(entity, spr);
-			p.texture = spr.texture;
+			p.sheet = spr.sheet;
+			p.frame = spr.frame;
 		}
 	}
 }

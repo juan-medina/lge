@@ -5,10 +5,13 @@
 
 #include <lge/interface/resource_manager.hpp>
 
+#include <string>
+
 namespace lge {
 
 struct previous_sprite {
-	texture_handle texture;
+	sprite_sheet_handle sheet;
+	std::string frame;
 };
 
 } // namespace lge

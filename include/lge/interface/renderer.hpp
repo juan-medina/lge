@@ -10,6 +10,7 @@
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float4.hpp>
 #include <string>
+#include <string_view>
 
 namespace lge {
 
@@ -62,13 +63,17 @@ public:
 							   const glm::vec4 &fill_color,
 							   float border_thickness) const -> void = 0;
 
-	virtual auto
-	render_sprite(texture_handle texture, const glm::vec2 &center, const glm::vec2 &size, float rotation) const
-		-> void = 0;
+	virtual auto render_sprite(sprite_sheet_handle sheet,
+							   std::string_view frame,
+							   const glm::vec2 &center,
+							   const glm::vec2 &size,
+							   float rotation) const -> void = 0;
 
 	virtual auto get_label_size(font_handle font, const std::string &text, const int &size) -> glm::vec2 = 0;
 
 	virtual auto get_texture_size(texture_handle texture) -> glm::vec2 = 0;
+
+	virtual auto get_sprite_frame_size(sprite_sheet_handle sheet, std::string_view frame) -> glm::vec2 = 0;
 
 	virtual auto show_cursor(bool show) -> void = 0;
 

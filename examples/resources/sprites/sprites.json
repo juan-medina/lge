@@ -1,0 +1,39 @@
+{
+  "frames": {
+    "logo-sm.png": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 105,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 2,
+        "y": 35,
+        "w": 105,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 110,
+        "h": 110
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "app": "http://free-tex-packer.com",
+    "version": "0.6.7",
+    "image": "sprites.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 105,
+      "h": 40
+    },
+    "scale": 1
+  }
+}
