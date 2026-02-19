@@ -33,8 +33,8 @@ auto transform_system::compose_transform(const placement &node_placement, const 
 	const float s = glm::sin(rad);
 	const float c = glm::cos(rad);
 
-	const auto rotation_scale = glm::mat3{{c * node_placement.scale.x, s * node_placement.scale.y, 0.F},
-										  {-s * node_placement.scale.x, c * node_placement.scale.y, 0.F},
+	const auto rotation_scale = glm::mat3{{c * node_placement.scale.x, -s * node_placement.scale.y, 0.F},
+										  {s * node_placement.scale.x, c * node_placement.scale.y, 0.F},
 										  z};
 
 	const auto to_pivot = glm::mat3{x, y, {-pivot_offset.x, -pivot_offset.y, 1.F}};
@@ -88,7 +88,8 @@ auto transform_system::update(const float /*dt*/) -> result<> {
 			// Child pivot in world space: scale local position by parent scale, then rotate
 			const auto scaled_pos = local.position * parent_scale;
 			const auto child_pivot_world =
-				parent_pos + glm::vec2{(pc * scaled_pos.x) + ps * scaled_pos.y, -ps * scaled_pos.x + pc * scaled_pos.y};
+				parent_pos
+				+ glm::vec2{(pc * scaled_pos.x) - (ps * scaled_pos.y), (ps * scaled_pos.x) + (pc * scaled_pos.y)};
 
 			// Combined rotation and scale for child
 			const float combined_rad = glm::radians(parent_placement.rotation + local.rotation);
@@ -99,13 +100,12 @@ auto transform_system::update(const float /*dt*/) -> result<> {
 			// Render pos = child pivot world - RS * child_pivot_offset (RS includes child_scale)
 			const auto render_pos =
 				child_pivot_world
-				- glm::vec2{(c * child_scale.x * child_pivot_offset.x) - (s * child_scale.y * child_pivot_offset.y),
-							(s * child_scale.x * child_pivot_offset.x) + (c * child_scale.y * child_pivot_offset.y)};
+				- glm::vec2{(c * child_scale.x * child_pivot_offset.x) + (s * child_scale.y * child_pivot_offset.y),
+							-(s * child_scale.x * child_pivot_offset.x) + (c * child_scale.y * child_pivot_offset.y)};
 
-			const auto child_world_mat = glm::mat3{glm::vec3{c * child_scale.x, s * child_scale.y, 0.F},
-												   glm::vec3{-s * child_scale.x, c * child_scale.y, 0.F},
+			const auto child_world_mat = glm::mat3{glm::vec3{c * child_scale.x, -s * child_scale.y, 0.F},
+												   glm::vec3{s * child_scale.x, c * child_scale.y, 0.F},
 												   glm::vec3{render_pos, 1.F}};
-
 			world.emplace_or_replace<transform>(child, transform{.world = child_world_mat});
 			transform_stack_.push_back(child);
 		}
