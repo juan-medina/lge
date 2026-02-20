@@ -3,16 +3,14 @@
 
 #pragma once
 
-#include <lge/components/sprite_animation.hpp>
 #include <lge/core/result.hpp>
 #include <lge/interface/resource_manager.hpp>
 
 #include "../../src/example.hpp"
 
-#include <cstdint>
+#include <cstddef>
 #include <entity/entity.hpp>
 #include <entity/fwd.hpp>
-#include <vector>
 
 class sprites: public example {
 public:
@@ -25,9 +23,9 @@ protected:
 
 private:
 	static constexpr auto example_title = "Sprites!";
-	static constexpr auto kb_message = "Press space: to change animation, F5 debug draw,\n"
+	static constexpr auto kb_message = "Cursor left/right to move, F5 debug draw,\n"
 									   "F11: toggle fullscreen, Esc: exit";
-	static constexpr auto controller_message = "Press controller A: to change animation,\n"
+	static constexpr auto controller_message = "Controller left/right to move,\n"
 											   "START: debug draw, SELECT: toggle fullscreen, B: exit";
 
 	static constexpr auto anim_path = "resources/game/sprites/hiker_anim.json";
@@ -35,12 +33,8 @@ private:
 	static constexpr auto idle_anim = "idle";
 	static constexpr auto run_anim = "run";
 
-	static constexpr auto change_anim_action = "change_anim";
-
-	enum class animation_state : std::uint8_t {
-		idle,
-		run,
-	} anim_state_ = animation_state::idle;
+	static constexpr size_t left_action = total_base_actions + 0;
+	static constexpr size_t right_action = total_base_actions + 1;
 
 	lge::sprite_sheet_handle sheet_{lge::invalid_sprite_sheet};
 

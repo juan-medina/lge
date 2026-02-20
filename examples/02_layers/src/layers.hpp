@@ -41,7 +41,7 @@ private:
 	entt::entity top_text_entity_ = entt::null;
 	auto change_top_color(top_color new_top_color) -> void;
 
-	static constexpr auto change_top_action = "change_top";
+	static constexpr size_t change_top_action = total_base_actions + 0;
 
 	// root nodes for each color
 	entt::entity red_root_ = entt::null;

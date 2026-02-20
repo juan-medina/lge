@@ -22,13 +22,18 @@ auto animation_system::advance_animation(const entt::entity entity, sprite_anima
 	const auto anim_library_changed = previous_anim.handle != anim.handle;
 	const auto anim_named_changed = previous_anim.name != anim.name;
 
+	// We need to update the sprite's flip state every frame, since the animation clip may have changed but not the
+	//  library or name, and the flip state is shared across all clips in the library
+	spr.flip_horizontal = anim.flip_horizontal;
+	spr.flip_vertical = anim.flip_vertical;
+
 	if(anim_library_changed || anim_named_changed) [[likely]] {
 		// Animation has changed, so we need to reset it
 		anim.current_frame = 0;
 		anim.elapsed = 0.F;
 		previous_anim.handle = anim.handle;
 		previous_anim.name = anim.name;
-		
+
 		// We need to update the sprite sheet only if we change the animation library, since the sprite sheet is
 		//  shared across all animations in the library
 		if(anim_library_changed) [[unlikely]] {

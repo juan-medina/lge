@@ -7,37 +7,92 @@
 
 #include <raylib.h>
 
+#include <array>
 #include <cstdlib>
-#include <unordered_map>
 
 namespace lge {
 
-auto raylib_input::update(const float delta_time) -> void {
-	update_controller_mode(delta_time);
+auto raylib_input::update(const float /*delta_time*/) -> void {
+	update_controller_mode();
 	reset_states();
 
-	for(auto &[bid, binding]: bindings) {
-		auto &[pressed, released, down] = states[bid];
+	const auto stick = update_virtual_dpad_states();
 
-		for(const auto k: binding.keys) {
-			const auto raylib_key = key_to_raylib(k);
-			pressed = pressed || IsKeyPressed(raylib_key);
-			released = released || IsKeyReleased(raylib_key);
-			down = down || IsKeyDown(raylib_key);
-		}
-
+	for(std::size_t bid = 0; bid < max_actions; ++bid) {
+		auto &st      = states[bid];
+		auto &binding = bindings[bid];
+		accumulate_key_states(st, binding);
 		if(controller_available && default_controller >= 0) {
-			for(const auto b: binding.buttons) {
-				const auto raylib_button = button_to_raylib(b);
-				pressed = pressed || IsGamepadButtonPressed(default_controller, raylib_button);
-				released = released || IsGamepadButtonReleased(default_controller, raylib_button);
-				down = down || IsGamepadButtonDown(default_controller, raylib_button);
-			}
+			accumulate_button_states(st, binding, stick);
 		}
+	}
+
+	prev_stick_dpad_ = stick;
+}
+
+auto raylib_input::accumulate_key_states(state &st, const binding &b) const -> void {
+	for(const auto k: b.keys) {
+		const auto rk = key_to_raylib(k);
+		st.pressed  = st.pressed  || IsKeyPressed(rk);
+		st.released = st.released || IsKeyReleased(rk);
+		st.down     = st.down     || IsKeyDown(rk);
 	}
 }
 
-auto raylib_input::update_controller_mode(const float delta_time) -> void {
+auto raylib_input::accumulate_button_states(state &st, const binding &b, const std::array<bool, 4> &stick) const -> void {
+	for(const auto btn: b.buttons) {
+		const auto rb = button_to_raylib(btn);
+		st.pressed  = st.pressed  || IsGamepadButtonPressed(default_controller, rb);
+		st.released = st.released || IsGamepadButtonReleased(default_controller, rb);
+		st.down     = st.down     || IsGamepadButtonDown(default_controller, rb);
+		apply_stick_dpad(st, btn, stick);
+	}
+}
+
+auto raylib_input::apply_stick_dpad(state &st, const button b, const std::array<bool, 4> &stick) const -> void {
+	const auto idx = stick_dpad_index(b);
+	if(idx < 0) {
+		return;
+	}
+	const auto cur  = stick[idx];
+	const auto prev = prev_stick_dpad_[idx];
+	st.pressed  = st.pressed  || (cur && !prev);
+	st.released = st.released || (!cur && prev);
+	st.down     = st.down     || cur;
+}
+
+auto raylib_input::stick_dpad_index(const button b) -> int {
+	switch(b) {
+	case button::left_face_left:
+		return 0;
+	case button::left_face_right:
+		return 1;
+	case button::left_face_up:
+		return 2;
+	case button::left_face_down:
+		return 3;
+	default:
+		return -1;
+	}
+}
+
+auto raylib_input::update_virtual_dpad_states() const -> std::array<bool, 4> {
+	std::array<bool, 4> stick{};
+	if(controller_available && default_controller >= 0) {
+		const auto xl = GetGamepadAxisMovement(default_controller, GAMEPAD_AXIS_LEFT_X);
+		const auto yl = GetGamepadAxisMovement(default_controller, GAMEPAD_AXIS_LEFT_Y);
+		const auto xr = GetGamepadAxisMovement(default_controller, GAMEPAD_AXIS_RIGHT_X);
+		const auto yr = GetGamepadAxisMovement(default_controller, GAMEPAD_AXIS_RIGHT_Y);
+
+		stick[0] = xl < -controller_axis_dead_zone || xr < -controller_axis_dead_zone;
+		stick[1] = xl >  controller_axis_dead_zone || xr >  controller_axis_dead_zone;
+		stick[2] = yl < -controller_axis_dead_zone || yr < -controller_axis_dead_zone;
+		stick[3] = yl >  controller_axis_dead_zone || yr >  controller_axis_dead_zone;
+	}
+	return stick;
+}
+
+auto raylib_input::update_controller_mode() -> void {
 	const auto was_no_controller = default_controller == -1;
 	default_controller = -1;
 
@@ -93,8 +148,6 @@ auto raylib_input::update_controller_mode(const float delta_time) -> void {
 
 	if(default_controller == -1 || !IsGamepadAvailable(default_controller)) {
 		controller_available = false;
-		mouse_inactive_time = 0.0F;
-		controller_inactive_time = 0.0F;
 		if(!was_no_controller) {
 			log::info("controller disconnected");
 		}
@@ -102,36 +155,11 @@ auto raylib_input::update_controller_mode(const float delta_time) -> void {
 	}
 
 	if(is_gamepad_input_detected()) {
-		controller_inactive_time = 0.0F;
-		// Only switch to controller mode if grace period expired or already in controller mode
-		if(controller_available || mouse_inactive_time > controller_mode_grace_period) {
-			controller_available = true;
-		}
+		controller_available = true;
 	}
 
 	if(is_mouse_keyboard_active()) {
-		mouse_inactive_time = 0.0F;
-		// Only switch to mouse mode if grace period expired or already in mouse mode
-		if(!controller_available || controller_inactive_time > controller_mode_grace_period) {
-			controller_available = false;
-		}
-	}
-
-	// Update inactive timers
-	mouse_inactive_time += delta_time;
-	controller_inactive_time += delta_time;
-
-	// Switch modes after grace period of inactivity from current mode
-	if(controller_available && controller_inactive_time > controller_mode_grace_period) {
-		// If controller hasn't been used for a while, allow mouse to take over
-		if(mouse_inactive_time < controller_inactive_time) {
-			controller_available = false;
-		}
-	} else if(!controller_available && mouse_inactive_time > controller_mode_grace_period) {
-		// If mouse hasn't been used for a while, allow controller to take over
-		if(controller_inactive_time < mouse_inactive_time) {
-			controller_available = true;
-		}
+		controller_available = false;
 	}
 }
 

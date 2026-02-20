@@ -12,6 +12,8 @@ namespace lge {
 struct sprite {
 	sprite_sheet_handle sheet;
 	std::string frame;
+	bool flip_horizontal;
+	bool flip_vertical;
 };
 
 } // namespace lge

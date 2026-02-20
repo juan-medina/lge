@@ -14,6 +14,8 @@ struct sprite_animation {
 	std::string name;
 	int current_frame = 0;
 	float elapsed = 0.F;
+	bool flip_horizontal;
+	bool flip_vertical;
 };
 
 } // namespace lge

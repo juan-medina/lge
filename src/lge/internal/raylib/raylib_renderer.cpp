@@ -311,7 +311,9 @@ auto raylib_renderer::render_sprite(const sprite_sheet_handle sheet,
 									const glm::vec2 &pivot_position,
 									const glm::vec2 &size,
 									const glm::vec2 &pivot,
-									const float rotation) const -> void {
+									const float rotation,
+									bool flip_horizontal,
+									bool flip_vertical) const -> void {
 	sprite_sheet_frame f{};
 	if(const auto err = resource_manager_.get_sprite_sheet_frame(sheet, frame).unwrap(f); err) [[unlikely]] {
 		log::error("failed to get sprite sheet frame '{}', skipping sprite render", frame);
@@ -331,8 +333,11 @@ auto raylib_renderer::render_sprite(const sprite_sheet_handle sheet,
 	}
 
 	const auto screen_pos = to_screen(pivot_position);
-	const auto source =
-		Rectangle{.x = f.source_pos.x, .y = f.source_pos.y, .width = f.source_size.x, .height = f.source_size.y};
+
+	const float sw = flip_horizontal ? -f.source_size.x : f.source_size.x;
+	const float sh = flip_vertical ? -f.source_size.y : f.source_size.y;
+
+	const auto source = Rectangle{.x = f.source_pos.x, .y = f.source_pos.y, .width = sw, .height = sh};
 	const auto dest = Rectangle{.x = screen_pos.x, .y = screen_pos.y, .width = size.x, .height = size.y};
 	const auto origin = Vector2{.x = pivot.x * size.x, .y = pivot.y * size.y};
 

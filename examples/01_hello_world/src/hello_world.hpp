@@ -8,6 +8,7 @@
 #include "../../src/example.hpp"
 #include "entity/fwd.hpp"
 
+#include <cstddef>
 #include <entity/entity.hpp>
 #include <string>
 
@@ -27,8 +28,8 @@ private:
 	static constexpr auto controller_message = "Press controller A: hide hello+world, X: hide world,\n"
 											   "START: debug draw, SELECT: toggle fullscreen, B: exit";
 
-	static constexpr auto hide_hello_world_action = "hide_hello_world";
-	static constexpr auto hide_world_action = "hide_world";
+	static constexpr size_t hide_hello_world_action = total_base_actions + 0;
+	static constexpr size_t hide_world_action = total_base_actions + 1;
 
 	entt::entity center_ent_ = entt::null;
 	entt::entity world_text_ent_ = entt::null;

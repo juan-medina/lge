@@ -3,9 +3,11 @@
 
 #pragma once
 
+#include <lge/interface/input.hpp>
+
 #include <raylib.h>
 
-#include <lge/interface/input.hpp>
+#include <array>
 
 #ifdef __EMSCRIPTEN__
 #	include <unordered_set>
@@ -18,16 +20,26 @@ public:
 	auto update(float delta_time) -> void override;
 
 private:
-	static constexpr float controller_mode_grace_period = 2.0F;
 	static constexpr auto controller_axis_dead_zone = 0.3F;
 
 #ifdef __EMSCRIPTEN__
 	std::unordered_set<std::string> validated_controllers_;
 #endif
 
-	auto update_controller_mode(float delta_time) -> void;
+	std::array<bool, 4> prev_stick_dpad_{};
+
+	auto update_controller_mode() -> void;
+
 	[[nodiscard]] auto is_gamepad_input_detected() const -> bool;
 	[[nodiscard]] auto is_mouse_keyboard_active() -> bool;
+
+	[[nodiscard]] auto update_virtual_dpad_states() const -> std::array<bool, 4>;
+
+	auto accumulate_key_states(state &st, const binding &b) const -> void;
+	auto accumulate_button_states(state &st, const binding &b, const std::array<bool, 4> &stick) const -> void;
+	auto apply_stick_dpad(state &st, button b, const std::array<bool, 4> &stick) const -> void;
+
+	static auto stick_dpad_index(button b) -> int;
 
 	// NOLINTNEXTLINE(*-avoid-c-arrays)
 	static constexpr int key_values[] = {KEY_NULL,

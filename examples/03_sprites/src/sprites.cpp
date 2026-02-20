@@ -22,10 +22,16 @@ auto sprites::init() -> lge::result<> {
 	}
 
 	auto &input = get_input();
-	input.bind(change_anim_action,
+	input.bind(left_action,
 			   {
-				   .keys = {lge::input::key::space},
-				   .buttons = {lge::input::button::right_face_down},
+				   .keys = {lge::input::key::left, lge::input::key::a, lge::input::key::o},
+				   .buttons = {lge::input::button::left_face_left},
+			   });
+
+	input.bind(right_action,
+			   {
+				   .keys = {lge::input::key::right, lge::input::key::d, lge::input::key::p},
+				   .buttons = {lge::input::button::left_face_right},
 			   });
 
 	auto &world = get_world();
@@ -45,16 +51,16 @@ auto sprites::init() -> lge::result<> {
 
 auto sprites::update(const float dt) -> lge::result<> {
 	const auto &input = get_input();
-	if(input.get(change_anim_action).pressed) {
-		if(anim_state_ == animation_state::idle) {
-			anim_state_ = animation_state::run;
-		} else {
-			anim_state_ = animation_state::idle;
-		}
 
-		auto &world = get_world();
-		auto &anim = world.get<lge::sprite_animation>(sprite_);
-		anim.name = anim_state_ == animation_state::idle ? idle_anim : run_anim;
+	const auto move_left = input.get(left_action).down;
+	const auto move_right = input.get(right_action).down;
+
+	auto &world = get_world();
+	auto &anim = world.get<lge::sprite_animation>(sprite_);
+
+	anim.name = (move_left || move_right) ? run_anim : idle_anim;
+	if(move_left || move_right) {
+		anim.flip_horizontal = move_left && !move_right;
 	}
 
 	return example::update(dt);

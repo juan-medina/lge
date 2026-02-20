@@ -61,7 +61,9 @@ public:
 					   const glm::vec2 &pivot_position,
 					   const glm::vec2 &size,
 					   const glm::vec2 &pivot,
-					   float rotation) const -> void override;
+					   float rotation,
+					   bool flip_horizontal,
+					   bool flip_vertical) const -> void override;
 
 	auto render_quad(const glm::vec2 &p0,
 					 const glm::vec2 &p1,

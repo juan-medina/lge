@@ -3,10 +3,10 @@
 
 #pragma once
 
+#include <array>
+#include <cassert>
+#include <cstddef>
 #include <cstdint>
-#include <ranges>
-#include <string_view>
-#include <unordered_map>
 #include <vector>
 
 namespace lge {
@@ -156,7 +156,7 @@ public:
 		right_thumb,
 	};
 
-	using id = std::string_view;
+	using id = std::size_t;
 
 	struct state {
 		bool pressed = false;  // went down this frame
@@ -169,37 +169,40 @@ public:
 		std::vector<button> buttons;
 	};
 
-	void bind(const id bid, const binding &binding) {
-		bindings[bid] = binding;
+	static constexpr std::size_t max_actions = 16;
+	static constexpr std::size_t max_keys_per_binding = 4;
+	static constexpr std::size_t max_buttons_per_binding = 4;
+
+	void bind(const id bid, const binding &b) {
+		assert(bid < max_actions && "action id exceeds max_actions");
+		assert(b.keys.size() <= max_keys_per_binding && "too many keys in binding");
+		assert(b.buttons.size() <= max_buttons_per_binding && "too many buttons in binding");
+		bindings[bid] = b;
 	}
 
 	[[nodiscard]] auto is_controller_available() const -> bool {
 		return controller_available;
 	}
 
-	[[nodiscard]] virtual auto get(id bid) const -> const state & {
-		static auto constexpr empty = state{};
-		if(const auto it = states.find(bid); it != states.end()) [[likely]] {
-			return it->second;
-		}
-		return empty;
+	[[nodiscard]] virtual auto get(const id bid) const -> const state & {
+		assert(bid < max_actions && "action id exceeds max_actions");
+		return states[bid];
 	}
 
 	virtual auto update(float delta_time) -> void = 0;
 
 protected:
-	std::unordered_map<id, binding> bindings;
-	std::unordered_map<id, state> states;
+	std::array<binding, max_actions> bindings{};
+	std::array<state, max_actions> states{};
 
 	bool controller_available{false};
-	float mouse_inactive_time{0.0F};
-	float controller_inactive_time{0.0F};
 	int default_controller{-1};
 
 	auto reset_states() -> void {
-		for(auto &st: states | std::views::values) {
+		for(auto &st: states) {
 			st.pressed = false;
 			st.released = false;
+			st.down = false;
 		}
 	}
 };

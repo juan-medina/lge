@@ -68,7 +68,9 @@ public:
 							   const glm::vec2 &pivot_position,
 							   const glm::vec2 &size,
 							   const glm::vec2 &pivot,
-							   float rotation) const -> void = 0;
+							   float rotation,
+							   bool flip_horizontal,
+							   bool flip_vertical) const -> void = 0;
 
 	virtual auto get_label_size(font_handle font, const std::string &text, const int &size) -> glm::vec2 = 0;
 

@@ -7,6 +7,7 @@
 #include <lge/app/app_config.hpp>
 #include <lge/core/result.hpp>
 
+#include <cstddef>
 #include <entity/entity.hpp>
 #include <entity/fwd.hpp>
 #include <glm/ext/vector_float2.hpp>
@@ -31,14 +32,14 @@ protected:
 	[[nodiscard]] static constexpr auto get_game_res() -> glm::vec2 {
 		return game_res;
 	}
+	static constexpr std::size_t fullscreen_action = 0;
+	static constexpr std::size_t exit_action = 1;
+	static constexpr std::size_t debug_action = 2;
+	static constexpr std::size_t total_base_actions = 3;
 
 private:
 	static constexpr auto clear_color = glm::vec4{0, 0, 0, 1}; // black background
 	static constexpr auto game_res = glm::vec2{640, 360}; // world expands horizontally keep the vertical size fixed
-
-	static constexpr auto fullscreen_action = "fullscreen";
-	static constexpr auto exit_action = "exit";
-	static constexpr auto debug_action = "debug";
 
 	bool was_in_controller_mode_ = false;
 	entt::entity message_ent_ = entt::null;
