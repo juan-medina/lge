@@ -53,12 +53,11 @@ auto animation_system::advance_animation(const entt::entity entity, sprite_anima
 
 	anim.elapsed += dt;
 	const auto frame_duration = 1.F / clip.fps;
-	if(anim.elapsed < frame_duration) [[likely]] {
-		return;
+	if(anim.elapsed >= frame_duration) [[unlikely]] {
+		anim.elapsed -= frame_duration;
+		anim.current_frame = (anim.current_frame + 1) % static_cast<int>(clip.frames.size());
 	}
-
-	anim.elapsed -= frame_duration;
-	anim.current_frame = (anim.current_frame + 1) % static_cast<int>(clip.frames.size());
+	spr.frame = clip.frames[static_cast<std::size_t>(anim.current_frame)];;
 
 	spr.frame = clip.frames[static_cast<std::size_t>(anim.current_frame)];
 }
