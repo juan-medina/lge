@@ -5,13 +5,16 @@
 
 #include <lge/interface/resource_manager.hpp>
 
-#include <string>
+#include <entt/core/fwd.hpp>
+#include <entt/core/hashed_string.hpp>
 
 namespace lge {
 
+using entt::literals::operator""_hs;
+
 struct previous_sprite {
 	sprite_sheet_handle sheet;
-	std::string frame;
+	entt::hashed_string frame = ""_hs;
 };
 
 } // namespace lge

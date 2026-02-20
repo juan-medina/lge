@@ -14,6 +14,7 @@
 
 #include <cstdarg>
 #include <cstdio>
+#include <entt/core/fwd.hpp>
 #include <glm/ext/vector_float4.hpp>
 #include <glm/trigonometric.hpp>
 #include <spdlog/common.h>
@@ -296,8 +297,7 @@ auto raylib_renderer::get_texture_size(const texture_handle texture) -> glm::vec
 	return {static_cast<float>(rl_texture.width), static_cast<float>(rl_texture.height)};
 }
 
-auto raylib_renderer::get_sprite_frame_size(const sprite_sheet_handle sheet, const std::string_view frame)
-	-> glm::vec2 {
+auto raylib_renderer::get_sprite_frame_size(const sprite_sheet_handle sheet, const entt::id_type frame) -> glm::vec2 {
 	sprite_sheet_frame f{};
 	if(const auto err = resource_manager_.get_sprite_sheet_frame(sheet, frame).unwrap(f); err) [[unlikely]] {
 		log::error("failed to get sprite sheet frame '{}' from sheet {}", frame, sheet);
@@ -307,7 +307,7 @@ auto raylib_renderer::get_sprite_frame_size(const sprite_sheet_handle sheet, con
 }
 
 auto raylib_renderer::render_sprite(const sprite_sheet_handle sheet,
-									const std::string_view frame,
+									const entt::id_type frame,
 									const glm::vec2 &pivot_position,
 									const glm::vec2 &size,
 									const glm::vec2 &pivot,

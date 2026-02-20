@@ -5,6 +5,7 @@
 #include <lge/core/result.hpp>
 #include <lge/interface/resource_manager.hpp>
 
+#include <entt/core/fwd.hpp>
 #include <filesystem>
 #include <fstream>
 #include <glm/ext/vector_float2.hpp>
@@ -26,12 +27,12 @@ namespace lge {
 
 namespace {
 
-auto parse_sprite_sheet_frames(const jsoncons::json &root) -> std::unordered_map<std::string, sprite_sheet_frame> {
+auto parse_sprite_sheet_frames(const jsoncons::json &root) -> std::unordered_map<entt::id_type, sprite_sheet_frame> {
 	if(!root.contains("frames") || !root["frames"].is_object()) {
 		return {};
 	}
 
-	std::unordered_map<std::string, sprite_sheet_frame> frames;
+	std::unordered_map<entt::id_type, sprite_sheet_frame> frames;
 
 	for(const auto &frames_node = root["frames"]; const auto &entry: frames_node.object_range()) {
 		const auto &value = entry.value();
@@ -52,8 +53,8 @@ auto parse_sprite_sheet_frames(const jsoncons::json &root) -> std::unordered_map
 			pivot.x = pivot_node.get_value_or<float>("x", 0.5F);
 			pivot.y = pivot_node.get_value_or<float>("y", 0.5F);
 		}
-
-		frames.emplace(entry.key(),
+		const auto key = entt::hashed_string{entry.key().data()}.value(); // NOLINT(*-suspicious-stringview-data-usage)
+		frames.emplace(key,
 					   sprite_sheet_frame{
 						   .source_pos = {src_x, src_y},
 						   .source_size = {src_w, src_h},
@@ -78,10 +79,10 @@ auto parse_sprite_sheet_image_path(const jsoncons::json &root, const std::filesy
 	return (base_path / image).string();
 }
 
-auto parse_sprite_sheet_json(const std::string_view uri) -> std::optional<jsoncons::json> {
+auto parse_sprite_sheet_json(const std::string_view uri) -> result<jsoncons::json> {
 	std::ifstream const file(static_cast<std::string>(uri));
 	if(!file.is_open()) {
-		return std::nullopt;
+		return error("failed to open sprite sheet JSON file: " + std::string(uri));
 	}
 
 	std::stringstream buffer;
@@ -92,7 +93,7 @@ auto parse_sprite_sheet_json(const std::string_view uri) -> std::optional<jsonco
 	jsoncons::json_stream_reader reader(buffer, decoder);
 	reader.read(error_code);
 	if(error_code) {
-		return std::nullopt;
+		return error("failed to parse sprite sheet JSON: " + std::string(uri) + ", error: " + error_code.message());
 	}
 
 	return decoder.get_result();
@@ -120,13 +121,13 @@ auto resource_manager::unload_sprite_sheet(const sprite_sheet_handle handle) -> 
 	return true;
 }
 
-auto resource_manager::get_sprite_sheet_frame(const sprite_sheet_handle handle, const std::string_view frame_name) const
+auto resource_manager::get_sprite_sheet_frame(const sprite_sheet_handle handle, const entt::id_type frame_name) const
 	-> result<sprite_sheet_frame> {
 	const sprite_sheet_data *data = nullptr;
 	if(const auto err = sprite_sheets_.get(handle).unwrap(data); err) [[unlikely]] {
 		return error("can not get sprite sheet frame, sprite sheet not found", *err);
 	}
-	return data->frames.at(std::string(frame_name));
+	return data->frames.at(frame_name);
 }
 
 auto resource_manager::get_sprite_sheet_texture(const sprite_sheet_handle handle) const -> result<texture_handle> {
@@ -138,13 +139,14 @@ auto resource_manager::get_sprite_sheet_texture(const sprite_sheet_handle handle
 }
 
 auto resource_manager::sprite_sheet_data::load(const std::string_view uri, resource_manager &rm) -> result<> {
-	const auto root = parse_sprite_sheet_json(uri);
-	if(!root) [[unlikely]] {
-		return error{"failed to parse sprite sheet JSON: " + std::string(uri)};
+	jsoncons::json root;
+
+	if(const auto err = parse_sprite_sheet_json(uri).unwrap(root); err) [[unlikely]] {
+		return error{"failed to parse sprite sheet JSON: " + std::string(uri), *err};
 	}
 
 	const auto base_path = std::filesystem::path(static_cast<std::string>(uri)).parent_path();
-	const auto image_path = parse_sprite_sheet_image_path(*root, base_path);
+	const auto image_path = parse_sprite_sheet_image_path(root, base_path);
 	if(image_path.empty()) [[unlikely]] {
 		return error{"sprite sheet missing meta.image: " + std::string(uri)};
 	}
@@ -153,7 +155,7 @@ auto resource_manager::sprite_sheet_data::load(const std::string_view uri, resou
 		return error{"failed to load sprite sheet texture", *err};
 	}
 
-	frames = parse_sprite_sheet_frames(*root);
+	frames = parse_sprite_sheet_frames(root);
 	if(frames.empty()) [[unlikely]] {
 		return error{"sprite sheet contains no frames: " + std::string(uri)};
 	}

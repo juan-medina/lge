@@ -47,7 +47,7 @@ auto animation_system::advance_animation(const entt::entity entity, sprite_anima
 
 	animation_library_anim clip{};
 	if(const auto err = resource_manager_.get_animation(anim.handle, anim.name).unwrap(clip); err) [[unlikely]] {
-		log::error("animation clip '{}' not found, skipping", anim.name);
+		log::error("animation clip '{}' not found, skipping", anim.name.data());
 		return;
 	}
 

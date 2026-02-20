@@ -14,6 +14,8 @@
 #include <string>
 #include <utility>
 
+namespace examples {
+
 class example: public lge::app {
 public:
 	explicit example(
@@ -52,3 +54,5 @@ private:
 	std::string kb_message_;
 	std::string controller_message_;
 };
+
+} // namespace examples

@@ -14,7 +14,9 @@
 #include <cassert>
 #include <entt/entt.hpp>
 
-LGE_MAIN(sprites);
+LGE_MAIN(examples::sprites);
+
+namespace examples {
 
 auto sprites::init() -> lge::result<> {
 	if(const auto err = example::init().unwrap(); err) [[unlikely]] {
@@ -75,3 +77,5 @@ auto sprites::end() -> lge::result<> {
 
 	return example::end();
 }
+
+} // namespace examples

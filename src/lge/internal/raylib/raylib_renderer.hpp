@@ -42,7 +42,7 @@ public:
 
 	auto get_label_size(font_handle font, const std::string &text, const int &size) -> glm::vec2 override;
 	auto get_texture_size(texture_handle texture) -> glm::vec2 override;
-	auto get_sprite_frame_size(sprite_sheet_handle sheet, std::string_view frame) -> glm::vec2 override;
+	auto get_sprite_frame_size(sprite_sheet_handle sheet, entt::id_type frame) -> glm::vec2 override;
 
 	auto show_cursor(bool show) -> void override;
 
@@ -57,7 +57,7 @@ public:
 					  float rotation) const -> void override;
 
 	auto render_sprite(sprite_sheet_handle sheet,
-					   std::string_view frame,
+					   entt::id_type frame,
 					   const glm::vec2 &pivot_position,
 					   const glm::vec2 &size,
 					   const glm::vec2 &pivot,

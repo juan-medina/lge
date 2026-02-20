@@ -21,7 +21,9 @@
 #include <glm/ext/vector_float4.hpp>
 #include <random>
 
-LGE_MAIN(layers);
+LGE_MAIN(examples::layers);
+
+namespace examples {
 
 auto layers::init() -> lge::result<> {
 	if(const auto err = example::init().unwrap(); err) [[unlikely]] {
@@ -268,3 +270,5 @@ auto layers::create_circle(float pos_x, float pos_y, const glm::vec4 &color, std
 	world.emplace<lge::placement>(circle_ent, pos_x, pos_y);
 	return circle_ent;
 }
+
+} // namespace examples

@@ -9,8 +9,13 @@
 #include "../../src/example.hpp"
 
 #include <cstddef>
-#include <entity/entity.hpp>
-#include <entity/fwd.hpp>
+#include <entt/core/hashed_string.hpp>
+#include <entt/entity/entity.hpp>
+#include <entt/entity/fwd.hpp>
+
+namespace examples {
+
+using entt::literals::operator""_hs;
 
 class sprites: public example {
 public:
@@ -30,8 +35,8 @@ private:
 
 	static constexpr auto anim_path = "resources/game/sprites/hiker_anim.json";
 
-	static constexpr auto idle_anim = "idle";
-	static constexpr auto run_anim = "run";
+	static constexpr auto idle_anim = "idle"_hs;
+	static constexpr auto run_anim = "run"_hs;
 
 	static constexpr size_t left_action = total_base_actions + 0;
 	static constexpr size_t right_action = total_base_actions + 1;
@@ -42,3 +47,5 @@ private:
 
 	entt::entity sprite_{entt::null};
 };
+
+} // namespace examples

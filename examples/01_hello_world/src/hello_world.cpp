@@ -14,8 +14,9 @@
 #include "../../src/example.hpp"
 #include "oscillation_system.hpp"
 
-LGE_MAIN(hello_world);
+LGE_MAIN(examples::hello_world);
 
+namespace examples {
 auto hello_world::init() -> lge::result<> {
 	if(const auto err = example::init().unwrap(); err) [[unlikely]] {
 		return lge::error("error init the app", *err);
@@ -89,3 +90,5 @@ auto hello_world::update(const float dt) -> lge::result<> {
 
 	return example::update(dt);
 }
+
+} // namespace examples

@@ -67,14 +67,14 @@ struct sprite_sheet_frame {
 };
 
 struct animation_library_anim {
-	std::vector<std::string> frames;
+	std::vector<entt::hashed_string> frames;
 	float fps;
 };
 
 struct animation_library_data {
 	std::string uri;
 	sprite_sheet_handle sprite_sheet;
-	std::unordered_map<std::string, animation_library_anim> animations;
+	std::unordered_map<entt::id_type, animation_library_anim> animations;
 };
 
 // =============================================================================
@@ -120,7 +120,7 @@ public:
 
 	[[nodiscard]] auto load_sprite_sheet(std::string_view uri) -> result<sprite_sheet_handle>;
 	[[nodiscard]] auto unload_sprite_sheet(sprite_sheet_handle handle) -> result<>;
-	[[nodiscard]] auto get_sprite_sheet_frame(sprite_sheet_handle handle, std::string_view frame_name) const
+	[[nodiscard]] auto get_sprite_sheet_frame(sprite_sheet_handle handle, entt::id_type frame_name) const
 		-> result<sprite_sheet_frame>;
 	[[nodiscard]] auto get_sprite_sheet_texture(sprite_sheet_handle handle) const -> result<texture_handle>;
 
@@ -129,7 +129,7 @@ public:
 	// =============================================================================
 	[[nodiscard]] virtual auto load_animation_library(std::string_view uri) -> result<animation_library_handle>;
 	[[nodiscard]] virtual auto unload_animation_library(animation_library_handle handle) -> result<>;
-	[[nodiscard]] virtual auto get_animation(animation_library_handle handle, std::string_view anim_name) const
+	[[nodiscard]] virtual auto get_animation(animation_library_handle handle, entt::id_type anim_name) const
 		-> result<animation_library_anim>;
 	[[nodiscard]] virtual auto get_animation_sprite_sheet(animation_library_handle handle) const
 		-> result<sprite_sheet_handle>;
@@ -143,7 +143,7 @@ private:
 	public:
 		[[nodiscard]] auto load(std::string_view uri, resource_manager &rm) -> result<>;
 		texture_handle texture;
-		std::unordered_map<std::string, sprite_sheet_frame> frames;
+		std::unordered_map<entt::id_type, sprite_sheet_frame> frames;
 	};
 
 	resource_store<sprite_sheet_data, sprite_sheet_handle> sprite_sheets_;

@@ -4,8 +4,11 @@
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
 #include <lge/interface/resource_manager.hpp>
+#include "core/fwd.hpp"
 
+#include <entt/core/hashed_string.hpp>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/json_decoder.hpp>
@@ -54,12 +57,12 @@ auto parse_sprite_sheet_path(const jsoncons::json &root, const std::filesystem::
 	return (base_path / sheet).string();
 }
 
-auto parse_animations(const jsoncons::json &root) -> std::unordered_map<std::string, animation_library_anim> {
+auto parse_animations(const jsoncons::json &root) -> std::unordered_map<entt::id_type, animation_library_anim> {
 	if(!root.contains("animations") || !root["animations"].is_object()) {
 		return {};
 	}
 
-	std::unordered_map<std::string, animation_library_anim> animations;
+	std::unordered_map<entt::id_type, animation_library_anim> animations;
 
 	for(const auto &frames_node = root["animations"]; const auto &entry: frames_node.object_range()) {
 		const auto &value = entry.value();
@@ -79,11 +82,15 @@ auto parse_animations(const jsoncons::json &root) -> std::unordered_map<std::str
 		anim.fps = value.get_value_or<float>("fps", 0.0F);
 
 		for(const auto &frame_entry: value["frames"].array_range()) {
-			anim.frames.push_back(frame_entry.as<std::string>());
+			auto str = frame_entry.as<std::string>();
+			auto key = entt::hashed_string(str.data()); // NOLINT(*-suspicious-stringview-data-usage)
+			anim.frames.push_back(key);
 		}
 
-		log::debug("animation loaded: {}", entry.key());
-		animations.emplace(entry.key(), std::move(anim));
+		auto key_str = entry.key();
+		log::debug("animation loaded: {}", key_str);
+		auto key = entt::hashed_string(key_str.data()); // NOLINT(*-suspicious-stringview-data-usage)
+		animations.emplace(key, std::move(anim));
 	}
 
 	return animations;
@@ -152,7 +159,7 @@ auto resource_manager::unload_animation_library(const animation_library_handle h
 	return true;
 }
 
-auto resource_manager::get_animation(const animation_library_handle handle, const std::string_view anim_name) const
+auto resource_manager::get_animation(const animation_library_handle handle, const entt::id_type anim_name) const
 	-> result<animation_library_anim> {
 	if(!handle.is_valid()) [[unlikely]] {
 		return error("invalid animation library handle");
@@ -163,7 +170,7 @@ auto resource_manager::get_animation(const animation_library_handle handle, cons
 		return error("animation library not found");
 	}
 
-	const auto clip_it = it->second.animations.find(std::string(anim_name));
+	const auto clip_it = it->second.animations.find(anim_name);
 	if(clip_it == it->second.animations.end()) [[unlikely]] {
 		return error(std::format("animation clip '{}' not found in animation library", anim_name));
 	}
@@ -171,7 +178,7 @@ auto resource_manager::get_animation(const animation_library_handle handle, cons
 	return clip_it->second;
 }
 
-auto resource_manager::get_animation_sprite_sheet(animation_library_handle handle) const
+auto resource_manager::get_animation_sprite_sheet(const animation_library_handle handle) const
 	-> result<sprite_sheet_handle> {
 	if(!handle.is_valid()) [[unlikely]] {
 		return error("invalid animation library handle");

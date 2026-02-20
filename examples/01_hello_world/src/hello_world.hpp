@@ -12,6 +12,7 @@
 #include <entity/entity.hpp>
 #include <string>
 
+namespace examples {
 class hello_world: public example {
 public:
 	explicit hello_world(): example(example_title, kb_message, controller_message) {}
@@ -34,3 +35,5 @@ private:
 	entt::entity center_ent_ = entt::null;
 	entt::entity world_text_ent_ = entt::null;
 };
+
+} // namespace examples

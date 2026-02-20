@@ -14,6 +14,8 @@
 #include <entity/fwd.hpp>
 #include <random>
 
+namespace examples {
+
 class layers: public example {
 public:
 	explicit layers(): example(example_title, kb_message, controller_message) {}
@@ -86,3 +88,5 @@ private:
 	[[nodiscard]] auto create_circle(float pos_x, float pos_y, const glm::vec4 &color, std::mt19937 &rng)
 		-> entt::entity;
 };
+
+} // namespace examples

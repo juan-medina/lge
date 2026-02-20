@@ -11,6 +11,8 @@
 #include <lge/core/result.hpp>
 #include <lge/interface/renderer.hpp>
 
+namespace examples {
+
 auto example::update(const float dt) -> lge::result<> {
 	handle_common_input();
 	update_controller_mode_message();
@@ -89,3 +91,5 @@ auto example::update_controller_mode_message() -> void {
 		was_in_controller_mode_ = in_controller_mode;
 	}
 }
+
+} // namespace examples
