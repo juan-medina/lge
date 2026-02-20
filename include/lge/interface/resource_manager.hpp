@@ -10,7 +10,6 @@
 #include <entt/entt.hpp>
 #include <format>
 #include <glm/ext/vector_float2.hpp>
-#include <string>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
@@ -69,12 +68,6 @@ struct sprite_sheet_frame {
 struct animation_library_anim {
 	std::vector<entt::hashed_string> frames;
 	float fps;
-};
-
-struct animation_library_data {
-	std::string uri;
-	sprite_sheet_handle sprite_sheet;
-	std::unordered_map<entt::id_type, animation_library_anim> animations;
 };
 
 // =============================================================================
@@ -141,9 +134,19 @@ private:
 
 	class sprite_sheet_data {
 	public:
+		~sprite_sheet_data();
+		sprite_sheet_data() = default;
+		sprite_sheet_data(const sprite_sheet_data &) = delete;
+		auto operator=(const sprite_sheet_data &) -> sprite_sheet_data & = delete;
+		sprite_sheet_data(sprite_sheet_data &&) noexcept = default;
+		auto operator=(sprite_sheet_data &&) noexcept -> sprite_sheet_data & = default;
+
 		[[nodiscard]] auto load(std::string_view uri, resource_manager &rm) -> result<>;
 		texture_handle texture;
 		std::unordered_map<entt::id_type, sprite_sheet_frame> frames;
+
+	private:
+		resource_manager *rm_ = nullptr;
 	};
 
 	resource_store<sprite_sheet_data, sprite_sheet_handle> sprite_sheets_;
@@ -152,11 +155,24 @@ private:
 	// Animation Library Data
 	// =============================================================================
 
-	std::unordered_map<entt::id_type, animation_library_data> animation_libraries_;
+	class animation_library_data {
+	public:
+		~animation_library_data();
+		animation_library_data() = default;
+		animation_library_data(const animation_library_data &) = delete;
+		auto operator=(const animation_library_data &) -> animation_library_data & = delete;
+		animation_library_data(animation_library_data &&) noexcept = default;
+		auto operator=(animation_library_data &&) noexcept -> animation_library_data & = default;
 
-	static auto uri_to_key(const std::string_view uri) noexcept -> entt::id_type {
-		return entt::hashed_string{uri.data()}.value(); // NOLINT(*-suspicious-stringview-data-usage)
-	}
+		[[nodiscard]] auto load(std::string_view uri, resource_manager &rm) -> result<>;
+		sprite_sheet_handle sprite_sheet;
+		std::unordered_map<entt::id_type, animation_library_anim> animations;
+
+	private:
+		resource_manager *rm_ = nullptr;
+	};
+
+	resource_store<animation_library_data, animation_library_handle> animation_libraries_;
 };
 
 } //  namespace lge

@@ -105,6 +105,40 @@ auto parse_sprite_sheet_json(const std::string_view uri) -> result<jsoncons::jso
 // Sprite Sheet
 // =============================================================================
 
+resource_manager::sprite_sheet_data::~sprite_sheet_data() {
+	if(rm_ != nullptr && texture.is_valid()) {
+		if(const auto err = rm_->unload_texture(texture).unwrap()) {
+			log::error("failed to unload sprite sheet texture: {}", err->to_string());
+		}
+	}
+}
+
+auto resource_manager::sprite_sheet_data::load(const std::string_view uri, resource_manager &rm) -> result<> {
+	jsoncons::json root;
+
+	if(const auto err = parse_sprite_sheet_json(uri).unwrap(root); err) [[unlikely]] {
+		return error{"failed to parse sprite sheet JSON: " + std::string(uri), *err};
+	}
+
+	const auto base_path = std::filesystem::path(static_cast<std::string>(uri)).parent_path();
+	const auto image_path = parse_sprite_sheet_image_path(root, base_path);
+	if(image_path.empty()) [[unlikely]] {
+		return error{"sprite sheet missing meta.image: " + std::string(uri)};
+	}
+
+	if(const auto err = rm.load_texture(image_path).unwrap(texture); err) [[unlikely]] {
+		return error{"failed to load sprite sheet texture", *err};
+	}
+
+	frames = parse_sprite_sheet_frames(root);
+	if(frames.empty()) [[unlikely]] {
+		return error{"sprite sheet contains no frames: " + std::string(uri)};
+	}
+
+	rm_ = &rm;
+	return true;
+}
+
 auto resource_manager::load_sprite_sheet(const std::string_view uri) -> result<sprite_sheet_handle> {
 	sprite_sheet_handle handle;
 	if(const auto err = sprite_sheets_.load(uri, *this).unwrap(handle); err) {
@@ -136,31 +170,6 @@ auto resource_manager::get_sprite_sheet_texture(const sprite_sheet_handle handle
 		return error("can not get sprite sheet texture, sprite sheet not found", *err);
 	}
 	return data->texture;
-}
-
-auto resource_manager::sprite_sheet_data::load(const std::string_view uri, resource_manager &rm) -> result<> {
-	jsoncons::json root;
-
-	if(const auto err = parse_sprite_sheet_json(uri).unwrap(root); err) [[unlikely]] {
-		return error{"failed to parse sprite sheet JSON: " + std::string(uri), *err};
-	}
-
-	const auto base_path = std::filesystem::path(static_cast<std::string>(uri)).parent_path();
-	const auto image_path = parse_sprite_sheet_image_path(root, base_path);
-	if(image_path.empty()) [[unlikely]] {
-		return error{"sprite sheet missing meta.image: " + std::string(uri)};
-	}
-
-	if(const auto err = rm.load_texture(image_path).unwrap(texture); err) [[unlikely]] {
-		return error{"failed to load sprite sheet texture", *err};
-	}
-
-	frames = parse_sprite_sheet_frames(root);
-	if(frames.empty()) [[unlikely]] {
-		return error{"sprite sheet contains no frames: " + std::string(uri)};
-	}
-
-	return true;
 }
 
 } // namespace lge
