@@ -170,13 +170,9 @@ public:
 	};
 
 	static constexpr std::size_t max_actions = 16;
-	static constexpr std::size_t max_keys_per_binding = 4;
-	static constexpr std::size_t max_buttons_per_binding = 4;
 
 	void bind(const id bid, const binding &b) {
 		assert(bid < max_actions && "action id exceeds max_actions");
-		assert(b.keys.size() <= max_keys_per_binding && "too many keys in binding");
-		assert(b.buttons.size() <= max_buttons_per_binding && "too many buttons in binding");
 		bindings[bid] = b;
 	}
 
