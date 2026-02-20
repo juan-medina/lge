@@ -1,8 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
-#pragma once
-
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
 #include <lge/interface/resource_manager.hpp>
@@ -11,7 +9,6 @@
 
 #include <raylib.h>
 
-#include <entt/entt.hpp>
 #include <string>
 #include <string_view>
 
@@ -21,6 +18,24 @@ namespace lge {
 // Font
 // =============================================================================
 
+raylib_resource_manager::font_data::~font_data() {
+	if(raylib_font.texture.id != 0) {
+		UnloadFont(raylib_font);
+	}
+}
+
+auto raylib_resource_manager::font_data::load(const std::string_view uri) -> result<> {
+	static const auto raylib_default_font_texture_id = GetFontDefault().texture.id;
+	raylib_font = LoadFont(std::string(uri).c_str());
+	// raylib returns the default font if it fails to load a font, so we check if the texture id is
+	// the same as the default font's texture id to determine if loading failed.
+	if(raylib_font.texture.id == raylib_default_font_texture_id) [[unlikely]] {
+		return error("failed to load font from uri: " + std::string(uri));
+	}
+	SetTextureFilter(raylib_font.texture, TEXTURE_FILTER_POINT);
+	return true;
+}
+
 auto raylib_resource_manager::load_font(const std::string_view uri) -> result<font_handle> {
 	log::debug("loading font from uri `{}`", uri);
 
@@ -28,43 +43,26 @@ auto raylib_resource_manager::load_font(const std::string_view uri) -> result<fo
 		return error("font file does not exist: " + std::string(uri));
 	}
 
-	const auto key = uri_to_key(uri);
-	auto [it, inserted] = font_cache_.load(key, uri);
-
-	if(it == font_cache_.end() || !it->second) [[unlikely]] {
-		return error("failed to load font from uri: " + std::string(uri));
+	font_handle handle;
+	if(const auto err = fonts_.load(uri).unwrap(handle); err) [[unlikely]] {
+		return error("failed to load font", *err);
 	}
-
-	return font_handle::from_id(key);
+	return handle;
 }
 
 auto raylib_resource_manager::unload_font(const font_handle handle) -> result<> {
-	if(!handle.is_valid()) [[unlikely]] {
-		return error("invalid font handle");
+	if(const auto err = fonts_.unload(handle).unwrap(); err) [[unlikely]] {
+		return error("failed to unload font", *err);
 	}
-
-	const auto resource = font_cache_[handle.raw()];
-	if(!resource) [[unlikely]] {
-		return error("font not found in cache");
-	}
-
-	log::debug("unloading font with id `{}` name `{}`", handle, resource->uri);
-	font_cache_.erase(handle.raw());
-
 	return true;
 }
 
 auto raylib_resource_manager::get_raylib_font(const font_handle handle) const -> result<Font> {
-	if(!handle.is_valid()) [[unlikely]] {
-		return error("invalid font handle");
+	const font_data *data = nullptr;
+	if(const auto err = fonts_.get(handle).unwrap(data); err) [[unlikely]] {
+		return error("font not found", *err);
 	}
-
-	const auto resource = font_cache_[handle.raw()];
-	if(!resource) [[unlikely]] {
-		return error("font not found in cache");
-	}
-
-	return resource->raylib_font;
+	return data->raylib_font;
 }
 
 } // namespace lge
