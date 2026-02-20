@@ -4,6 +4,7 @@
 #pragma once
 
 #include <lge/core/result.hpp>
+#include <lge/interface/resource_store.hpp>
 
 #include <core/fwd.hpp>
 #include <entt/entt.hpp>
@@ -128,7 +129,8 @@ public:
 	// =============================================================================
 	[[nodiscard]] virtual auto load_animation_library(std::string_view uri) -> result<animation_library_handle>;
 	[[nodiscard]] virtual auto unload_animation_library(animation_library_handle handle) -> result<>;
-	[[nodiscard]] virtual auto get_animation(animation_library_handle handle, std::string_view anim_name) const -> result<animation_library_anim>;
+	[[nodiscard]] virtual auto get_animation(animation_library_handle handle, std::string_view anim_name) const
+		-> result<animation_library_anim>;
 	[[nodiscard]] virtual auto get_animation_sprite_sheet(animation_library_handle handle) const
 		-> result<sprite_sheet_handle>;
 
@@ -137,11 +139,14 @@ private:
 	// Sprite Sheet Data
 	// =============================================================================
 
-	struct sprite_sheet_data {
+	class sprite_sheet_data {
+	public:
+		[[nodiscard]] auto load(std::string_view uri, resource_manager &rm) -> result<>;
 		texture_handle texture;
 		std::unordered_map<std::string, sprite_sheet_frame> frames;
 	};
-	std::unordered_map<entt::id_type, sprite_sheet_data> sprite_sheets_;
+
+	resource_store<sprite_sheet_data, sprite_sheet_handle> sprite_sheets_;
 
 	// =============================================================================
 	// Animation Library Data

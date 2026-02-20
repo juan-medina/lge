@@ -6,7 +6,6 @@
 #include <lge/interface/resource_manager.hpp>
 
 #include <filesystem>
-#include <format>
 #include <fstream>
 #include <glm/ext/vector_float2.hpp>
 #include <jsoncons/basic_json.hpp>
@@ -106,84 +105,60 @@ auto parse_sprite_sheet_json(const std::string_view uri) -> std::optional<jsonco
 // =============================================================================
 
 auto resource_manager::load_sprite_sheet(const std::string_view uri) -> result<sprite_sheet_handle> {
-	log::debug("loading sprite sheet from uri `{}`", uri);
-
-	if(!exists(uri)) [[unlikely]] {
-		return error("sprite sheet file does not exist: " + std::string(uri));
+	sprite_sheet_handle handle;
+	if(const auto err = sprite_sheets_.load(uri, *this).unwrap(handle); err) {
+		return error("failed to load sprite sheet", *err);
 	}
-
-	const auto root = parse_sprite_sheet_json(uri);
-	if(!root) [[unlikely]] {
-		return error("failed to parse sprite sheet JSON: " + std::string(uri));
-	}
-
-	const auto base_path = std::filesystem::path(static_cast<std::string>(uri)).parent_path();
-	const auto image_path = parse_sprite_sheet_image_path(*root, base_path);
-	if(image_path.empty()) [[unlikely]] {
-		return error("sprite sheet missing meta.image: " + std::string(uri));
-	}
-
-	texture_handle texture;
-	if(const auto err = load_texture(image_path).unwrap(texture); err) [[unlikely]] {
-		return error("failed to load sprite sheet texture", *err);
-	}
-
-	const auto key = uri_to_key(uri);
-	sprite_sheets_.emplace(key, sprite_sheet_data{.texture = texture, .frames = parse_sprite_sheet_frames(*root)});
-
-	return sprite_sheet_handle::from_id(key);
+	return handle;
 }
 
 auto resource_manager::unload_sprite_sheet(const sprite_sheet_handle handle) -> result<> {
-	if(!handle.is_valid()) [[unlikely]] {
-		return error("invalid sprite sheet handle");
+	if(const auto err = sprite_sheets_.unload(handle).unwrap(); err) {
+		return error("failed to unload sprite sheet", *err);
 	}
-
-	const auto it = sprite_sheets_.find(handle.raw());
-	if(it == sprite_sheets_.end()) [[unlikely]] {
-		return error("sprite sheet not found");
-	}
-
-	if(const auto err = unload_texture(it->second.texture).unwrap(); err) [[unlikely]] {
-		return error("failed to unload sprite sheet texture", *err);
-	}
-
-	log::debug("unloading sprite sheet with id `{}`", handle);
-	sprite_sheets_.erase(it);
 
 	return true;
 }
 
 auto resource_manager::get_sprite_sheet_frame(const sprite_sheet_handle handle, const std::string_view frame_name) const
 	-> result<sprite_sheet_frame> {
-	if(!handle.is_valid()) [[unlikely]] {
-		return error("invalid sprite sheet handle");
+	const sprite_sheet_data *data = nullptr;
+	if(const auto err = sprite_sheets_.get(handle).unwrap(data); err) [[unlikely]] {
+		return error("can not get sprite sheet frame, sprite sheet not found", *err);
 	}
-
-	const auto it = sprite_sheets_.find(handle.raw());
-	if(it == sprite_sheets_.end()) [[unlikely]] {
-		return error("sprite sheet not found");
-	}
-
-	const auto frame_it = it->second.frames.find(std::string(frame_name));
-	if(frame_it == it->second.frames.end()) [[unlikely]] {
-		return error(std::format("frame '{}' not found in sprite sheet", frame_name));
-	}
-
-	return frame_it->second;
+	return data->frames.at(std::string(frame_name));
 }
 
 auto resource_manager::get_sprite_sheet_texture(const sprite_sheet_handle handle) const -> result<texture_handle> {
-	if(!handle.is_valid()) [[unlikely]] {
-		return error("invalid sprite sheet handle");
+	const sprite_sheet_data *data = nullptr;
+	if(const auto err = sprite_sheets_.get(handle).unwrap(data); err) [[unlikely]] {
+		return error("can not get sprite sheet texture, sprite sheet not found", *err);
+	}
+	return data->texture;
+}
+
+auto resource_manager::sprite_sheet_data::load(const std::string_view uri, resource_manager &rm) -> result<> {
+	const auto root = parse_sprite_sheet_json(uri);
+	if(!root) [[unlikely]] {
+		return error{"failed to parse sprite sheet JSON: " + std::string(uri)};
 	}
 
-	const auto it = sprite_sheets_.find(handle.raw());
-	if(it == sprite_sheets_.end()) [[unlikely]] {
-		return error("sprite sheet not found");
+	const auto base_path = std::filesystem::path(static_cast<std::string>(uri)).parent_path();
+	const auto image_path = parse_sprite_sheet_image_path(*root, base_path);
+	if(image_path.empty()) [[unlikely]] {
+		return error{"sprite sheet missing meta.image: " + std::string(uri)};
 	}
 
-	return it->second.texture;
+	if(const auto err = rm.load_texture(image_path).unwrap(texture); err) [[unlikely]] {
+		return error{"failed to load sprite sheet texture", *err};
+	}
+
+	frames = parse_sprite_sheet_frames(*root);
+	if(frames.empty()) [[unlikely]] {
+		return error{"sprite sheet contains no frames: " + std::string(uri)};
+	}
+
+	return true;
 }
 
 } // namespace lge
