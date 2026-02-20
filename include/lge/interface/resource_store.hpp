@@ -56,7 +56,7 @@ public:
 		return true;
 	}
 
-	[[nodiscard]] auto get(Key key) const noexcept -> result<const T *> {
+	[[nodiscard]] auto get(Key key) const -> result<const T *> {
 		const auto it = entries_.find(key.raw());
 		if(it == entries_.end()) [[unlikely]] {
 			return error{std::format("resource not found with key: {}", key)};

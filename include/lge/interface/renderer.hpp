@@ -7,10 +7,10 @@
 #include <lge/core/result.hpp>
 #include <lge/interface/resource_manager.hpp>
 
+#include <entt/core/fwd.hpp>
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float4.hpp>
 #include <string>
-#include <string_view>
 
 namespace lge {
 

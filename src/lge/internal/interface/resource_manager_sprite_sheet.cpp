@@ -7,6 +7,7 @@
 
 #include <entt/core/fwd.hpp>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <glm/ext/vector_float2.hpp>
 #include <jsoncons/basic_json.hpp>
@@ -161,7 +162,12 @@ auto resource_manager::get_sprite_sheet_frame(const sprite_sheet_handle handle, 
 	if(const auto err = sprite_sheets_.get(handle).unwrap(data); err) [[unlikely]] {
 		return error("can not get sprite sheet frame, sprite sheet not found", *err);
 	}
-	return data->frames.at(frame_name);
+
+	const auto it = data->frames.find(frame_name);
+	if(it == data->frames.end()) [[unlikely]] {
+		return error(std::format("sprite sheet frame not found: {}", frame_name));
+	}
+	return it->second;
 }
 
 auto resource_manager::get_sprite_sheet_texture(const sprite_sheet_handle handle) const -> result<texture_handle> {
