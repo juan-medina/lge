@@ -10,6 +10,9 @@
 
 #include <core/fwd.hpp>
 #include <entt/entt.hpp>
+#include <filesystem>
+#include <jsoncons/basic_json.hpp>
+#include <string>
 #include <string_view>
 #include <unordered_map>
 
@@ -30,6 +33,10 @@ public:
 
 private:
 	resource_manager *rm_ = nullptr;
+	auto parse_sprite_sheet_frames(const jsoncons::json &root) -> result<>;
+	static auto parse_sprite_sheet_image_path(const jsoncons::json &root, const std::filesystem::path &base_path)
+		-> result<std::string>;
+	static auto parse_sprite_sheet_json(std::string_view uri) -> result<jsoncons::json>;
 };
 
 using sprite_sheet_store = resource_store<sprite_sheet, sprite_sheet_handle>;
