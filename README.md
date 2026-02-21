@@ -1,4 +1,5 @@
 # l[g]e : little game engine
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-478CBF.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Conduct](https://img.shields.io/badge/Conduct-Covenat%202.0-478CBF.svg?style=for-the-badge)](https://www.contributor-covenant.org/version/2/0/code_of_conduct/)
 [![Made with C++20](https://img.shields.io/badge/C%2B%2B-20-478CBF?style=for-the-badge&logo=c%2B%2B&logoColor=white)](https://isocpp.org/)
@@ -30,8 +31,8 @@ In your root `CMakeLists.txt`, add lge as a subdirectory and use the provided he
 cmake_minimum_required(VERSION 3.28)
 
 project(my_game
-        VERSION 0.1.0.0
-        LANGUAGES CXX
+	VERSION 0.1.0.0
+	LANGUAGES CXX
 )
 
 set(CMAKE_CXX_STANDARD 20)
@@ -50,34 +51,36 @@ file(GLOB_RECURSE GAME_SOURCES "src/*.cpp")
 set(GAME_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
 
 lge_add_application(my_game
-        SOURCES ${GAME_SOURCES}
-        EMSCRIPTEN_SHELL ${CMAKE_CURRENT_SOURCE_DIR}/web/template.html
-        EMSCRIPTEN_ASSETS ${CMAKE_CURRENT_SOURCE_DIR}/web/favicon.ico
-        GAME_RESOURCES ${GAME_RESOURCES_DIR}
+	SOURCES ${GAME_SOURCES}
+	EMSCRIPTEN_SHELL ${CMAKE_CURRENT_SOURCE_DIR}/web/template.html
+	EMSCRIPTEN_ASSETS ${CMAKE_CURRENT_SOURCE_DIR}/web/favicon.ico
+	GAME_RESOURCES ${GAME_RESOURCES_DIR}
 )
 ```
 
 ### lge_add_application Options
 
-| Option | Required | Description |
-|--------|----------|-------------|
-| `SOURCES` | Yes | List of source files for your application |
-| `EMSCRIPTEN_SHELL` | No | Path to custom HTML shell template for WebAssembly builds |
-| `EMSCRIPTEN_ASSETS` | No | List of asset files to copy for WebAssembly builds |
-| `GAME_RESOURCES` | No | Path to your game's resources folder (merged with engine resources) |
+| Option              | Required | Description                                                         |
+|---------------------|----------|---------------------------------------------------------------------|
+| `SOURCES`           | Yes      | List of source files for your application                           |
+| `EMSCRIPTEN_SHELL`  | No       | Path to custom HTML shell template for WebAssembly builds           |
+| `EMSCRIPTEN_ASSETS` | No       | List of asset files to copy for WebAssembly builds                  |
+| `GAME_RESOURCES`    | No       | Path to your game's resources folder (merged with engine resources) |
 
 The function automatically configures:
+
 - Linking to the lge library
 - Windows subsystem settings (console for Debug, Windows for Release)
 - Emscripten/WebAssembly build options (GLFW, memory growth, exports)
 - Merges engine resources and your game resources into the build output directory:
-  - `resources/lge` (engine)
-  - `resources/game` (your game, if provided)
+	- `resources/lge` (engine)
+	- `resources/game` (your game, if provided)
 - For Emscripten, preloads the merged resources folder for use in the browser
 
 ### Minimal Example
 
 **src/my_game.hpp**
+
 ```cpp
 #pragma once
 
@@ -92,6 +95,7 @@ public:
 ```
 
 **src/my_game.cpp**
+
 ```cpp
 #include "my_game.hpp"
 
@@ -144,10 +148,16 @@ auto my_game::init() -> lge::result<> {
 **Graphics**
 
 *Engine assets:*
-- [Peaberry Pixel Font by emhuo](https://emhuo.itch.io/peaberry-pixel-font) (licensed under Open Font License Version 1.1).
+
+- [Peaberry Pixel Font by emhuo](https://emhuo.itch.io/peaberry-pixel-font) (licensed under Open Font License Version
+  1.1).
 
 *Example assets:*
-- [Pixelart Hiker by Chroma Dave](https://chroma-dave.itch.io/pixelart-hiker) (free to use in any project per the author).
+
+- [Pixelart Hiker by Chroma Dave](https://chroma-dave.itch.io/pixelart-hiker) (free to use in any project per the
+  author).
+- [Demon Woods Parallax Background by Aethrall](https://aethrall.itch.io/demon-woods-parallax-background) (set as free
+  by the author).
 
 **License**
 
