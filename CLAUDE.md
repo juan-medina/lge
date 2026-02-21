@@ -92,3 +92,45 @@ Use the `lge::log` class: `log::debug("msg: {}", val)`, `log::info(...)`, `log::
 ## Application Helper (cmake/LGEApplication.cmake)
 
 Games use `lge_add_application(NAME ... SOURCES ... RESOURCES ...)` to create executables. It handles resource merging, platform-specific settings, and Emscripten shell/asset configuration.
+
+## Testing
+
+Testing in lge is pragmatic and targeted. There is no formal test suite; manual playtesting is standard. Engine internals that have no dependency on raylib or a render context are covered by tests. The goal is to catch regressions in subsystems where bugs are silent and hard to diagnose—not to achieve coverage metrics.
+
+**What is tested:**
+
+- Pure logic with no external dependencies (math, transforms, hierarchy, error propagation)
+- Systems that can be exercised with a real `entt::registry` and no render context
+- Anything that has previously caused a hard-to-diagnose bug
+
+**What is not tested:**
+
+- Anything requiring a raylib window or render context
+- Gameplay feel, timing, or visual correctness
+- Scene logic or application lifecycle
+
+Tests use a real `entt::registry`—no mocking. If a system needs a window, it is not tested.
+
+**Build with tests enabled:**
+
+```bash
+cmake -B cmake-build-debug -DCMAKE_BUILD_TYPE=Debug -DLGE_BUILD_TESTS=ON
+cmake --build cmake-build-debug
+```
+
+**Run tests:**
+
+```bash
+ctest --test-dir cmake-build-debug/tests --output-on-failure
+```
+
+Tests run automatically on every push via GitHub Actions across Linux, macOS, and Windows.
+
+## Test Addition Policy
+
+Do not add new tests unless they strictly adhere to the project's testing philosophy:
+
+- Only add tests for pure logic, engine internals without external dependencies, or subsystems where regressions are silent and hard to diagnose.
+- Do not add tests for code requiring a render context, gameplay feel, timing, visual correctness, or scene/application lifecycle.
+- All new tests must be justified by prior bugs or clear risk of silent failure.
+- If unsure, do not add the test and ask for clarification.

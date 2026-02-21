@@ -87,10 +87,42 @@
 	  emcmake cmake -B cmake-build-wsl2-emscripten-debug -DCMAKE_BUILD_TYPE=Debug
 	  cmake --build cmake-build-wsl2-emscripten-debug
 
-## Testing & Debugging
-- No formal test suite; manual playtesting is standard.
-- Debug builds enable extra logging and assertions.
-- Use the `resources/` directory for hot-reloading assets during development.
+## Testing Philosophy
+
+Tests in lge are pragmatic and targeted. The focus is on catching regressions in engine subsystems where bugs are silent and hard to diagnose—not on coverage metrics.
+
+**What is tested:**
+- Pure logic with no external dependencies (math, transforms, hierarchy, error propagation)
+- Systems that can be exercised with a real `entt::registry` and no render context
+- Anything that has previously caused a hard-to-diagnose bug
+
+**What is not tested:**
+- Anything requiring a raylib window or render context
+- Gameplay feel, timing, or visual correctness
+- Scene logic or application lifecycle
+
+Tests use a real `entt::registry`—no mocking. If a system needs a window, it is not tested.
+
+**Build with tests enabled:**
+```
+cmake -B cmake-build-debug -DCMAKE_BUILD_TYPE=Debug -DLGE_BUILD_TESTS=ON
+cmake --build cmake-build-debug
+```
+
+**Run tests:**
+```
+ctest --test-dir cmake-build-debug/tests --output-on-failure
+```
+
+Tests run automatically on every push via GitHub Actions across Linux, macOS, and Windows.
+
+## Test Addition Policy
+
+Do not add new tests unless they strictly adhere to the project's testing philosophy:
+- Only add tests for pure logic, engine internals without external dependencies, or subsystems where regressions are silent and hard to diagnose.
+- Do not add tests for code requiring a render context, gameplay feel, timing, visual correctness, or scene/application lifecycle.
+- All new tests must be justified by prior bugs or clear risk of silent failure.
+- If unsure, do not add the test and ask for clarification.
 
 ## Tooling
 - The codebase uses clang-tidy with strict warning settings. All warnings must be cleared before committing code.
