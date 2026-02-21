@@ -3,7 +3,8 @@
 
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
-#include <lge/interface/resource_manager.hpp>
+#include <lge/interface/resources.hpp>
+#include <lge/internal/resource_manager/base_resource_manager.hpp>
 
 #include <entt/core/fwd.hpp>
 #include <filesystem>
@@ -106,7 +107,7 @@ auto parse_sprite_sheet_json(const std::string_view uri) -> result<jsoncons::jso
 // Sprite Sheet
 // =============================================================================
 
-resource_manager::sprite_sheet_data::~sprite_sheet_data() {
+base_resource_manager::sprite_sheet_data::~sprite_sheet_data() {
 	if(rm_ != nullptr && texture.is_valid()) {
 		if(const auto err = rm_->unload_texture(texture).unwrap()) {
 			log::error("failed to unload sprite sheet texture: {}", err->to_string());
@@ -114,7 +115,7 @@ resource_manager::sprite_sheet_data::~sprite_sheet_data() {
 	}
 }
 
-auto resource_manager::sprite_sheet_data::load(const std::string_view uri, resource_manager &rm) -> result<> {
+auto base_resource_manager::sprite_sheet_data::load(const std::string_view uri, resource_manager &rm) -> result<> {
 	jsoncons::json root;
 
 	if(const auto err = parse_sprite_sheet_json(uri).unwrap(root); err) [[unlikely]] {
@@ -140,7 +141,7 @@ auto resource_manager::sprite_sheet_data::load(const std::string_view uri, resou
 	return true;
 }
 
-auto resource_manager::load_sprite_sheet(const std::string_view uri) -> result<sprite_sheet_handle> {
+auto base_resource_manager::load_sprite_sheet(const std::string_view uri) -> result<sprite_sheet_handle> {
 	sprite_sheet_handle handle;
 	if(const auto err = sprite_sheets_.load(uri, *this).unwrap(handle); err) {
 		return error("failed to load sprite sheet", *err);
@@ -148,7 +149,7 @@ auto resource_manager::load_sprite_sheet(const std::string_view uri) -> result<s
 	return handle;
 }
 
-auto resource_manager::unload_sprite_sheet(const sprite_sheet_handle handle) -> result<> {
+auto base_resource_manager::unload_sprite_sheet(const sprite_sheet_handle handle) -> result<> {
 	if(const auto err = sprite_sheets_.unload(handle).unwrap(); err) {
 		return error("failed to unload sprite sheet", *err);
 	}
@@ -156,8 +157,8 @@ auto resource_manager::unload_sprite_sheet(const sprite_sheet_handle handle) -> 
 	return true;
 }
 
-auto resource_manager::get_sprite_sheet_frame(const sprite_sheet_handle handle, const entt::id_type frame_name) const
-	-> result<sprite_sheet_frame> {
+auto base_resource_manager::get_sprite_sheet_frame(const sprite_sheet_handle handle,
+												   const entt::id_type frame_name) const -> result<sprite_sheet_frame> {
 	const sprite_sheet_data *data = nullptr;
 	if(const auto err = sprite_sheets_.get(handle).unwrap(data); err) [[unlikely]] {
 		return error("can not get sprite sheet frame, sprite sheet not found", *err);
@@ -170,7 +171,7 @@ auto resource_manager::get_sprite_sheet_frame(const sprite_sheet_handle handle, 
 	return it->second;
 }
 
-auto resource_manager::get_sprite_sheet_texture(const sprite_sheet_handle handle) const -> result<texture_handle> {
+auto base_resource_manager::get_sprite_sheet_texture(const sprite_sheet_handle handle) const -> result<texture_handle> {
 	const sprite_sheet_data *data = nullptr;
 	if(const auto err = sprite_sheets_.get(handle).unwrap(data); err) [[unlikely]] {
 		return error("can not get sprite sheet texture, sprite sheet not found", *err);

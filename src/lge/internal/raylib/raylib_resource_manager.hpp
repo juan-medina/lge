@@ -4,8 +4,9 @@
 #pragma once
 
 #include <lge/core/result.hpp>
-#include <lge/interface/resource_manager.hpp>
-#include <lge/interface/resource_store.hpp>
+#include <lge/interface/resources.hpp>
+#include <lge/internal/resource_manager/base_resource_manager.hpp>
+#include <lge/internal/resource_manager/resource_store.hpp>
 
 #include <raylib.h>
 
@@ -13,7 +14,7 @@
 
 namespace lge {
 
-class raylib_resource_manager final: public resource_manager {
+class raylib_resource_manager final: public base_resource_manager {
 public:
 	[[nodiscard]] auto init() -> result<> override;
 	[[nodiscard]] auto end() -> result<> override;

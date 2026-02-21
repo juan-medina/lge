@@ -3,7 +3,8 @@
 
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
-#include <lge/interface/resource_manager.hpp>
+#include <lge/interface/resources.hpp>
+#include <lge/internal/resource_manager/base_resource_manager.hpp>
 
 #include "core/fwd.hpp"
 
@@ -103,7 +104,7 @@ auto parse_animations(const jsoncons::json &root) -> std::unordered_map<entt::id
 // Animation Libraries
 // =============================================================================
 
-resource_manager::animation_library_data::~animation_library_data() {
+base_resource_manager::animation_library_data::~animation_library_data() {
 	if(rm_ != nullptr && sprite_sheet.is_valid()) {
 		if(const auto err = rm_->unload_sprite_sheet(sprite_sheet).unwrap()) {
 			log::error("failed to unload animation library sprite sheet: {}", err->to_string());
@@ -111,12 +112,8 @@ resource_manager::animation_library_data::~animation_library_data() {
 	}
 }
 
-auto resource_manager::animation_library_data::load(const std::string_view uri, resource_manager &rm) -> result<> {
+auto base_resource_manager::animation_library_data::load(const std::string_view uri, resource_manager &rm) -> result<> {
 	log::debug("loading animation library from uri `{}`", uri);
-
-	if(!rm.exists(uri)) [[unlikely]] {
-		return error("animation library file does not exist: " + std::string(uri));
-	}
 
 	const auto root = parse_animation_library_json(uri);
 	if(!root) [[unlikely]] {
@@ -129,10 +126,6 @@ auto resource_manager::animation_library_data::load(const std::string_view uri, 
 		return error("animation library missing sprite sheet path: " + std::string(uri));
 	}
 
-	if(!rm.exists(sprite_sheet_path)) [[unlikely]] {
-		return error("animation library sprite sheet file does not exist: " + std::string(uri));
-	}
-
 	if(const auto err = rm.load_sprite_sheet(sprite_sheet_path).unwrap(sprite_sheet); err) [[unlikely]] {
 		return error("failed to load animation library sprite sheet", *err);
 	}
@@ -142,7 +135,7 @@ auto resource_manager::animation_library_data::load(const std::string_view uri, 
 	return true;
 }
 
-auto resource_manager::load_animation_library(const std::string_view uri) -> result<animation_library_handle> {
+auto base_resource_manager::load_animation_library(const std::string_view uri) -> result<animation_library_handle> {
 	animation_library_handle handle;
 	if(const auto err = animation_libraries_.load(uri, *this).unwrap(handle); err) [[unlikely]] {
 		return error("failed to load animation library", *err);
@@ -150,14 +143,14 @@ auto resource_manager::load_animation_library(const std::string_view uri) -> res
 	return handle;
 }
 
-auto resource_manager::unload_animation_library(const animation_library_handle handle) -> result<> {
+auto base_resource_manager::unload_animation_library(const animation_library_handle handle) -> result<> {
 	if(const auto err = animation_libraries_.unload(handle).unwrap(); err) [[unlikely]] {
 		return error("failed to unload animation library", *err);
 	}
 	return true;
 }
 
-auto resource_manager::get_animation(const animation_library_handle handle, const entt::id_type anim_name) const
+auto base_resource_manager::get_animation(const animation_library_handle handle, const entt::id_type anim_name) const
 	-> result<animation_library_anim> {
 	const animation_library_data *data = nullptr;
 	if(const auto err = animation_libraries_.get(handle).unwrap(data); err) [[unlikely]] {
@@ -170,7 +163,7 @@ auto resource_manager::get_animation(const animation_library_handle handle, cons
 	return clip_it->second;
 }
 
-auto resource_manager::get_animation_sprite_sheet(const animation_library_handle handle) const
+auto base_resource_manager::get_animation_sprite_sheet(const animation_library_handle handle) const
 	-> result<sprite_sheet_handle> {
 	const animation_library_data *data = nullptr;
 	if(const auto err = animation_libraries_.get(handle).unwrap(data); err) [[unlikely]] {
