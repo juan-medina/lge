@@ -48,8 +48,6 @@ private:
 	static constexpr size_t left_action = total_base_actions + 0;
 	static constexpr size_t right_action = total_base_actions + 1;
 
-	lge::sprite_sheet_handle sheet_{lge::invalid_sprite_sheet};
-
 	lge::animation_library_handle animation_library_{lge::invalid_animation_library};
 
 	entt::entity sprite_{entt::null};
@@ -63,8 +61,15 @@ private:
 		"parallax-demon-woods-close-trees.png"_hs,
 	};
 
+	static constexpr std::array<float, 3> factors{0.5F, 1.5F, 2.0F};
+
 	glm::vec2 bg_size_{0.0F, 0.0F};
 	static constexpr auto run_speed = 45.0F;
+	static constexpr auto character_y = 75.0F;
+
+	struct parallax {
+		float factor;
+	};
 };
 
 } // namespace examples

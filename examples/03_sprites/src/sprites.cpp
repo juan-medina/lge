@@ -62,20 +62,24 @@ auto sprites::init() -> lge::result<> {
 
 	int layer_num = 0;
 	for(const auto bg_id: bg) {
+		const float factor = factors[layer_num];
 		const auto layer = world.create();
 		world.emplace<lge::sprite>(layer, bg_sheet_, bg_id);
 		world.emplace<lge::placement>(layer, 0.0F, 0.0F);
 		world.emplace<lge::order>(layer, layer_num);
+		world.emplace<parallax>(layer, factor);
 
 		const auto layer_left = world.create();
 		world.emplace<lge::sprite>(layer_left, bg_sheet_, bg_id);
 		world.emplace<lge::placement>(layer_left, -bg_size_.x, 0.0F);
 		world.emplace<lge::order>(layer_left, layer_num);
+		world.emplace<parallax>(layer_left, factor);
 
 		const auto layer_right = world.create();
 		world.emplace<lge::sprite>(layer_right, bg_sheet_, bg_id);
 		world.emplace<lge::placement>(layer_right, bg_size_.x, 0.0F);
 		world.emplace<lge::order>(layer_right, layer_num);
+		world.emplace<parallax>(layer_right, factor);
 
 		layer_num++;
 	}
@@ -86,7 +90,7 @@ auto sprites::init() -> lge::result<> {
 
 	sprite_ = world.create();
 	world.emplace<lge::sprite_animation>(sprite_, animation_library_, idle_anim);
-	auto &p = world.emplace<lge::placement>(sprite_, 0.0F, 80.0F);
+	auto &p = world.emplace<lge::placement>(sprite_, 0.0F, character_y);
 	p.pivot = lge::pivot::bottom_center;
 	world.emplace<lge::order>(sprite_, 1);
 
@@ -105,9 +109,22 @@ auto sprites::update(const float dt) -> lge::result<> {
 	anim.name = (move_left || move_right) ? run_anim : idle_anim;
 	if(move_left || move_right) {
 		anim.flip_horizontal = move_left && !move_right;
-		auto &p = world.get<lge::placement>(sprite_);
 		const auto dir = move_left ? -1.0F : 1.0F;
-		p.position.x += dir * run_speed * dt;
+
+		for(const auto view = world.view<lge::placement, parallax>(); const auto ent: view) {
+			auto &p = view.get<lge::placement>(ent);
+			auto &[factor] = view.get<parallax>(ent);
+
+			// Move layer opposite to player movement
+			p.position.x += -dir * factor * run_speed * dt;
+
+			// Wrap around
+			if(p.position.x < -bg_size_.x * 1.5F) {
+				p.position.x += bg_size_.x * 3.0F;
+			} else if(p.position.x > bg_size_.x * 1.5F) {
+				p.position.x -= bg_size_.x * 3.0F;
+			}
+		}
 	}
 
 	return example::update(dt);
