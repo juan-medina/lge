@@ -1,18 +1,20 @@
 // SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
-#include "lge/internal/systems/transform_system.hpp"
 #include <lge/components/hierarchy.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/internal/components/transform.hpp>
+#include <lge/internal/systems/transform_system.hpp>
 #include <lge/systems/system.hpp>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <cmath>
 #include <entt/entity/fwd.hpp>
 #include <entt/entt.hpp>
 #include <glm/ext/vector_float2.hpp>
 #include <glm/geometric.hpp>
+#include <glm/trigonometric.hpp>
 
 using Catch::Approx;
 
@@ -164,6 +166,19 @@ TEST_CASE("transform: child inherits parent rotation", "[transform][hierarchy]")
 	const auto pos = world_pos(world, child);
 	REQUIRE(pos.x == Approx(0.F).margin(tolerance));
 	REQUIRE(pos.y == Approx(10.F).margin(tolerance));
+}
+
+TEST_CASE("transform: root entity rotation", "[transform]") {
+	auto world = make_registry();
+	auto system = make_system(world);
+
+	const auto e = add_entity(world, lge::placement{0.f, 0.f, 45.f});
+
+	REQUIRE(!system.update(0.f).has_error());
+
+	const auto &mat = world.get<lge::transform>(e).world;
+	const float angle = glm::degrees(std::atan2(mat[0][1], mat[0][0]));
+	REQUIRE(angle == Approx(-45.f).margin(tolerance));
 }
 
 // =============================================================================
