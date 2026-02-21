@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 Juan Medina
+# SPDX-License-Identifier: MIT
+
+Checks: '-*,
+bugprone-*,
+-bugprone-easily-swappable-parameters,
+modernize-*,
+performance-*,
+-*-throwing-static-initialization,
+'

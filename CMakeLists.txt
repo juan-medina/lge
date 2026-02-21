@@ -92,9 +92,15 @@ if (NOT EMSCRIPTEN)
 
 endif ()
 
-
 # Add optional examples directory. Examples are built only when BUILD_LGE_EXAMPLES is ON.
 option(BUILD_LGE_EXAMPLES "Build example programs" OFF)
 if (BUILD_LGE_EXAMPLES)
     add_subdirectory(examples)
+endif ()
+
+# Add optional tests directory. Tests are built only when LGE_BUILD_TESTS is ON.
+option(LGE_BUILD_TESTS "Build engine tests" OFF)
+if (LGE_BUILD_TESTS)
+    add_subdirectory(external/catch2)
+    add_subdirectory(tests)
 endif ()
