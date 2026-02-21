@@ -7,6 +7,7 @@
 #include <lge/interface/resource_manager.hpp>
 #include <lge/interface/resources.hpp>
 #include <lge/internal/resource_manager/resource_store.hpp>
+#include <lge/internal/resource_manager/sprite_sheet.hpp>
 
 #include <core/fwd.hpp>
 #include <entt/entt.hpp>
@@ -57,27 +58,9 @@ public:
 
 private:
 	// =============================================================================
-	// Sprite Sheet Data
+	// Sprite Sheet
 	// =============================================================================
-
-	class sprite_sheet_data {
-	public:
-		~sprite_sheet_data();
-		sprite_sheet_data() = default;
-		sprite_sheet_data(const sprite_sheet_data &) = delete;
-		auto operator=(const sprite_sheet_data &) -> sprite_sheet_data & = delete;
-		sprite_sheet_data(sprite_sheet_data &&) noexcept = default;
-		auto operator=(sprite_sheet_data &&) noexcept -> sprite_sheet_data & = default;
-
-		[[nodiscard]] auto load(std::string_view uri, resource_manager &rm) -> result<>;
-		texture_handle texture;
-		std::unordered_map<entt::id_type, sprite_sheet_frame> frames;
-
-	private:
-		resource_manager *rm_ = nullptr;
-	};
-
-	resource_store<sprite_sheet_data, sprite_sheet_handle> sprite_sheets_;
+	sprite_sheet_store sprite_sheets_;
 
 	// =============================================================================
 	// Animation Library Data

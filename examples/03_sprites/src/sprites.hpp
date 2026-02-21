@@ -5,7 +5,7 @@
 
 #include <lge/core/colors.hpp>
 #include <lge/core/result.hpp>
-#include <lge/interface/resource_manager.hpp>
+#include <lge/interface/resources.hpp>
 
 #include "../../src/example.hpp"
 
