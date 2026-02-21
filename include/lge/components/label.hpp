@@ -12,7 +12,7 @@ namespace lge {
 
 struct label {
 	std::string text;
-	color color = colors::white;
+	color text_color = colors::white;
 	float size = 17.0F;
 	font_handle font = invalid_font;
 };

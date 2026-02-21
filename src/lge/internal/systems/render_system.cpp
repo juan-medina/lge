@@ -104,7 +104,7 @@ auto render_system::handle_label(const entt::entity entity, const glm::mat3 &wor
 	renderer_.render_label(lbl.font,
 						   lbl.text,
 						   static_cast<int>(final_font_size),
-						   lbl.color,
+						   lbl.text_color,
 						   pivot_world,
 						   pivot_to_top_left_local,
 						   rotation);

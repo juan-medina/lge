@@ -18,9 +18,9 @@ auto create() -> backend_components {
 	auto input = std::make_unique<raylib_input>();
 
 	return backend_components{
-		.resource_manager = std::move(resource_manager),
-		.renderer = std::move(renderer),
-		.input = std::move(input),
+		.resource_manager_ptr = std::move(resource_manager),
+		.renderer_ptr = std::move(renderer),
+		.input_ptr = std::move(input),
 	};
 }
 
