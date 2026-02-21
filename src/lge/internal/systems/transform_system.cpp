@@ -76,8 +76,8 @@ auto transform_system::update(const float /*dt*/) -> result<> {
 			const auto child_pivot_offset =
 				world.all_of<metrics>(child) ? local.pivot * world.get<metrics>(child).size : glm::vec2{0.F, 0.F};
 
-			// Parent rotation
-			const float parent_rad = glm::radians(parent_placement.rotation);
+			// Extract accumulated rotation from parent world matrix
+			const float parent_rad = -glm::atan(parent_world[0][1], parent_world[0][0]);
 			const float ps = glm::sin(parent_rad);
 			const float pc = glm::cos(parent_rad);
 
@@ -92,7 +92,7 @@ auto transform_system::update(const float /*dt*/) -> result<> {
 				+ glm::vec2{(pc * scaled_pos.x) - (ps * scaled_pos.y), (ps * scaled_pos.x) + (pc * scaled_pos.y)};
 
 			// Combined rotation and scale for child
-			const float combined_rad = glm::radians(parent_placement.rotation + local.rotation);
+			const float combined_rad = parent_rad + glm::radians(local.rotation);
 			const float s = glm::sin(combined_rad);
 			const float c = glm::cos(combined_rad);
 			const auto child_scale = parent_scale * local.scale;

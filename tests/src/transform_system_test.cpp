@@ -376,3 +376,66 @@ TEST_CASE("transform: pivot offset with metrics (manual pivot)", "[transform][pi
 	REQUIRE(pos.x == Approx(-30.F).margin(tolerance));
 	REQUIRE(pos.y == Approx(-140.F).margin(tolerance));
 }
+
+TEST_CASE("transform: grandchild inherits full hierarchy", "[transform][hierarchy][deep]") {
+	entt::registry world;
+	auto system = make_system(world);
+
+	const auto grandparent = add_entity(world, lge::placement{100.F, 0.F});
+	const auto parent = add_child(world, grandparent, lge::placement{50.F, 0.F});
+	const auto child = add_child(world, parent, lge::placement{25.F, 0.F});
+
+	REQUIRE(!system.update(0.F).has_error());
+
+	const auto pos = world_pos(world, child);
+	REQUIRE(pos.x == 175.F);
+	REQUIRE(pos.y == 0.F);
+}
+
+TEST_CASE("transform: grandchild inherits grandparent translation only", "[transform][hierarchy][deep]") {
+	entt::registry world;
+	auto system = make_system(world);
+
+	const auto grandparent = add_entity(world, lge::placement{100.F, 0.F});
+	const auto parent = add_child(world, grandparent, lge::placement{50.F, 0.F});
+	const auto child = add_child(world, parent, lge::placement{25.F, 0.F});
+
+	REQUIRE(!system.update(0.F).has_error());
+
+	const auto grandparent_pos = world_pos(world, grandparent);
+	const auto parent_pos = world_pos(world, parent);
+	const auto child_pos = world_pos(world, child);
+
+	// grandparent at 100
+	REQUIRE(grandparent_pos.x == 100.F);
+	REQUIRE(grandparent_pos.y == 0.F);
+
+	// parent at 100 + 50 = 150
+	REQUIRE(parent_pos.x == 150.F);
+	REQUIRE(parent_pos.y == 0.F);
+
+	// child at 100 + 50 + 25 = 175
+	REQUIRE(child_pos.x == 175.F);
+	REQUIRE(child_pos.y == 0.F);
+}
+
+TEST_CASE("transform: deep hierarchy with rotation", "[transform][hierarchy][deep]") {
+	entt::registry world;
+	auto system = make_system(world);
+
+	// Grandparent rotated 90 degrees, parent and child offset on x
+	// Each level at (10, 0) local -> after 90 degree rotation accumulates down
+	const auto grandparent = add_entity(world, lge::placement{0.F, 0.F, 90.F});
+	const auto parent = add_child(world, grandparent, lge::placement{10.F, 0.F});
+	const auto child = add_child(world, parent, lge::placement{10.F, 0.F});
+
+	REQUIRE(!system.update(0.F).has_error());
+
+	const auto parent_pos = world_pos(world, parent);
+	REQUIRE(parent_pos.x == Approx(0.F).margin(tolerance));
+	REQUIRE(parent_pos.y == Approx(10.F).margin(tolerance));
+
+	const auto child_pos = world_pos(world, child);
+	REQUIRE(child_pos.x == Approx(0.F).margin(tolerance));
+	REQUIRE(child_pos.y == Approx(20.F).margin(tolerance));
+}
