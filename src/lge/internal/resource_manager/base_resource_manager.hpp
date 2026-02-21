@@ -6,13 +6,12 @@
 #include <lge/core/result.hpp>
 #include <lge/interface/resource_manager.hpp>
 #include <lge/interface/resources.hpp>
-#include <lge/internal/resource_manager/resource_store.hpp>
+#include <lge/internal/resource_manager/animation_library.hpp>
 #include <lge/internal/resource_manager/sprite_sheet.hpp>
 
 #include <core/fwd.hpp>
 #include <entt/entt.hpp>
 #include <string_view>
-#include <unordered_map>
 
 namespace lge {
 
@@ -57,33 +56,8 @@ public:
 		-> result<sprite_sheet_handle> override;
 
 private:
-	// =============================================================================
-	// Sprite Sheet
-	// =============================================================================
 	sprite_sheet_store sprite_sheets_;
-
-	// =============================================================================
-	// Animation Library Data
-	// =============================================================================
-
-	class animation_library_data {
-	public:
-		~animation_library_data();
-		animation_library_data() = default;
-		animation_library_data(const animation_library_data &) = delete;
-		auto operator=(const animation_library_data &) -> animation_library_data & = delete;
-		animation_library_data(animation_library_data &&) noexcept = default;
-		auto operator=(animation_library_data &&) noexcept -> animation_library_data & = default;
-
-		[[nodiscard]] auto load(std::string_view uri, resource_manager &rm) -> result<>;
-		sprite_sheet_handle sprite_sheet;
-		std::unordered_map<entt::id_type, animation_library_anim> animations;
-
-	private:
-		resource_manager *rm_ = nullptr;
-	};
-
-	resource_store<animation_library_data, animation_library_handle> animation_libraries_;
+	animation_library_store animation_libraries_;
 };
 
 } //  namespace lge

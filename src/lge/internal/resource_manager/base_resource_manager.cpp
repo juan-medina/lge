@@ -3,6 +3,7 @@
 
 #include <lge/core/result.hpp>
 #include <lge/interface/resources.hpp>
+#include <lge/internal/resource_manager/animation_library.hpp>
 #include <lge/internal/resource_manager/base_resource_manager.hpp>
 #include <lge/internal/resource_manager/sprite_sheet.hpp>
 
@@ -57,6 +58,43 @@ auto base_resource_manager::get_sprite_sheet_texture(const sprite_sheet_handle h
 		return error("can not get sprite sheet texture, sprite sheet not found", *err);
 	}
 	return data->texture;
+}
+
+auto base_resource_manager::load_animation_library(const std::string_view uri) -> result<animation_library_handle> {
+	animation_library_handle handle;
+	if(const auto err = animation_libraries_.load(uri, *this).unwrap(handle); err) [[unlikely]] {
+		return error("failed to load animation library", *err);
+	}
+	return handle;
+}
+
+auto base_resource_manager::unload_animation_library(const animation_library_handle handle) -> result<> {
+	if(const auto err = animation_libraries_.unload(handle).unwrap(); err) [[unlikely]] {
+		return error("failed to unload animation library", *err);
+	}
+	return true;
+}
+
+auto base_resource_manager::get_animation(const animation_library_handle handle, const entt::id_type anim_name) const
+	-> result<animation_library_anim> {
+	const animation_library *data = nullptr;
+	if(const auto err = animation_libraries_.get(handle).unwrap(data); err) [[unlikely]] {
+		return error("animation library not found", *err);
+	}
+	const auto clip_it = data->animations.find(anim_name);
+	if(clip_it == data->animations.end()) [[unlikely]] {
+		return error(std::format("animation clip '{}' not found in animation library", anim_name));
+	}
+	return clip_it->second;
+}
+
+auto base_resource_manager::get_animation_sprite_sheet(const animation_library_handle handle) const
+	-> result<sprite_sheet_handle> {
+	const animation_library *data = nullptr;
+	if(const auto err = animation_libraries_.get(handle).unwrap(data); err) [[unlikely]] {
+		return error("can not get animation sprite sheet, animation library not found", *err);
+	}
+	return data->sprite_sheet;
 }
 
 } // namespace lge
