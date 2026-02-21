@@ -3,26 +3,30 @@
 
 #pragma once
 
+#include <lge/core/result.hpp>
+#include <lge/interface/resources.hpp>
 #include <lge/internal/resource_manager/resource_store.hpp>
 
 #include <raylib.h>
 
+#include <string_view>
+
 namespace lge {
 
-	class raylib_texture {
-	public:
-		raylib_texture() = default;
-		~raylib_texture();
-		raylib_texture(const raylib_texture &) = delete;
-		auto operator=(const raylib_texture &) -> raylib_texture & = delete;
-		raylib_texture(raylib_texture &&) noexcept = default;
-		auto operator=(raylib_texture &&) noexcept -> raylib_texture & = default;
+class raylib_texture {
+public:
+	raylib_texture() = default;
+	~raylib_texture();
+	raylib_texture(const raylib_texture &) = delete;
+	auto operator=(const raylib_texture &) -> raylib_texture & = delete;
+	raylib_texture(raylib_texture &&) noexcept = default;
+	auto operator=(raylib_texture &&) noexcept -> raylib_texture & = default;
 
-		[[nodiscard]] auto load(std::string_view uri) -> result<>;
+	[[nodiscard]] auto load(std::string_view uri) -> result<>;
 
-		Texture2D raylib_native_texture{};
-	};
+	Texture2D raylib_native_texture{};
+};
 
-	using texture_store = resource_store<raylib_texture, texture_handle>;
+using texture_store = resource_store<raylib_texture, texture_handle>;
 
 } // namespace lge
