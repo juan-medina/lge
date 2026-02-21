@@ -10,6 +10,9 @@
 
 #include <core/fwd.hpp>
 #include <entt/entt.hpp>
+#include <filesystem>
+#include <jsoncons/basic_json.hpp>
+#include <string>
 #include <string_view>
 #include <unordered_map>
 
@@ -30,6 +33,11 @@ public:
 
 private:
 	resource_manager *rm_ = nullptr;
+
+	auto parse_animations(const jsoncons::json &root) -> result<>;
+	static auto parse_sprite_sheet_path(const jsoncons::json &root, const std::filesystem::path &base_path)
+		-> result<std::string>;
+	static auto parse_animation_library_json(std::string_view uri) -> result<jsoncons::json>;
 };
 
 using animation_library_store = resource_store<animation_library, animation_library_handle>;
