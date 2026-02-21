@@ -72,8 +72,8 @@ TEST_CASE("transform: root entity position", "[transform]") {
 	REQUIRE(!system.update(0.F).has_error());
 
 	const auto pos = world_pos(world, e);
-	REQUIRE(pos.x == Approx(100.F).margin(tolerance));
-	REQUIRE(pos.y == Approx(200.F).margin(tolerance));
+	REQUIRE(pos.x == 100.F);
+	REQUIRE(pos.y == 200.F);
 }
 
 TEST_CASE("transform: root entity identity", "[transform]") {
@@ -86,10 +86,10 @@ TEST_CASE("transform: root entity identity", "[transform]") {
 
 	const auto pos = world_pos(world, e);
 	const auto scale = world_scale(world, e);
-	REQUIRE(pos.x == Approx(0.F).margin(tolerance));
-	REQUIRE(pos.y == Approx(0.F).margin(tolerance));
-	REQUIRE(scale.x == Approx(1.F).margin(tolerance));
-	REQUIRE(scale.y == Approx(1.F).margin(tolerance));
+	REQUIRE(pos.x == 0.F);
+	REQUIRE(pos.y == 0.F);
+	REQUIRE(scale.x == 1.F);
+	REQUIRE(scale.y == 1.F);
 }
 
 TEST_CASE("transform: root entity scale", "[transform]") {
@@ -101,8 +101,8 @@ TEST_CASE("transform: root entity scale", "[transform]") {
 	REQUIRE(!system.update(0.F).has_error());
 
 	const auto scale = world_scale(world, e);
-	REQUIRE(scale.x == Approx(2.F).margin(tolerance));
-	REQUIRE(scale.y == Approx(3.F).margin(tolerance));
+	REQUIRE(scale.x == 2.F);
+	REQUIRE(scale.y == 3.F);
 }
 
 // =============================================================================
@@ -119,8 +119,8 @@ TEST_CASE("transform: child inherits parent position", "[transform][hierarchy]")
 	REQUIRE(!system.update(0.F).has_error());
 
 	const auto pos = world_pos(world, child);
-	REQUIRE(pos.x == Approx(150.F).margin(tolerance));
-	REQUIRE(pos.y == Approx(0.F).margin(tolerance));
+	REQUIRE(pos.x == 150.F);
+	REQUIRE(pos.y == 0.F);
 }
 
 TEST_CASE("transform: child inherits parent scale", "[transform][hierarchy]") {
@@ -133,8 +133,8 @@ TEST_CASE("transform: child inherits parent scale", "[transform][hierarchy]") {
 	REQUIRE(!system.update(0.F).has_error());
 
 	const auto scale = world_scale(world, child);
-	REQUIRE(scale.x == Approx(2.F).margin(tolerance));
-	REQUIRE(scale.y == Approx(2.F).margin(tolerance));
+	REQUIRE(scale.x == 2.F);
+	REQUIRE(scale.y == 2.F);
 }
 
 TEST_CASE("transform: child position scaled by parent", "[transform][hierarchy]") {
@@ -147,8 +147,8 @@ TEST_CASE("transform: child position scaled by parent", "[transform][hierarchy]"
 	REQUIRE(!system.update(0.F).has_error());
 
 	const auto pos = world_pos(world, child);
-	REQUIRE(pos.x == Approx(20.F).margin(tolerance));
-	REQUIRE(pos.y == Approx(0.F).margin(tolerance));
+	REQUIRE(pos.x == 20.F);
+	REQUIRE(pos.y == 0.F);
 }
 
 TEST_CASE("transform: child inherits parent rotation", "[transform][hierarchy]") {
@@ -176,7 +176,7 @@ TEST_CASE("transform: root entity rotation", "[transform]") {
 
 	const auto &mat = world.get<lge::transform>(e).world;
 	const float angle = glm::degrees(std::atan2(mat[0][1], mat[0][0]));
-	REQUIRE(angle == Approx(-45.f).margin(tolerance));
+	REQUIRE(angle == -45.f);
 }
 
 // =============================================================================
@@ -228,8 +228,8 @@ TEST_CASE("transform: pivot offset with metrics", "[transform][pivot][metrics]")
 	REQUIRE(!system.update(0.F).has_error());
 
 	const auto pos = world_pos(world, e);
-	REQUIRE(pos.x == Approx(-50.F).margin(tolerance));
-	REQUIRE(pos.y == Approx(-100.F).margin(tolerance));
+	REQUIRE(pos.x == -50.F);
+	REQUIRE(pos.y == -100.F);
 }
 
 TEST_CASE("transform: pivot offset with metrics (top_left)", "[transform][pivot][metrics]") {
@@ -245,8 +245,8 @@ TEST_CASE("transform: pivot offset with metrics (top_left)", "[transform][pivot]
 
 	REQUIRE(!system.update(0.F).has_error());
 	const auto pos = world_pos(world, e);
-	REQUIRE(pos.x == Approx(0.F).margin(tolerance));
-	REQUIRE(pos.y == Approx(0.F).margin(tolerance));
+	REQUIRE(pos.x == 0.F);
+	REQUIRE(pos.y == 0.F);
 }
 
 TEST_CASE("transform: pivot offset with metrics (bottom_right)", "[transform][pivot][metrics]") {
@@ -262,8 +262,8 @@ TEST_CASE("transform: pivot offset with metrics (bottom_right)", "[transform][pi
 
 	REQUIRE(!system.update(0.F).has_error());
 	const auto pos = world_pos(world, e);
-	REQUIRE(pos.x == Approx(-100.F).margin(tolerance));
-	REQUIRE(pos.y == Approx(-200.F).margin(tolerance));
+	REQUIRE(pos.x == -100.F);
+	REQUIRE(pos.y == -200.F);
 }
 
 TEST_CASE("transform: entity without metrics uses zero pivot offset", "[transform][pivot][metrics]") {
@@ -274,8 +274,8 @@ TEST_CASE("transform: entity without metrics uses zero pivot offset", "[transfor
 	// No metrics component
 	REQUIRE(!system.update(0.F).has_error());
 	const auto pos = world_pos(world, e);
-	REQUIRE(pos.x == Approx(10.F).margin(tolerance));
-	REQUIRE(pos.y == Approx(20.F).margin(tolerance));
+	REQUIRE(pos.x == 10.F);
+	REQUIRE(pos.y == 20.F);
 }
 
 TEST_CASE("transform: parent with multiple children", "[transform][hierarchy][children]") {
@@ -290,10 +290,10 @@ TEST_CASE("transform: parent with multiple children", "[transform][hierarchy][ch
 
 	const auto pos1 = world_pos(world, child1);
 	const auto pos2 = world_pos(world, child2);
-	REQUIRE(pos1.x == Approx(6.F).margin(tolerance));
-	REQUIRE(pos1.y == Approx(5.F).margin(tolerance));
-	REQUIRE(pos2.x == Approx(5.F).margin(tolerance));
-	REQUIRE(pos2.y == Approx(7.F).margin(tolerance));
+	REQUIRE(pos1.x == 6.F);
+	REQUIRE(pos1.y == 5.F);
+	REQUIRE(pos2.x == 5.F);
+	REQUIRE(pos2.y == 7.F);
 }
 
 TEST_CASE("transform: detach child and reattach to different parent", "[transform][hierarchy][reattach]") {
@@ -305,7 +305,7 @@ TEST_CASE("transform: detach child and reattach to different parent", "[transfor
 	const auto child = add_child(world, parent1, lge::placement{10.F, 0.F});
 
 	REQUIRE(!system.update(0.F).has_error());
-	REQUIRE(world_pos(world, child).x == Approx(10.F).margin(tolerance));
+	REQUIRE(world_pos(world, child).x == 10.F);
 
 	// Detach from parent1
 	world.erase<lge::parent>(child);
@@ -317,7 +317,7 @@ TEST_CASE("transform: detach child and reattach to different parent", "[transfor
 	world.get<lge::children>(parent2).ids.push_back(child);
 
 	REQUIRE(!system.update(0.F).has_error());
-	REQUIRE(world_pos(world, child).x == Approx(110.F).margin(tolerance));
+	REQUIRE(world_pos(world, child).x == 110.F);
 }
 
 TEST_CASE("transform: destroying child updates parent's children list", "[transform][hierarchy][destroy]") {
@@ -340,8 +340,8 @@ TEST_CASE("transform: negative scale (mirroring)", "[transform][scale][negative]
 	const auto e = add_entity(world, lge::placement{0.F, 0.F, 0.F, {-2.F, 3.F}});
 	REQUIRE(!system.update(0.F).has_error());
 	const auto scale = world_scale(world, e);
-	REQUIRE(scale.x == Approx(2.F).margin(tolerance));
-	REQUIRE(scale.y == Approx(3.F).margin(tolerance));
+	REQUIRE(scale.x == 2.F);
+	REQUIRE(scale.y == 3.F);
 }
 
 TEST_CASE("transform: zero scale does not produce NaN", "[transform][scale][zero]") {
@@ -351,8 +351,8 @@ TEST_CASE("transform: zero scale does not produce NaN", "[transform][scale][zero
 	const auto e = add_entity(world, lge::placement{0.F, 0.F, 0.F, {0.F, 0.F}});
 	REQUIRE(!system.update(0.F).has_error());
 	const auto scale = world_scale(world, e);
-	REQUIRE(scale.x == Approx(0.F).margin(tolerance));
-	REQUIRE(scale.y == Approx(0.F).margin(tolerance));
+	REQUIRE(scale.x == 0.F);
+	REQUIRE(scale.y == 0.F);
 	const auto pos = world_pos(world, e);
 	REQUIRE(std::isfinite(pos.x));
 	REQUIRE(std::isfinite(pos.y));
