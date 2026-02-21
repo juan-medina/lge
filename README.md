@@ -3,6 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-478CBF.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Conduct](https://img.shields.io/badge/Conduct-Covenat%202.0-478CBF.svg?style=for-the-badge)](https://www.contributor-covenant.org/version/2/0/code_of_conduct/)
 [![Made with C++20](https://img.shields.io/badge/C%2B%2B-20-478CBF?style=for-the-badge&logo=c%2B%2B&logoColor=white)](https://isocpp.org/)
+[![Tests](https://img.shields.io/github/actions/workflow/status/juan-medina/lge/tests.yml?style=for-the-badge&label=Tests)](https://github.com/juan-medina/lge/actions/workflows/tests.yml)
 
 <p align ="center">
   <img src="media/logo/logo-sm.png" width="110" alt="lge logo">
@@ -77,6 +78,45 @@ The function automatically configures:
 	- `resources/game` (your game, if provided)
 - For Emscripten, preloads the merged resources folder for use in the browser
 
+---
+
+## Running the Tests
+
+Tests cover engine internals that have no dependency on raylib or a render context. They are off by default and do not affect library consumers.
+
+### Testing philosophy
+
+Tests in lge are targeted and pragmatic. The goal is to catch regressions in engine subsystems where bugs are silent and hard to diagnose — not to achieve coverage metrics or test every line of code.
+
+**What is worth testing:**
+- Pure logic with no external dependencies — math, transforms, hierarchy relationships, error propagation
+- Anything that has already caused a hard-to-diagnose bug and was fixed
+- Systems that can be exercised with a real `entt::registry` and no render context
+
+**What is not tested:**
+- Anything requiring a raylib window or render context
+- Gameplay feel, timing, or visual correctness
+- Scene logic or application lifecycle
+
+Tests use a real `entt::registry` — no mocking. If a system needs a window to run, it is not a candidate for testing here.
+
+### Building with tests enabled
+```bash
+cmake -B cmake-build-debug -DCMAKE_BUILD_TYPE=Debug -DLGE_BUILD_TESTS=ON
+cmake --build cmake-build-debug
+```
+
+### Running the tests
+```bash
+ctest --test-dir cmake-build-debug/tests --output-on-failure
+```
+
+### Continuous integration
+
+Tests run automatically on every push via GitHub Actions across Linux (GCC), macOS (Apple Clang), and Windows (MSVC).
+
+---
+
 ### Minimal Example
 
 **src/my_game.hpp**
@@ -145,6 +185,10 @@ auto my_game::init() -> lge::result<> {
 - [jsoncons](https://github.com/danielaparker/jsoncons) v1.5.0 (licensed under Boost Software License)
 - [Boxer](https://github.com/aaronmjacobs/Boxer) (licensed under MIT License)
 
+**Testing:**
+
+- [Catch2](https://github.com/catchorg/Catch2) v3.13.0 (licensed under BSL-1.0 License)
+
 **Graphics**
 
 *Engine assets:*
@@ -152,7 +196,7 @@ auto my_game::init() -> lge::result<> {
 - [Peaberry Pixel Font by emhuo](https://emhuo.itch.io/peaberry-pixel-font) (licensed under Open Font License Version
   1.1).
 
-*Example assets:*
+*Examples assets:*
 
 - [Pixelart Hiker by Chroma Dave](https://chroma-dave.itch.io/pixelart-hiker) (free to use in any project per the
   author).
