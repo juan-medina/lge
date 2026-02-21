@@ -9,6 +9,7 @@
 #include <lge/components/order.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/components/shapes.hpp>
+#include <lge/core/colors.hpp>
 #include <lge/core/result.hpp>
 
 #include "../../src/example.hpp"
@@ -18,7 +19,6 @@
 #include <cstddef>
 #include <entity/fwd.hpp>
 #include <entt/entt.hpp>
-#include <glm/ext/vector_float4.hpp>
 #include <random>
 
 LGE_MAIN(examples::layers);
@@ -77,25 +77,25 @@ auto layers::update(const float dt) -> lge::result<> {
 auto layers::change_top_color(const top_color new_top_color) -> void {
 	top_color_ = new_top_color;
 
-	glm::vec4 color;
+	lge::color color;
 	std::string txt = "top color: ";
 
 	switch(top_color_) {
 	case top_color::none:
 		txt += "none";
-		color = glm::vec4{1, 1, 1, 1};
+		color = lge::colors::white;
 		break;
 	case top_color::red:
 		txt += "red";
-		color = glm::vec4{1, 0, 0, 1};
+		color = lge::colors::red;
 		break;
 	case top_color::green:
 		txt += "green";
-		color = glm::vec4{0, 1, 0, 1};
+		color = lge::colors::green;
 		break;
 	case top_color::blue:
 		txt += "blue";
-		color = glm::vec4{0, 0, 1, 1};
+		color = lge::colors::blue;
 		break;
 	}
 
@@ -183,7 +183,7 @@ auto layers::create_random_shapes() -> void {
 	}
 }
 
-auto layers::create_rectangle(float pos_x, float pos_y, const glm::vec4 &color, std::mt19937 &rng) -> entt::entity {
+auto layers::create_rectangle(float pos_x, float pos_y, const lge::color &color, std::mt19937 &rng) -> entt::entity {
 	static constexpr auto game_res = get_game_res();
 	auto &world = get_world();
 
@@ -227,7 +227,7 @@ auto layers::create_rectangle(float pos_x, float pos_y, const glm::vec4 &color, 
 	return rect_ent;
 }
 
-auto layers::create_circle(float pos_x, float pos_y, const glm::vec4 &color, std::mt19937 &rng) -> entt::entity {
+auto layers::create_circle(float pos_x, float pos_y, const lge::color &color, std::mt19937 &rng) -> entt::entity {
 	static constexpr auto game_res = get_game_res();
 	auto &world = get_world();
 

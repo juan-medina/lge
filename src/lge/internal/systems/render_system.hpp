@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <lge/core/colors.hpp>
 #include <lge/core/result.hpp>
 #include <lge/interface/renderer.hpp>
 #include <lge/systems/system.hpp>
@@ -44,6 +45,8 @@ private:
 	auto handle_circle(entt::entity entity, const glm::mat3 &world_transform) const -> void;
 	auto handle_sprite(entt::entity entity, const glm::mat3 &world_transform) const -> void;
 	auto handle_bounds(entt::entity entity, const glm::mat3 &world_transform) const -> void;
+
+	static constexpr auto bounds_color = color::from_hex(0xFF00007F); // Red with 50% opacity
 };
 
 } // namespace lge

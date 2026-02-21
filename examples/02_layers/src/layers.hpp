@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <lge/core/colors.hpp>
 #include <lge/core/result.hpp>
 
 #include "../../src/example.hpp"
@@ -52,16 +53,13 @@ private:
 	auto create_root() -> entt::entity;
 
 	// colors for the shapes, with alpha 1.0 for full opacity
-	static constexpr auto red_color = glm::vec4{1.0F, 0.0F, 0.0F, 1.0F};
-	static constexpr auto green_color = glm::vec4{0.0F, 1.0F, 0.0F, 1.0F};
-	static constexpr auto blue_color = glm::vec4{0.0F, 0.0F, 1.0F, 1.0F};
-	static constexpr std::array colors = {red_color, green_color, blue_color};
+	static constexpr std::array colors = {lge::colors::red, lge::colors::green, lge::colors::blue};
 
 	// randomly interleave colors until we have exactly rect_count_per_color of each
 	std::array<size_t, colors.size()> color_counts_ = {0, 0, 0};
 	static constexpr auto shapes_count_per_color = 40;
 	static constexpr auto shapes_border_thickness = 1.0F;
-	static constexpr auto shapes_border_color = glm::vec4{0.7F, 0.7F, 0.7F, 1.0F};
+	static constexpr auto shapes_border_color = lge::colors::gray_70;
 
 	// shapes
 	static constexpr auto shape_rect = 0;
@@ -83,9 +81,9 @@ private:
 	static constexpr auto text_area_margin = 15.0F;
 
 	auto create_random_shapes() -> void;
-	[[nodiscard]] auto create_rectangle(float pos_x, float pos_y, const glm::vec4 &color, std::mt19937 &rng)
+	[[nodiscard]] auto create_rectangle(float pos_x, float pos_y, const lge::color &color, std::mt19937 &rng)
 		-> entt::entity;
-	[[nodiscard]] auto create_circle(float pos_x, float pos_y, const glm::vec4 &color, std::mt19937 &rng)
+	[[nodiscard]] auto create_circle(float pos_x, float pos_y, const lge::color &color, std::mt19937 &rng)
 		-> entt::entity;
 };
 

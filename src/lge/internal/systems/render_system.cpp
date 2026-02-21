@@ -168,7 +168,7 @@ auto render_system::handle_bounds(const entt::entity entity, const glm::mat3 &wo
 	};
 
 	renderer_.render_quad(
-		transform_local(p0), transform_local(p1), transform_local(p2), transform_local(p3), {1, 0, 0, 0.5F});
+		transform_local(p0), transform_local(p1), transform_local(p2), transform_local(p3), bounds_color);
 }
 
 } // namespace lge

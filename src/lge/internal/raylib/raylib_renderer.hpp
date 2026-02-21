@@ -4,6 +4,7 @@
 #pragma once
 
 #include <lge/app/app_config.hpp>
+#include <lge/core/colors.hpp>
 #include <lge/core/result.hpp>
 #include <lge/interface/renderer.hpp>
 #include <lge/interface/resource_manager.hpp>
@@ -11,6 +12,7 @@
 
 #include <raylib.h>
 
+#include <entt/core/fwd.hpp>
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float4.hpp>
 #include <string>
@@ -51,7 +53,7 @@ public:
 	auto render_label(font_handle font,
 					  const std::string &text,
 					  const int &size,
-					  const glm::vec4 &color,
+					  const color &color,
 					  const glm::vec2 &pivot_position,
 					  const glm::vec2 &rotated_offset,
 					  float rotation) const -> void override;
@@ -69,19 +71,19 @@ public:
 					 const glm::vec2 &p1,
 					 const glm::vec2 &p2,
 					 const glm::vec2 &p3,
-					 const glm::vec4 &color) const -> void override;
+					 const color &color) const -> void override;
 
 	auto render_rect(const glm::vec2 &center,
 					 const glm::vec2 &size,
 					 float rotation,
-					 const glm::vec4 &border_color,
-					 const glm::vec4 &fill_color,
+					 const color &border_color,
+					 const color &fill_color,
 					 float border_thickness) const -> void override;
 
 	auto render_circle(const glm::vec2 &center,
 					   float radius,
-					   const glm::vec4 &border_color,
-					   const glm::vec4 &fill_color,
+					   const color &border_color,
+					   const color &fill_color,
 					   float border_thickness) const -> void override;
 
 private:
@@ -101,8 +103,8 @@ private:
 
 	[[nodiscard]] auto screen_size_changed(glm::vec2 screen_size) -> result<>;
 
-	static auto color_from_glm(const glm::vec4 &v) -> Color {
-		return ColorFromNormalized({.x = v.r, .y = v.g, .z = v.b, .w = v.a});
+	static auto color_to_raylib(const color &c) -> Color {
+		return {.r = c.r, .g = c.g, .b = c.b, .a = c.a};
 	}
 
 	[[nodiscard]] auto to_screen(const glm::vec2 &p) const -> glm::vec2 {

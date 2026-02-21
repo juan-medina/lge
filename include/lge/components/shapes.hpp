@@ -3,22 +3,23 @@
 
 #pragma once
 
+#include <lge/core/colors.hpp>
+
 #include <glm/ext/vector_float2.hpp>
-#include <glm/ext/vector_float4.hpp>
 
 namespace lge {
 
 struct rect {
 	glm::vec2 size;
-	glm::vec4 border_color{1, 1, 1, 1};
-	glm::vec4 fill_color{0, 0, 0, 0};
+	color border_color = colors::white;
+	color fill_color = colors::transparent;
 	float border_thickness = 1.0F;
 };
 
 struct circle {
 	float radius;
-	glm::vec4 border_color{1, 1, 1, 1};
-	glm::vec4 fill_color{0, 0, 0, 0};
+	color border_color = colors::white;
+	color fill_color = colors::transparent;
 	float border_thickness = 1.0F;
 };
 

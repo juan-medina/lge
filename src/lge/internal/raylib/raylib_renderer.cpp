@@ -4,6 +4,7 @@
 #include "raylib_renderer.hpp"
 
 #include <lge/app/app_config.hpp>
+#include <lge/core/colors.hpp>
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
 #include <lge/interface/resource_manager.hpp>
@@ -25,7 +26,7 @@
 namespace lge {
 
 auto raylib_renderer::init(const app_config &config) -> result<> {
-	clear_color_ = color_from_glm(config.clear_color);
+	clear_color_ = color_to_raylib(config.clear_color);
 	design_resolution_ = config.design_resolution;
 	title_ = config.window_title;
 
@@ -347,7 +348,7 @@ auto raylib_renderer::render_sprite(const sprite_sheet_handle sheet,
 auto raylib_renderer::render_label(const font_handle font,
 								   const std::string &text,
 								   const int &size,
-								   const glm::vec4 &color,
+								   const color &color,
 								   const glm::vec2 &pivot_position,
 								   const glm::vec2 &pivot_to_top_left,
 								   const float rotation) const -> void {
@@ -369,14 +370,14 @@ auto raylib_renderer::render_label(const font_handle font,
 				rotation,
 				static_cast<float>(size),
 				spacing,
-				color_from_glm(color));
+				color_to_raylib(color));
 }
 
 auto raylib_renderer::render_quad(const glm::vec2 &p0,
 								  const glm::vec2 &p1,
 								  const glm::vec2 &p2,
 								  const glm::vec2 &p3,
-								  const glm::vec4 &color) const -> void {
+								  const color &color) const -> void {
 	const auto screen_p0 = to_screen(p0);
 	const auto screen_p1 = to_screen(p1);
 	const auto screen_p2 = to_screen(p2);
@@ -387,7 +388,7 @@ auto raylib_renderer::render_quad(const glm::vec2 &p0,
 	const auto ray_vec2 = Vector2{.x = screen_p2.x, .y = screen_p2.y};
 	const auto ray_vec3 = Vector2{.x = screen_p3.x, .y = screen_p3.y};
 
-	const auto ray_color = color_from_glm(color);
+	const auto ray_color = color_to_raylib(color);
 
 	DrawLineV(ray_vec0, ray_vec1, ray_color);
 	DrawLineV(ray_vec1, ray_vec2, ray_color);
@@ -398,12 +399,12 @@ auto raylib_renderer::render_quad(const glm::vec2 &p0,
 auto raylib_renderer::render_rect(const glm::vec2 &center,
 								  const glm::vec2 &size,
 								  const float rotation,
-								  const glm::vec4 &border_color,
-								  const glm::vec4 &fill_color,
+								  const color &border_color,
+								  const color &fill_color,
 								  const float border_thickness) const -> void {
 	const auto screen_center = to_screen(center);
-	const auto fill = color_from_glm(fill_color);
-	const auto border = color_from_glm(border_color);
+	const auto fill = color_to_raylib(fill_color);
+	const auto border = color_to_raylib(border_color);
 
 	auto rec = Rectangle{.x = screen_center.x, .y = screen_center.y, .width = size.x, .height = size.y};
 	DrawRectanglePro(rec, {.x = size.x * 0.5F, .y = size.y * 0.5F}, rotation, fill);
@@ -454,12 +455,12 @@ auto raylib_renderer::render_rect(const glm::vec2 &center,
 
 auto raylib_renderer::render_circle(const glm::vec2 &center,
 									const float radius,
-									const glm::vec4 &border_color,
-									const glm::vec4 &fill_color,
+									const color &border_color,
+									const color &fill_color,
 									const float border_thickness) const -> void {
 	const auto screen_center = to_screen(center);
-	const auto ray_border_color = color_from_glm(border_color);
-	const auto ray_fill_color = color_from_glm(fill_color);
+	const auto ray_border_color = color_to_raylib(border_color);
+	const auto ray_fill_color = color_to_raylib(fill_color);
 	const auto ray_center = Vector2{.x = screen_center.x, .y = screen_center.y};
 
 	// has fill, draw the filled circle

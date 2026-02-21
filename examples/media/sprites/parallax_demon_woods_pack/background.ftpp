@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "version": "0.6.7"
+  },
+  "savePath": "",
+  "images": [
+    {
+      "name": "parallax-demon-woods-close-trees.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/parallax_demon_woods_pack/layers/parallax-demon-woods-close-trees.png",
+      "folder": ""
+    },
+    {
+      "name": "parallax-demon-woods-far-trees.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/parallax_demon_woods_pack/layers/parallax-demon-woods-far-trees.png",
+      "folder": ""
+    },
+    {
+      "name": "parallax-demon-woods-mid-trees.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/parallax_demon_woods_pack/layers/parallax-demon-woods-mid-trees.png",
+      "folder": ""
+    }
+  ],
+  "folders": [],
+  "packOptions": {
+    "textureName": "background",
+    "textureFormat": "png",
+    "removeFileExtension": false,
+    "prependFolderName": true,
+    "base64Export": false,
+    "tinify": false,
+    "tinifyKey": "",
+    "scale": 1,
+    "filter": "none",
+    "exporter": "JSON (hash)",
+    "fileName": "pack-result",
+    "savePath": "",
+    "width": 2048,
+    "height": 2048,
+    "fixedSize": false,
+    "powerOfTwo": false,
+    "padding": 0,
+    "extrude": 0,
+    "allowRotation": false,
+    "allowTrim": false,
+    "trimMode": "trim",
+    "alphaThreshold": "0",
+    "detectIdentical": true,
+    "packer": "MaxRectsBin",
+    "packerMethod": "BestShortSideFit"
+  }
+}

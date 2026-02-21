@@ -1,0 +1,87 @@
+{
+  "frames": {
+    "parallax-demon-woods-close-trees.png": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 592,
+        "h": 272
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 592,
+        "h": 272
+      },
+      "sourceSize": {
+        "w": 592,
+        "h": 272
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "parallax-demon-woods-far-trees.png": {
+      "frame": {
+        "x": 592,
+        "y": 0,
+        "w": 592,
+        "h": 272
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 592,
+        "h": 272
+      },
+      "sourceSize": {
+        "w": 592,
+        "h": 272
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "parallax-demon-woods-mid-trees.png": {
+      "frame": {
+        "x": 1184,
+        "y": 0,
+        "w": 592,
+        "h": 272
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 592,
+        "h": 272
+      },
+      "sourceSize": {
+        "w": 592,
+        "h": 272
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "app": "http://free-tex-packer.com",
+    "version": "0.6.7",
+    "image": "background.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 1776,
+      "h": 272
+    },
+    "scale": 1
+  }
+}

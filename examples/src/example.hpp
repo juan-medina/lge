@@ -5,6 +5,7 @@
 
 #include <lge/app/app.hpp>
 #include <lge/app/app_config.hpp>
+#include <lge/core/colors.hpp>
 #include <lge/core/result.hpp>
 
 #include <cstddef>
@@ -21,9 +22,10 @@ public:
 	explicit example(
 		std::string game_title = "Example",
 		std::string kb_message = "change the keyboard message in the constructor of your example subclass",
-		std::string controller_message = "change the controller message in the constructor of your example subclass")
+		std::string controller_message = "change the controller message in the constructor of your example subclass",
+		const lge::color clear_color = default_clear_color)
 		: game_title_(std::move(game_title)), kb_message_(std::move(kb_message)),
-		  controller_message_(std::move(controller_message)) {}
+		  controller_message_(std::move(controller_message)), clear_color_(clear_color) {}
 
 	[[nodiscard]] auto update(float dt) -> lge::result<> override;
 	[[nodiscard]] auto configure() -> lge::app_config override;
@@ -40,7 +42,8 @@ protected:
 	static constexpr std::size_t total_base_actions = 3;
 
 private:
-	static constexpr auto clear_color = glm::vec4{0, 0, 0, 1}; // black background
+	static constexpr auto default_clear_color = lge::colors::black;
+	lge::color clear_color_ = default_clear_color;
 	static constexpr auto game_res = glm::vec2{640, 360}; // world expands horizontally keep the vertical size fixed
 
 	bool was_in_controller_mode_ = false;
