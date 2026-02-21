@@ -7,7 +7,7 @@
 #include <lge/core/colors.hpp>
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
-#include <lge/interface/resource_manager.hpp>
+#include <lge/interface/resources.hpp>
 
 #include "raylib_resource_manager.hpp"
 
@@ -317,19 +317,16 @@ auto raylib_renderer::render_sprite(const sprite_sheet_handle sheet,
 									bool flip_vertical) const -> void {
 	sprite_sheet_frame f{};
 	if(const auto err = resource_manager_.get_sprite_sheet_frame(sheet, frame).unwrap(f); err) [[unlikely]] {
-		log::error("failed to get sprite sheet frame '{}', skipping sprite render", frame);
 		return;
 	}
 
 	texture_handle tex_handle{};
 	if(const auto err = resource_manager_.get_sprite_sheet_texture(sheet).unwrap(tex_handle); err) [[unlikely]] {
-		log::error("failed to get sprite sheet texture for sheet {}, skipping sprite render", sheet);
 		return;
 	}
 
 	Texture2D rl_texture{};
 	if(const auto err = resource_manager_.get_raylib_texture(tex_handle).unwrap(rl_texture); err) [[unlikely]] {
-		log::error("failed to resolve raylib texture for sheet {}, skipping sprite render", sheet);
 		return;
 	}
 
