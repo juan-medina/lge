@@ -50,14 +50,14 @@ auto hello_world::init() -> lge::result<> {
 
 	const auto hello_text_ent = world.create();
 	auto &hello_label = world.emplace<lge::label>(hello_text_ent, "Hello");
-	hello_label.color = lge::colors::yellow;
+	hello_label.text_color = lge::colors::yellow;
 	world.emplace<lge::placement>(
 		hello_text_ent, 0, -gap_between_labels / 2, 0.0F, glm::vec2{1.F, 1.F}, lge::pivot::bottom_center);
 	lge::attach(world, center_ent_, hello_text_ent);
 
 	world_text_ent_ = world.create();
 	auto &world_label = world.emplace<lge::label>(world_text_ent_, "World");
-	world_label.color = lge::colors::red;
+	world_label.text_color = lge::colors::red;
 	world.emplace<lge::placement>(
 		world_text_ent_, 0, gap_between_labels / 2, 0.0F, glm::vec2{1.F, 1.F}, lge::pivot::top_center);
 	lge::attach(world, center_ent_, world_text_ent_);
