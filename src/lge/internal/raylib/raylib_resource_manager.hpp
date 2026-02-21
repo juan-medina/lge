@@ -5,6 +5,7 @@
 
 #include <lge/core/result.hpp>
 #include <lge/interface/resources.hpp>
+#include <lge/internal/raylib/raylib_font.hpp>
 #include <lge/internal/resource_manager/base_resource_manager.hpp>
 #include <lge/internal/resource_manager/resource_store.hpp>
 
@@ -28,23 +29,7 @@ public:
 	[[nodiscard]] auto get_raylib_texture(texture_handle handle) const -> result<Texture2D>;
 
 private:
-	// =============================================================================
-	// Font Data
-	// =============================================================================
-
-	class font_data {
-	public:
-		font_data() = default;
-		~font_data();
-		font_data(const font_data &) = delete;
-		auto operator=(const font_data &) -> font_data & = delete;
-		font_data(font_data &&) noexcept = default;
-		auto operator=(font_data &&) noexcept -> font_data & = default;
-		[[nodiscard]] auto load(std::string_view uri) -> result<>;
-		Font raylib_font{};
-	};
-
-	resource_store<font_data, font_handle> fonts_;
+	font_store fonts_;
 
 	// =============================================================================
 	// Texture Data
