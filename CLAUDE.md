@@ -134,3 +134,14 @@ Do not add new tests unless they strictly adhere to the project's testing philos
 - Do not add tests for code requiring a render context, gameplay feel, timing, visual correctness, or scene/application lifecycle.
 - All new tests must be justified by prior bugs or clear risk of silent failure.
 - If unsure, do not add the test and ask for clarification.
+
+## Example Test Reference
+
+See `tests/src/transform_system_test.cpp` for an example of a test that follows the lge engine's testing philosophy and policies. This file:
+- Tests pure logic and engine internals without external dependencies
+- Uses a real `entt::registry` (no mocking)
+- Avoids testing code requiring a render context, gameplay feel, timing, or scene/application lifecycle
+- Is justified by prior bugs or risk of silent failure
+
+Use `transform_system_test.cpp` as a template for new tests to ensure compliance with project standards.
+

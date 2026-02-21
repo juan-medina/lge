@@ -124,6 +124,16 @@ Do not add new tests unless they strictly adhere to the project's testing philos
 - All new tests must be justified by prior bugs or clear risk of silent failure.
 - If unsure, do not add the test and ask for clarification.
 
+## Example Test: transform_system_test.cpp
+
+The file `tests/src/transform_system_test.cpp` demonstrates how to write tests that follow the project's testing philosophy and policies. It tests pure logic and engine internals without external dependencies or render context. Use this file as a reference for structuring new tests, ensuring they:
+- Target pure logic, engine internals, or subsystems with risk of silent failure
+- Avoid testing code requiring a render context, gameplay feel, timing, or scene/application lifecycle
+- Use a real `entt::registry` (no mocking)
+- Justify new tests by prior bugs or clear risk
+
+Refer to `transform_system_test.cpp` for proper test structure, error/result handling, and adherence to project conventions.
+
 ## Tooling
 - The codebase uses clang-tidy with strict warning settings. All warnings must be cleared before committing code.
 - The active clang-tidy rules are defined in the project configuration.
