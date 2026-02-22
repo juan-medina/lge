@@ -38,12 +38,10 @@ auto add_child(entt::registry &world, const entt::entity parent_entity, const lg
 	const auto child = world.create();
 	world.emplace<lge::placement>(child, p);
 	world.emplace<lge::parent>(child, parent_entity);
-
 	if(!world.all_of<lge::children>(parent_entity)) {
 		world.emplace<lge::children>(parent_entity);
 	}
 	world.get<lge::children>(parent_entity).ids.push_back(child);
-
 	return child;
 }
 
@@ -63,379 +61,248 @@ auto world_scale(const entt::registry &world, const entt::entity e) -> glm::vec2
 // Root entity
 // =============================================================================
 
-TEST_CASE("transform: root entity position", "[transform]") {
+TEST_CASE("transform: root entity", "[transform]") {
 	entt::registry world;
 	auto system = make_system(world);
 
-	const auto e = add_entity(world, lge::placement{100.F, 200.F});
+	SECTION("position is applied directly") {
+		const auto e = add_entity(world, lge::placement{100.F, 200.F});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto pos = world_pos(world, e);
+		REQUIRE(pos.x == 100.F);
+		REQUIRE(pos.y == 200.F);
+	}
 
-	REQUIRE(!system.update(0.F).has_error());
+	SECTION("scale is applied directly") {
+		const auto e = add_entity(world, lge::placement{0.F, 0.F, 0.F, {2.F, 3.F}});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto scale = world_scale(world, e);
+		REQUIRE(scale.x == 2.F);
+		REQUIRE(scale.y == 3.F);
+	}
 
-	const auto pos = world_pos(world, e);
-	REQUIRE(pos.x == 100.F);
-	REQUIRE(pos.y == 200.F);
+	SECTION("rotation is applied directly") {
+		const auto e = add_entity(world, lge::placement{0.F, 0.F, 45.F});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto &mat = world.get<lge::transform>(e).world;
+		const float angle = glm::degrees(std::atan2(mat[0][1], mat[0][0]));
+		REQUIRE(angle == -45.F);
+	}
+
+	SECTION("negative scale does not produce NaN") {
+		const auto e = add_entity(world, lge::placement{0.F, 0.F, 0.F, {-2.F, 3.F}});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto scale = world_scale(world, e);
+		REQUIRE(scale.x == 2.F);
+		REQUIRE(scale.y == 3.F);
+	}
+
+	SECTION("zero scale produces finite position") {
+		const auto e = add_entity(world, lge::placement{0.F, 0.F, 0.F, {0.F, 0.F}});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto pos = world_pos(world, e);
+		REQUIRE(std::isfinite(pos.x));
+		REQUIRE(std::isfinite(pos.y));
+	}
 }
 
-TEST_CASE("transform: root entity identity", "[transform]") {
+// =============================================================================
+// Pivot with metrics
+// =============================================================================
+
+TEST_CASE("transform: pivot with metrics", "[transform][pivot]") {
 	entt::registry world;
+	world.storage<lge::metrics>();
 	auto system = make_system(world);
 
-	const auto e = add_entity(world, lge::placement{0.F, 0.F, 0.F, {1.F, 1.F}});
+	SECTION("center pivot offsets by half size") {
+		const auto e = world.create();
+		world.emplace<lge::placement>(e, lge::placement{0.F, 0.F, 0.F, {1.F, 1.F}, {0.5F, 0.5F}});
+		world.emplace<lge::metrics>(e, lge::metrics{glm::vec2{100.F, 200.F}});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto pos = world_pos(world, e);
+		REQUIRE(pos.x == -50.F);
+		REQUIRE(pos.y == -100.F);
+	}
 
-	REQUIRE(!system.update(0.F).has_error());
+	SECTION("top_left pivot produces no offset") {
+		const auto e = world.create();
+		world.emplace<lge::placement>(e, lge::placement{0.F, 0.F, 0.F, {1.F, 1.F}, lge::pivot::top_left});
+		world.emplace<lge::metrics>(e, lge::metrics{glm::vec2{100.F, 200.F}});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto pos = world_pos(world, e);
+		REQUIRE(pos.x == 0.F);
+		REQUIRE(pos.y == 0.F);
+	}
 
-	const auto pos = world_pos(world, e);
-	const auto scale = world_scale(world, e);
-	REQUIRE(pos.x == 0.F);
-	REQUIRE(pos.y == 0.F);
-	REQUIRE(scale.x == 1.F);
-	REQUIRE(scale.y == 1.F);
-}
+	SECTION("bottom_right pivot offsets by full size") {
+		const auto e = world.create();
+		world.emplace<lge::placement>(e, lge::placement{0.F, 0.F, 0.F, {1.F, 1.F}, lge::pivot::bottom_right});
+		world.emplace<lge::metrics>(e, lge::metrics{glm::vec2{100.F, 200.F}});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto pos = world_pos(world, e);
+		REQUIRE(pos.x == -100.F);
+		REQUIRE(pos.y == -200.F);
+	}
 
-TEST_CASE("transform: root entity scale", "[transform]") {
-	entt::registry world;
-	auto system = make_system(world);
+	SECTION("manual pivot offsets by fractional size") {
+		constexpr glm::vec2 manual_pivot{0.3F, 0.7F};
+		const auto e = world.create();
+		world.emplace<lge::placement>(e, lge::placement{0.F, 0.F, 0.F, {1.F, 1.F}, manual_pivot});
+		world.emplace<lge::metrics>(e, lge::metrics{glm::vec2{100.F, 200.F}});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto pos = world_pos(world, e);
+		REQUIRE(pos.x == Approx(-30.F).margin(tolerance));
+		REQUIRE(pos.y == Approx(-140.F).margin(tolerance));
+	}
 
-	const auto e = add_entity(world, lge::placement{0.F, 0.F, 0.F, {2.F, 3.F}});
-
-	REQUIRE(!system.update(0.F).has_error());
-
-	const auto scale = world_scale(world, e);
-	REQUIRE(scale.x == 2.F);
-	REQUIRE(scale.y == 3.F);
+	SECTION("entity without metrics uses zero pivot offset") {
+		const auto e = add_entity(world, lge::placement{10.F, 20.F, 0.F, {1.F, 1.F}, lge::pivot::top_right});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto pos = world_pos(world, e);
+		REQUIRE(pos.x == 10.F);
+		REQUIRE(pos.y == 20.F);
+	}
 }
 
 // =============================================================================
 // Parent / child hierarchy
 // =============================================================================
 
-TEST_CASE("transform: child inherits parent position", "[transform][hierarchy]") {
+TEST_CASE("transform: child inherits parent transform", "[transform][hierarchy]") {
 	entt::registry world;
 	auto system = make_system(world);
 
-	const auto parent = add_entity(world, lge::placement{100.F, 0.F});
-	const auto child = add_child(world, parent, lge::placement{50.F, 0.F});
-
-	REQUIRE(!system.update(0.F).has_error());
-
-	const auto pos = world_pos(world, child);
-	REQUIRE(pos.x == 150.F);
-	REQUIRE(pos.y == 0.F);
-}
-
-TEST_CASE("transform: child inherits parent scale", "[transform][hierarchy]") {
-	entt::registry world;
-	auto system = make_system(world);
-
-	const auto parent = add_entity(world, lge::placement{0.F, 0.F, 0.F, {2.F, 2.F}});
-	const auto child = add_child(world, parent, lge::placement{0.F, 0.F, 0.F, {1.F, 1.F}});
-
-	REQUIRE(!system.update(0.F).has_error());
-
-	const auto scale = world_scale(world, child);
-	REQUIRE(scale.x == 2.F);
-	REQUIRE(scale.y == 2.F);
-}
-
-TEST_CASE("transform: child position scaled by parent", "[transform][hierarchy]") {
-	entt::registry world;
-	auto system = make_system(world);
-
-	const auto parent = add_entity(world, lge::placement{0.F, 0.F, 0.F, {2.F, 2.F}});
-	const auto child = add_child(world, parent, lge::placement{10.F, 0.F});
-
-	REQUIRE(!system.update(0.F).has_error());
-
-	const auto pos = world_pos(world, child);
-	REQUIRE(pos.x == 20.F);
-	REQUIRE(pos.y == 0.F);
-}
-
-TEST_CASE("transform: child inherits parent rotation", "[transform][hierarchy]") {
-	entt::registry world;
-	auto system = make_system(world);
-
-	// Child at (10, 0) relative to parent rotated 90 degrees -> world pos should be (0, 10)
-	const auto parent = add_entity(world, lge::placement{0.F, 0.F, 90.F});
-	const auto child = add_child(world, parent, lge::placement{10.F, 0.F});
-
-	REQUIRE(!system.update(0.F).has_error());
-
-	const auto pos = world_pos(world, child);
-	REQUIRE(pos.x == Approx(0.F).margin(tolerance));
-	REQUIRE(pos.y == Approx(10.F).margin(tolerance));
-}
-
-TEST_CASE("transform: root entity rotation", "[transform]") {
-	entt::registry world;
-	auto system = make_system(world);
-
-	const auto e = add_entity(world, lge::placement{0.f, 0.f, 45.f});
-
-	REQUIRE(!system.update(0.f).has_error());
-
-	const auto &mat = world.get<lge::transform>(e).world;
-	const float angle = glm::degrees(std::atan2(mat[0][1], mat[0][0]));
-	REQUIRE(angle == -45.f);
-}
-
-// =============================================================================
-// Hierarchy events
-// =============================================================================
-
-TEST_CASE("transform: detaching child removes it from parent children list", "[transform][hierarchy]") {
-	entt::registry world;
-	auto system = make_system(world);
-
-	const auto parent = add_entity(world, lge::placement{0.F, 0.F});
-	const auto child = add_child(world, parent, lge::placement{10.F, 0.F});
-
-	REQUIRE(!system.update(0.F).has_error());
-
-	world.erase<lge::parent>(child);
-
-	const auto &kids = world.get<lge::children>(parent).ids;
-	REQUIRE(kids.empty());
-}
-
-TEST_CASE("transform: destroying parent destroys children", "[transform][hierarchy]") {
-	entt::registry world;
-	auto system = make_system(world);
-
-	const auto parent = add_entity(world, lge::placement{0.F, 0.F});
-	const auto child = add_child(world, parent, lge::placement{10.F, 0.F});
-
-	REQUIRE(!system.update(0.F).has_error());
-
-	world.destroy(parent);
-
-	REQUIRE(!world.valid(child));
-}
-
-TEST_CASE("transform: pivot offset with metrics", "[transform][pivot][metrics]") {
-	using lge::metrics;
-	using lge::placement;
-	using lge::transform;
-
-	entt::registry world;
-	world.storage<metrics>();
-	auto system = make_system(world);
-
-	const auto e = world.create();
-	world.emplace<placement>(e, placement{0.F, 0.F, 0.F, {1.F, 1.F}, {0.5F, 0.5F}});
-	world.emplace<metrics>(e, metrics{glm::vec2{100.F, 200.F}});
-
-	REQUIRE(!system.update(0.F).has_error());
-
-	const auto pos = world_pos(world, e);
-	REQUIRE(pos.x == -50.F);
-	REQUIRE(pos.y == -100.F);
-}
-
-TEST_CASE("transform: pivot offset with metrics (top_left)", "[transform][pivot][metrics]") {
-	using lge::metrics;
-	using lge::placement;
-	entt::registry world;
-	world.storage<metrics>();
-	auto system = make_system(world);
-
-	const auto e = world.create();
-	world.emplace<placement>(e, placement{0.F, 0.F, 0.F, {1.F, 1.F}, lge::pivot::top_left});
-	world.emplace<metrics>(e, metrics{glm::vec2{100.F, 200.F}});
-
-	REQUIRE(!system.update(0.F).has_error());
-	const auto pos = world_pos(world, e);
-	REQUIRE(pos.x == 0.F);
-	REQUIRE(pos.y == 0.F);
-}
-
-TEST_CASE("transform: pivot offset with metrics (bottom_right)", "[transform][pivot][metrics]") {
-	using lge::metrics;
-	using lge::placement;
-	entt::registry world;
-	world.storage<metrics>();
-	auto system = make_system(world);
-
-	const auto e = world.create();
-	world.emplace<placement>(e, placement{0.F, 0.F, 0.F, {1.F, 1.F}, lge::pivot::bottom_right});
-	world.emplace<metrics>(e, metrics{glm::vec2{100.F, 200.F}});
-
-	REQUIRE(!system.update(0.F).has_error());
-	const auto pos = world_pos(world, e);
-	REQUIRE(pos.x == -100.F);
-	REQUIRE(pos.y == -200.F);
-}
-
-TEST_CASE("transform: entity without metrics uses zero pivot offset", "[transform][pivot][metrics]") {
-	entt::registry world;
-	auto system = make_system(world);
-
-	const auto e = add_entity(world, lge::placement{10.F, 20.F, 0.F, {1.F, 1.F}, lge::pivot::top_right});
-	// No metrics component
-	REQUIRE(!system.update(0.F).has_error());
-	const auto pos = world_pos(world, e);
-	REQUIRE(pos.x == 10.F);
-	REQUIRE(pos.y == 20.F);
-}
-
-TEST_CASE("transform: parent with multiple children", "[transform][hierarchy][children]") {
-	entt::registry world;
-	auto system = make_system(world);
-
-	const auto parent = add_entity(world, lge::placement{5.F, 5.F});
-	const auto child1 = add_child(world, parent, lge::placement{1.F, 0.F});
-	const auto child2 = add_child(world, parent, lge::placement{0.F, 2.F});
-
-	REQUIRE(!system.update(0.F).has_error());
-
-	const auto pos1 = world_pos(world, child1);
-	const auto pos2 = world_pos(world, child2);
-	REQUIRE(pos1.x == 6.F);
-	REQUIRE(pos1.y == 5.F);
-	REQUIRE(pos2.x == 5.F);
-	REQUIRE(pos2.y == 7.F);
-}
-
-TEST_CASE("transform: detach child and reattach to different parent", "[transform][hierarchy][reattach]") {
-	entt::registry world;
-	auto system = make_system(world);
-
-	const auto parent1 = add_entity(world, lge::placement{0.F, 0.F});
-	const auto parent2 = add_entity(world, lge::placement{100.F, 0.F});
-	const auto child = add_child(world, parent1, lge::placement{10.F, 0.F});
-
-	REQUIRE(!system.update(0.F).has_error());
-	REQUIRE(world_pos(world, child).x == 10.F);
-
-	// Detach from parent1
-	world.erase<lge::parent>(child);
-	// Attach to parent2
-	world.emplace<lge::parent>(child, parent2);
-	if(!world.all_of<lge::children>(parent2)) {
-		world.emplace<lge::children>(parent2);
+	SECTION("child position adds to parent position") {
+		const auto parent = add_entity(world, lge::placement{100.F, 0.F});
+		const auto child = add_child(world, parent, lge::placement{50.F, 0.F});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto pos = world_pos(world, child);
+		REQUIRE(pos.x == 150.F);
+		REQUIRE(pos.y == 0.F);
 	}
-	world.get<lge::children>(parent2).ids.push_back(child);
 
-	REQUIRE(!system.update(0.F).has_error());
-	REQUIRE(world_pos(world, child).x == 110.F);
+	SECTION("child scale multiplies parent scale") {
+		const auto parent = add_entity(world, lge::placement{0.F, 0.F, 0.F, {2.F, 2.F}});
+		const auto child = add_child(world, parent, lge::placement{0.F, 0.F, 0.F, {1.F, 1.F}});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto scale = world_scale(world, child);
+		REQUIRE(scale.x == 2.F);
+		REQUIRE(scale.y == 2.F);
+	}
+
+	SECTION("child position is scaled by parent scale") {
+		const auto parent = add_entity(world, lge::placement{0.F, 0.F, 0.F, {2.F, 2.F}});
+		const auto child = add_child(world, parent, lge::placement{10.F, 0.F});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto pos = world_pos(world, child);
+		REQUIRE(pos.x == 20.F);
+		REQUIRE(pos.y == 0.F);
+	}
+
+	SECTION("child position is rotated by parent rotation") {
+		const auto parent = add_entity(world, lge::placement{0.F, 0.F, 90.F});
+		const auto child = add_child(world, parent, lge::placement{10.F, 0.F});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto pos = world_pos(world, child);
+		REQUIRE(pos.x == Approx(0.F).margin(tolerance));
+		REQUIRE(pos.y == Approx(10.F).margin(tolerance));
+	}
+
+	SECTION("parent with multiple children each get correct position") {
+		const auto parent = add_entity(world, lge::placement{5.F, 5.F});
+		const auto child1 = add_child(world, parent, lge::placement{1.F, 0.F});
+		const auto child2 = add_child(world, parent, lge::placement{0.F, 2.F});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto pos1 = world_pos(world, child1);
+		const auto pos2 = world_pos(world, child2);
+		REQUIRE(pos1.x == 6.F);
+		REQUIRE(pos1.y == 5.F);
+		REQUIRE(pos2.x == 5.F);
+		REQUIRE(pos2.y == 7.F);
+	}
 }
 
-TEST_CASE("transform: destroying child updates parent's children list", "[transform][hierarchy][destroy]") {
+// =============================================================================
+// Deep hierarchy
+// =============================================================================
+
+TEST_CASE("transform: deep hierarchy", "[transform][hierarchy][deep]") {
 	entt::registry world;
 	auto system = make_system(world);
 
-	const auto parent = add_entity(world, lge::placement{0.F, 0.F});
-	const auto child = add_child(world, parent, lge::placement{10.F, 0.F});
+	SECTION("grandchild accumulates all ancestor positions") {
+		const auto grandparent = add_entity(world, lge::placement{100.F, 0.F});
+		const auto parent = add_child(world, grandparent, lge::placement{50.F, 0.F});
+		const auto child = add_child(world, parent, lge::placement{25.F, 0.F});
+		REQUIRE(!system.update(0.F).has_error());
+		REQUIRE(world_pos(world, grandparent).x == 100.F);
+		REQUIRE(world_pos(world, parent).x == 150.F);
+		REQUIRE(world_pos(world, child).x == 175.F);
+	}
 
-	REQUIRE(!system.update(0.F).has_error());
-	world.destroy(child);
-	const auto &kids = world.get<lge::children>(parent).ids;
-	REQUIRE(std::ranges::find(kids, child) == kids.end());
+	SECTION("grandchild accumulates rotation through hierarchy") {
+		const auto grandparent = add_entity(world, lge::placement{0.F, 0.F, 90.F});
+		const auto parent = add_child(world, grandparent, lge::placement{10.F, 0.F});
+		const auto child = add_child(world, parent, lge::placement{10.F, 0.F});
+		REQUIRE(!system.update(0.F).has_error());
+		const auto parent_pos = world_pos(world, parent);
+		REQUIRE(parent_pos.x == Approx(0.F).margin(tolerance));
+		REQUIRE(parent_pos.y == Approx(10.F).margin(tolerance));
+		const auto child_pos = world_pos(world, child);
+		REQUIRE(child_pos.x == Approx(0.F).margin(tolerance));
+		REQUIRE(child_pos.y == Approx(20.F).margin(tolerance));
+	}
 }
 
-TEST_CASE("transform: negative scale (mirroring)", "[transform][scale][negative]") {
+// =============================================================================
+// Hierarchy mutation
+// =============================================================================
+
+TEST_CASE("transform: hierarchy mutation", "[transform][hierarchy]") {
 	entt::registry world;
 	auto system = make_system(world);
 
-	const auto e = add_entity(world, lge::placement{0.F, 0.F, 0.F, {-2.F, 3.F}});
-	REQUIRE(!system.update(0.F).has_error());
-	const auto scale = world_scale(world, e);
-	REQUIRE(scale.x == 2.F);
-	REQUIRE(scale.y == 3.F);
-}
+	SECTION("detaching child removes it from parent children list") {
+		const auto parent = add_entity(world, lge::placement{0.F, 0.F});
+		const auto child = add_child(world, parent, lge::placement{10.F, 0.F});
+		REQUIRE(!system.update(0.F).has_error());
+		world.erase<lge::parent>(child);
+		REQUIRE(world.get<lge::children>(parent).ids.empty());
+	}
 
-TEST_CASE("transform: zero scale does not produce NaN", "[transform][scale][zero]") {
-	entt::registry world;
-	auto system = make_system(world);
+	SECTION("destroying parent destroys children") {
+		const auto parent = add_entity(world, lge::placement{0.F, 0.F});
+		const auto child = add_child(world, parent, lge::placement{10.F, 0.F});
+		REQUIRE(!system.update(0.F).has_error());
+		world.destroy(parent);
+		REQUIRE(!world.valid(child));
+	}
 
-	const auto e = add_entity(world, lge::placement{0.F, 0.F, 0.F, {0.F, 0.F}});
-	REQUIRE(!system.update(0.F).has_error());
-	const auto scale = world_scale(world, e);
-	REQUIRE(scale.x == 0.F);
-	REQUIRE(scale.y == 0.F);
-	const auto pos = world_pos(world, e);
-	REQUIRE(std::isfinite(pos.x));
-	REQUIRE(std::isfinite(pos.y));
-}
+	SECTION("destroying child removes it from parent children list") {
+		const auto parent = add_entity(world, lge::placement{0.F, 0.F});
+		const auto child = add_child(world, parent, lge::placement{10.F, 0.F});
+		REQUIRE(!system.update(0.F).has_error());
+		world.destroy(child);
+		const auto &kids = world.get<lge::children>(parent).ids;
+		REQUIRE(std::ranges::find(kids, child) == kids.end());
+	}
 
-TEST_CASE("transform: pivot offset with metrics (manual pivot)", "[transform][pivot][metrics]") {
-	using lge::metrics;
-	using lge::placement;
+	SECTION("child reattached to different parent uses new parent transform") {
+		const auto parent1 = add_entity(world, lge::placement{0.F, 0.F});
+		const auto parent2 = add_entity(world, lge::placement{100.F, 0.F});
+		const auto child = add_child(world, parent1, lge::placement{10.F, 0.F});
+		REQUIRE(!system.update(0.F).has_error());
+		REQUIRE(world_pos(world, child).x == 10.F);
 
-	entt::registry world;
-	world.storage<metrics>();
-	auto system = make_system(world);
+		world.erase<lge::parent>(child);
+		world.emplace<lge::parent>(child, parent2);
+		if(!world.all_of<lge::children>(parent2)) {
+			world.emplace<lge::children>(parent2);
+		}
+		world.get<lge::children>(parent2).ids.push_back(child);
 
-	constexpr glm::vec2 manual_pivot{0.3F, 0.7F};
-	const auto e = world.create();
-	world.emplace<placement>(e, placement{0.F, 0.F, 0.F, {1.F, 1.F}, manual_pivot});
-	world.emplace<metrics>(e, metrics{glm::vec2{100.F, 200.F}});
-
-	REQUIRE(!system.update(0.F).has_error());
-	const auto pos = world_pos(world, e);
-	REQUIRE(pos.x == Approx(-30.F).margin(tolerance));
-	REQUIRE(pos.y == Approx(-140.F).margin(tolerance));
-}
-
-TEST_CASE("transform: grandchild inherits full hierarchy", "[transform][hierarchy][deep]") {
-	entt::registry world;
-	auto system = make_system(world);
-
-	const auto grandparent = add_entity(world, lge::placement{100.F, 0.F});
-	const auto parent = add_child(world, grandparent, lge::placement{50.F, 0.F});
-	const auto child = add_child(world, parent, lge::placement{25.F, 0.F});
-
-	REQUIRE(!system.update(0.F).has_error());
-
-	const auto pos = world_pos(world, child);
-	REQUIRE(pos.x == 175.F);
-	REQUIRE(pos.y == 0.F);
-}
-
-TEST_CASE("transform: grandchild inherits grandparent translation only", "[transform][hierarchy][deep]") {
-	entt::registry world;
-	auto system = make_system(world);
-
-	const auto grandparent = add_entity(world, lge::placement{100.F, 0.F});
-	const auto parent = add_child(world, grandparent, lge::placement{50.F, 0.F});
-	const auto child = add_child(world, parent, lge::placement{25.F, 0.F});
-
-	REQUIRE(!system.update(0.F).has_error());
-
-	const auto grandparent_pos = world_pos(world, grandparent);
-	const auto parent_pos = world_pos(world, parent);
-	const auto child_pos = world_pos(world, child);
-
-	// grandparent at 100
-	REQUIRE(grandparent_pos.x == 100.F);
-	REQUIRE(grandparent_pos.y == 0.F);
-
-	// parent at 100 + 50 = 150
-	REQUIRE(parent_pos.x == 150.F);
-	REQUIRE(parent_pos.y == 0.F);
-
-	// child at 100 + 50 + 25 = 175
-	REQUIRE(child_pos.x == 175.F);
-	REQUIRE(child_pos.y == 0.F);
-}
-
-TEST_CASE("transform: deep hierarchy with rotation", "[transform][hierarchy][deep]") {
-	entt::registry world;
-	auto system = make_system(world);
-
-	// Grandparent rotated 90 degrees, parent and child offset on x
-	// Each level at (10, 0) local -> after 90 degree rotation accumulates down
-	const auto grandparent = add_entity(world, lge::placement{0.F, 0.F, 90.F});
-	const auto parent = add_child(world, grandparent, lge::placement{10.F, 0.F});
-	const auto child = add_child(world, parent, lge::placement{10.F, 0.F});
-
-	REQUIRE(!system.update(0.F).has_error());
-
-	const auto parent_pos = world_pos(world, parent);
-	REQUIRE(parent_pos.x == Approx(0.F).margin(tolerance));
-	REQUIRE(parent_pos.y == Approx(10.F).margin(tolerance));
-
-	const auto child_pos = world_pos(world, child);
-	REQUIRE(child_pos.x == Approx(0.F).margin(tolerance));
-	REQUIRE(child_pos.y == Approx(20.F).margin(tolerance));
+		REQUIRE(!system.update(0.F).has_error());
+		REQUIRE(world_pos(world, child).x == 110.F);
+	}
 }

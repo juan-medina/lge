@@ -6,7 +6,7 @@
 #include <lge/core/result.hpp>
 
 #include <cstdint>
-#include <entity/fwd.hpp>
+#include <entt/entity/fwd.hpp>
 
 namespace lge {
 
@@ -19,7 +19,7 @@ public:
 	explicit system(const phase p, entt::registry &w): world{w}, phase_{p} {}
 	virtual ~system() = default;
 
-	// Disable copying and moving — apps are not copyable or movable
+	// Disable copying and moving — system are not copyable or movable
 	system(const system &) = delete;
 	system(system &&) = delete;
 	auto operator=(const system &) -> system & = delete;
