@@ -41,7 +41,6 @@ auto sprites::init() -> lge::result<> {
 				   .buttons = {lge::input::button::left_face_right},
 			   });
 
-	auto &world = get_world();
 	auto &resource_mgr = get_resource_manager();
 
 	if(const auto err = resource_mgr.load_sprite_sheet(bg_path).unwrap(bg_sheet_); err) [[unlikely]] {
@@ -104,7 +103,6 @@ auto sprites::update(const float dt) -> lge::result<> {
 	const auto move_left = input.get(left_action).down;
 	const auto move_right = input.get(right_action).down;
 
-	auto &world = get_world();
 	auto &anim = world.get<lge::sprite_animation>(sprite_);
 
 	anim.name = (move_left || move_right) ? run_anim : idle_anim;

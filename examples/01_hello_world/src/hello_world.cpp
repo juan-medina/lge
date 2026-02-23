@@ -36,8 +36,6 @@ auto hello_world::init() -> lge::result<> {
 				   .buttons = {lge::input::button::right_face_left},
 			   });
 
-	auto &world = get_world();
-
 	center_ent_ = world.create();
 	world.emplace<lge::placement>(center_ent_, 0, 0);
 	world.emplace<oscillation_system::effect>(center_ent_,
@@ -68,7 +66,6 @@ auto hello_world::init() -> lge::result<> {
 }
 
 auto hello_world::update(const float dt) -> lge::result<> {
-	auto &world = get_world();
 	const auto &input = get_input();
 
 	// toggle hidden on the center entity, this will hide both labels since they are children of the center entity

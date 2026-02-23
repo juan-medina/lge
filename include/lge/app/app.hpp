@@ -7,9 +7,11 @@
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
 #include <lge/core/types.hpp>
+#include <lge/dispatcher/dispatcher.hpp>
 #include <lge/interface/input.hpp>
 #include <lge/interface/renderer.hpp>
 #include <lge/interface/resource_manager.hpp>
+#include <lge/scene/scene_manager.hpp>
 #include <lge/systems/system.hpp>
 
 #include <entity/fwd.hpp>
@@ -30,14 +32,6 @@ public:
 	auto operator=(app &&) -> app & = delete;
 
 	[[nodiscard]] auto run() -> result<>;
-
-	[[nodiscard]] auto get_world() noexcept -> entt::registry & {
-		return world_;
-	}
-
-	[[nodiscard]] auto get_world() const noexcept -> const entt::registry & {
-		return world_;
-	}
 
 	[[nodiscard]] virtual auto configure() -> app_config {
 		return app_config{};
@@ -62,7 +56,7 @@ protected:
 	template<typename T, typename... Args>
 		requires std::is_base_of_v<system, T>
 	void register_system(phase p, Args &&...args) {
-		auto system = std::make_unique<T>(p, world_, std::forward<Args>(args)...);
+		auto system = std::make_unique<T>(p, world, std::forward<Args>(args)...);
 		const auto type_name = get_type_name<T>();
 		systems_.push_back(std::move(system));
 		log::debug("system of type `{}` registered", type_name);
@@ -106,6 +100,14 @@ protected:
 #endif
 	}
 
+	// =============================================================================
+	// Core state
+	// =============================================================================
+
+	entt::registry world;
+	dispatcher events;
+	scene_manager scenes;
+
 private:
 	// =============================================================================
 	// Subsystems
@@ -115,11 +117,6 @@ private:
 	std::shared_ptr<input> input_;
 	std::shared_ptr<resource_manager> resource_manager_;
 
-	// =============================================================================
-	// Core state
-	// =============================================================================
-
-	entt::registry world_;
 	std::vector<std::unique_ptr<system>> systems_;
 
 #ifndef __EMSCRIPTEN__

@@ -29,8 +29,6 @@ auto example::init() -> lge::result<> {
 		return lge::error("error init the app", *err);
 	}
 
-	auto &world = get_world();
-
 	message_ent_ = world.create();
 	world.emplace<lge::label>(message_ent_, kb_message_);
 	world.emplace<lge::placement>(
@@ -81,7 +79,6 @@ auto example::handle_common_input() -> void {
 auto example::update_controller_mode_message() -> void {
 	if(const auto in_controller_mode = get_input().is_controller_available();
 	   in_controller_mode != was_in_controller_mode_) {
-		auto &world = get_world();
 		auto &message_label = world.get<lge::label>(message_ent_);
 		if(in_controller_mode) {
 			message_label.text = controller_message_;

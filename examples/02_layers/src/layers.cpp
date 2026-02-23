@@ -30,7 +30,6 @@ auto layers::init() -> lge::result<> {
 		return lge::error("error init the app", *err);
 	}
 
-	auto &world = get_world();
 	static constexpr auto game_res = get_game_res();
 
 	top_text_entity_ = world.create();
@@ -99,11 +98,9 @@ auto layers::change_top_color(const top_color new_top_color) -> void {
 		break;
 	}
 
-	auto &world = get_world();
-
 	auto &lbl = world.get<lge::label>(top_text_entity_);
 	lbl.text = txt;
-	lbl.color = color;
+	lbl.text_color = color;
 
 	world.get<lge::order>(red_root_).layer = (top_color_ == top_color::red) ? 1 : 0;
 	world.get<lge::order>(green_root_).layer = (top_color_ == top_color::green) ? 1 : 0;
@@ -111,7 +108,6 @@ auto layers::change_top_color(const top_color new_top_color) -> void {
 }
 
 auto layers::create_root() -> entt::entity {
-	auto &world = get_world();
 	const auto root_entity = world.create();
 	world.emplace<lge::order>(root_entity);
 	world.emplace<lge::placement>(root_entity, 0.F, 0.F); // center of the screen
@@ -122,7 +118,6 @@ auto layers::create_random_shapes() -> void {
 	std::random_device rd;
 	std::mt19937 rng{rd()};
 
-	auto &world = get_world();
 	static constexpr auto game_res = get_game_res();
 
 	red_root_ = create_root();
@@ -185,7 +180,6 @@ auto layers::create_random_shapes() -> void {
 
 auto layers::create_rectangle(float pos_x, float pos_y, const lge::color &color, std::mt19937 &rng) -> entt::entity {
 	static constexpr auto game_res = get_game_res();
-	auto &world = get_world();
 
 	std::uniform_real_distribution size_dist_w{rect_min_width, rect_max_width};
 	std::uniform_real_distribution size_dist_h{rect_min_height, rect_max_height};
@@ -229,7 +223,6 @@ auto layers::create_rectangle(float pos_x, float pos_y, const lge::color &color,
 
 auto layers::create_circle(float pos_x, float pos_y, const lge::color &color, std::mt19937 &rng) -> entt::entity {
 	static constexpr auto game_res = get_game_res();
-	auto &world = get_world();
 
 	std::uniform_real_distribution padding_dist{rect_min_border_padding, rect_max_border_padding};
 	std::uniform_real_distribution radius_dist{circle_min_radius, circle_max_radius};

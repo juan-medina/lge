@@ -23,7 +23,7 @@
 
 namespace lge {
 
-app::app() {
+app::app(): scenes{world, events} {
 	auto [resource_manager, renderer, input] = raylib_backend::create();
 	resource_manager_ = std::move(resource_manager);
 	renderer_ = std::move(renderer);
