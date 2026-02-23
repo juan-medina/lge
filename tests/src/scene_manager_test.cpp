@@ -3,36 +3,17 @@
 
 #include <lge/components/hierarchy.hpp>
 #include <lge/components/order.hpp>
+#include <lge/dispatcher/dispatcher.hpp>
 #include <lge/internal/components/render_order.hpp>
 #include <lge/scene/scene.hpp>
 #include <lge/scene/scene_manager.hpp>
+
+#include "test_helpers.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <entt/entt.hpp>
 #include <string>
 #include <vector>
-
-std::vector<std::string> test_log;
-
-// Asserts setup steps succeed without re-testing their logic
-auto must(const lge::result<> &res) -> void {
-	REQUIRE(res.has_value());
-}
-
-// Asserts log matches expected sequence and shows diff on failure
-auto require_log(const std::vector<std::string> &expected) -> void {
-	std::string actual_str;
-	for(const auto &e: test_log) {
-		actual_str += "  " + e + "\n";
-	}
-	std::string expected_str;
-	for(const auto &e: expected) {
-		expected_str += "  " + e + "\n";
-	}
-	INFO("actual:\n" << actual_str);
-	INFO("expected:\n" << expected_str);
-	REQUIRE(test_log == expected);
-}
 
 // =============================================================================
 // Test Scenes
@@ -40,7 +21,7 @@ auto require_log(const std::vector<std::string> &expected) -> void {
 
 class test_scene1: public lge::scene {
 public:
-	explicit test_scene1(entt::id_type id, entt::registry &world): scene(id, world) {}
+	using scene::scene;
 	auto init() -> lge::result<> {
 		test_log.emplace_back("test_scene1::init");
 		return true;
@@ -73,7 +54,7 @@ public:
 
 class test_scene2: public lge::scene {
 public:
-	explicit test_scene2(entt::id_type id, entt::registry &world): scene(id, world) {}
+	using scene::scene;
 	auto init() -> lge::result<> {
 		test_log.emplace_back("test_scene2::init");
 		return true;
@@ -110,7 +91,8 @@ struct enter_data {
 
 class test_scene_with_data: public lge::scene {
 public:
-	explicit test_scene_with_data(entt::id_type id, entt::registry &world): scene(id, world) {}
+	explicit test_scene_with_data(const entt::id_type id, entt::registry &world, lge::dispatcher &dispatcher)
+		: scene(id, world, dispatcher) {}
 	auto init() -> lge::result<> {
 		test_log.emplace_back("test_scene_with_data::init");
 		return true;
@@ -146,7 +128,8 @@ TEST_CASE("scene_manager: registering scenes", "[scene_manager]") {
 	SECTION("registering one scene succeeds and calls init") {
 		test_log.clear();
 		entt::registry world;
-		auto scm = lge::scene_manager(world);
+		lge::dispatcher dispatcher;
+		auto scm = lge::scene_manager(world, dispatcher);
 
 		const auto res = scm.register_scene<test_scene1>();
 		REQUIRE(res.has_value());
@@ -157,7 +140,8 @@ TEST_CASE("scene_manager: registering scenes", "[scene_manager]") {
 	SECTION("registering multiple scenes calls init on each") {
 		test_log.clear();
 		entt::registry world;
-		auto scm = lge::scene_manager(world);
+		lge::dispatcher dispatcher;
+		auto scm = lge::scene_manager(world, dispatcher);
 
 		must(scm.register_scene<test_scene1>());
 		const auto res = scm.register_scene<test_scene2>();
@@ -169,7 +153,8 @@ TEST_CASE("scene_manager: registering scenes", "[scene_manager]") {
 	SECTION("registering same scene twice returns error") {
 		test_log.clear();
 		entt::registry world;
-		auto scm = lge::scene_manager(world);
+		lge::dispatcher dispatcher;
+		auto scm = lge::scene_manager(world, dispatcher);
 
 		must(scm.register_scene<test_scene1>());
 		test_log.clear();
@@ -189,7 +174,9 @@ TEST_CASE("scene_manager: changing scene", "[scene_manager]") {
 	SECTION("first activation calls on_enter") {
 		test_log.clear();
 		entt::registry world;
-		auto scm = lge::scene_manager(world);
+		lge::dispatcher dispatcher;
+		auto scm = lge::scene_manager(world, dispatcher);
+
 		must(scm.register_scene<test_scene1>());
 		test_log.clear();
 
@@ -201,7 +188,9 @@ TEST_CASE("scene_manager: changing scene", "[scene_manager]") {
 	SECTION("switching scenes calls on_exit then on_enter") {
 		test_log.clear();
 		entt::registry world;
-		auto scm = lge::scene_manager(world);
+		lge::dispatcher dispatcher;
+		auto scm = lge::scene_manager(world, dispatcher);
+
 		must(scm.register_scene<test_scene1>());
 		must(scm.register_scene<test_scene2>());
 		must(scm.set_active_scene<test_scene1>());
@@ -215,7 +204,9 @@ TEST_CASE("scene_manager: changing scene", "[scene_manager]") {
 	SECTION("switching to non-existing scene returns error") {
 		test_log.clear();
 		entt::registry world;
-		auto scm = lge::scene_manager(world);
+		lge::dispatcher dispatcher;
+		auto scm = lge::scene_manager(world, dispatcher);
+
 		must(scm.register_scene<test_scene1>());
 		test_log.clear();
 
@@ -227,7 +218,9 @@ TEST_CASE("scene_manager: changing scene", "[scene_manager]") {
 	SECTION("on_enter receives data passed to set_active_scene") {
 		test_log.clear();
 		entt::registry world;
-		auto scm = lge::scene_manager(world);
+		lge::dispatcher dispatcher;
+		auto scm = lge::scene_manager(world, dispatcher);
+
 		must(scm.register_scene<test_scene_with_data>());
 		test_log.clear();
 
@@ -245,7 +238,9 @@ TEST_CASE("scene_manager: update", "[scene_manager]") {
 	SECTION("update calls update on active scene only") {
 		test_log.clear();
 		entt::registry world;
-		auto scm = lge::scene_manager(world);
+		lge::dispatcher dispatcher;
+		auto scm = lge::scene_manager(world, dispatcher);
+
 		must(scm.register_scene<test_scene1>());
 		must(scm.register_scene<test_scene2>());
 		must(scm.set_active_scene<test_scene1>());
@@ -259,7 +254,9 @@ TEST_CASE("scene_manager: update", "[scene_manager]") {
 	SECTION("update with no active scene does nothing") {
 		test_log.clear();
 		entt::registry world;
-		auto scm = lge::scene_manager(world);
+		lge::dispatcher dispatcher;
+		auto scm = lge::scene_manager(world, dispatcher);
+
 		must(scm.register_scene<test_scene1>());
 		test_log.clear();
 
@@ -277,7 +274,9 @@ TEST_CASE("scene_manager: pause and resume", "[scene_manager]") {
 	SECTION("pause calls on_pause on active scene") {
 		test_log.clear();
 		entt::registry world;
-		auto scm = lge::scene_manager(world);
+		lge::dispatcher dispatcher;
+		auto scm = lge::scene_manager(world, dispatcher);
+
 		must(scm.register_scene<test_scene1>());
 		must(scm.set_active_scene<test_scene1>());
 		test_log.clear();
@@ -290,7 +289,9 @@ TEST_CASE("scene_manager: pause and resume", "[scene_manager]") {
 	SECTION("resume calls on_resume on active scene") {
 		test_log.clear();
 		entt::registry world;
-		auto scm = lge::scene_manager(world);
+		lge::dispatcher dispatcher;
+		auto scm = lge::scene_manager(world, dispatcher);
+
 		must(scm.register_scene<test_scene1>());
 		must(scm.set_active_scene<test_scene1>());
 		test_log.clear();
@@ -303,7 +304,9 @@ TEST_CASE("scene_manager: pause and resume", "[scene_manager]") {
 	SECTION("pause with no active scene does nothing") {
 		test_log.clear();
 		entt::registry world;
-		auto scm = lge::scene_manager(world);
+		lge::dispatcher dispatcher;
+		auto scm = lge::scene_manager(world, dispatcher);
+
 		must(scm.register_scene<test_scene1>());
 		test_log.clear();
 
@@ -315,7 +318,9 @@ TEST_CASE("scene_manager: pause and resume", "[scene_manager]") {
 	SECTION("resume with no active scene does nothing") {
 		test_log.clear();
 		entt::registry world;
-		auto scm = lge::scene_manager(world);
+		lge::dispatcher dispatcher;
+		auto scm = lge::scene_manager(world, dispatcher);
+
 		must(scm.register_scene<test_scene1>());
 		test_log.clear();
 
@@ -333,7 +338,9 @@ TEST_CASE("scene_manager: end", "[scene_manager]") {
 	SECTION("end calls end on all registered scenes") {
 		test_log.clear();
 		entt::registry world;
-		auto scm = lge::scene_manager(world);
+		lge::dispatcher dispatcher;
+		auto scm = lge::scene_manager(world, dispatcher);
+
 		must(scm.register_scene<test_scene1>());
 		must(scm.register_scene<test_scene2>());
 		must(scm.set_active_scene<test_scene1>());

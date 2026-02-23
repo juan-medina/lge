@@ -4,6 +4,7 @@
 #pragma once
 
 #include <lge/core/result.hpp>
+#include <lge/dispatcher/dispatcher.hpp>
 
 #include <entt/core/fwd.hpp>
 #include <entt/entity/entity.hpp>
@@ -13,7 +14,8 @@ namespace lge {
 
 class scene {
 public:
-	explicit scene(const entt::id_type id, entt::registry &the_world): id_{id}, world{the_world} {};
+	explicit scene(const entt::id_type id, entt::registry &the_world, dispatcher &the_events)
+		: id_{id}, world{the_world}, events{the_events} {}
 	virtual ~scene() = default;
 
 	scene(const scene &) = delete;
@@ -35,6 +37,7 @@ public:
 
 protected:
 	entt::registry &world;
+	dispatcher &events;
 
 private:
 	entt::id_type id_ = entt::null;

@@ -6,6 +6,7 @@
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
 #include <lge/core/types.hpp>
+#include <lge/dispatcher/dispatcher.hpp>
 #include <lge/scene/scene.hpp>
 
 #include <cstddef>
@@ -21,7 +22,7 @@ namespace lge {
 
 class scene_manager {
 public:
-	explicit scene_manager(entt::registry &world): world_{world} {}
+	explicit scene_manager(entt::registry &world, dispatcher &dispatcher): world_{world}, events_{dispatcher} {}
 	~scene_manager() = default;
 
 	scene_manager(const scene_manager &) = delete;
@@ -61,7 +62,7 @@ public:
 			const auto type_name = get_type_name<T>();
 			return error(std::format("scene of type `{}` already registered", type_name));
 		}
-		auto new_scene = std::make_unique<T>(key, world_);
+		auto new_scene = std::make_unique<T>(key, world_, events_);
 		const auto type_name = get_type_name<T>();
 		if(const auto err = new_scene->init(std::forward<Args>(args)...).unwrap(); err) [[unlikely]] {
 			return error(std::format("error initializing scene of type `{}`", type_name), *err);
@@ -99,6 +100,7 @@ public:
 
 private:
 	entt::registry &world_;
+	dispatcher &events_;
 	std::optional<std::reference_wrapper<scene>> current_scene_;
 	std::unordered_map<entt::id_type, std::unique_ptr<scene>> scenes_;
 };
