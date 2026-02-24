@@ -18,8 +18,7 @@ namespace lge {
 
 class render_system: public system {
 public:
-	explicit render_system(const phase p, entt::registry &world, renderer &renderer)
-		: system(p, world), renderer_{renderer} {}
+	using system::system;
 	auto update(float dt) -> result<> override;
 
 private:
@@ -33,7 +32,6 @@ private:
 		auto operator<=>(const render_entry &) const = default;
 	};
 
-	renderer &renderer_;
 	std::vector<render_entry> render_entries_;
 
 	static auto transform_point(const glm::mat3 &m, const glm::vec2 &p) -> glm::vec2;

@@ -35,18 +35,18 @@ auto metrics_system::update(const float /*dt*/) -> result<> {
 }
 
 auto metrics_system::calculate_label_metrics(const entt::entity entity, const label &lbl) const -> void {
-	const auto text_size = renderer_.get_label_size(lbl.font, lbl.text, static_cast<int>(lbl.size));
-	world.emplace_or_replace<metrics>(entity, metrics{.size = text_size});
+	const auto text_size = ctx.render.get_label_size(lbl.font, lbl.text, static_cast<int>(lbl.size));
+	ctx.world.emplace_or_replace<metrics>(entity, metrics{.size = text_size});
 }
 
 auto metrics_system::calculate_rect_metrics(const entt::entity entity, const rect &r) const -> void {
-	world.emplace_or_replace<metrics>(entity, metrics{.size = r.size});
+	ctx.world.emplace_or_replace<metrics>(entity, metrics{.size = r.size});
 }
 
 auto metrics_system::calculate_circle_metrics(const entt::entity entity, const circle &c) const -> void {
 	const auto diameter = c.radius * 2.0F;
 	const auto size = glm::vec2{diameter, diameter};
-	world.emplace_or_replace<metrics>(entity, metrics{.size = size});
+	ctx.world.emplace_or_replace<metrics>(entity, metrics{.size = size});
 }
 
 auto metrics_system::is_label_dirty(const label &lbl, const previous_label &p) -> bool {
@@ -64,8 +64,8 @@ auto metrics_system::is_circle_dirty(const circle &c, const previous_circle &p) 
 }
 
 auto metrics_system::calculate_sprite_metrics(const entt::entity entity, const sprite &spr) const -> void {
-	const auto frame_size = renderer_.get_sprite_frame_size(spr.sheet, spr.frame);
-	world.emplace_or_replace<metrics>(entity, metrics{.size = frame_size});
+	const auto frame_size = ctx.render.get_sprite_frame_size(spr.sheet, spr.frame);
+	ctx.world.emplace_or_replace<metrics>(entity, metrics{.size = frame_size});
 }
 
 auto metrics_system::is_sprite_dirty(const sprite &spr, const previous_sprite &p) -> bool {
@@ -73,9 +73,9 @@ auto metrics_system::is_sprite_dirty(const sprite &spr, const previous_sprite &p
 }
 
 auto metrics_system::handle_sprites() const -> void {
-	for(const auto entity: world.view<sprite>()) {
-		auto &p = world.get_or_emplace<previous_sprite>(entity);
-		if(auto &spr = world.get<sprite>(entity); !world.all_of<metrics>(entity) || is_sprite_dirty(spr, p)) {
+	for(const auto entity: ctx.world.view<sprite>()) {
+		auto &p = ctx.world.get_or_emplace<previous_sprite>(entity);
+		if(auto &spr = ctx.world.get<sprite>(entity); !ctx.world.all_of<metrics>(entity) || is_sprite_dirty(spr, p)) {
 			calculate_sprite_metrics(entity, spr);
 			p.sheet = spr.sheet;
 			p.frame = spr.frame;
@@ -84,9 +84,9 @@ auto metrics_system::handle_sprites() const -> void {
 }
 
 auto metrics_system::handle_labels() const -> void {
-	for(const auto entity: world.view<label>()) {
-		auto &p = world.get_or_emplace<previous_label>(entity);
-		if(auto &lbl = world.get<label>(entity); !world.all_of<metrics>(entity) || is_label_dirty(lbl, p)) {
+	for(const auto entity: ctx.world.view<label>()) {
+		auto &p = ctx.world.get_or_emplace<previous_label>(entity);
+		if(auto &lbl = ctx.world.get<label>(entity); !ctx.world.all_of<metrics>(entity) || is_label_dirty(lbl, p)) {
 			calculate_label_metrics(entity, lbl);
 			p.text = lbl.text;
 			p.size = lbl.size;
@@ -96,9 +96,9 @@ auto metrics_system::handle_labels() const -> void {
 }
 
 auto metrics_system::handle_rects() const -> void {
-	for(const auto entity: world.view<rect>()) {
-		auto &p = world.get_or_emplace<previous_rect>(entity);
-		if(auto &r = world.get<rect>(entity); !world.all_of<metrics>(entity) || is_rect_dirty(r, p)) {
+	for(const auto entity: ctx.world.view<rect>()) {
+		auto &p = ctx.world.get_or_emplace<previous_rect>(entity);
+		if(auto &r = ctx.world.get<rect>(entity); !ctx.world.all_of<metrics>(entity) || is_rect_dirty(r, p)) {
 			calculate_rect_metrics(entity, r);
 			p.size = r.size;
 		}
@@ -106,9 +106,9 @@ auto metrics_system::handle_rects() const -> void {
 }
 
 auto metrics_system::handle_circles() const -> void {
-	for(const auto entity: world.view<circle>()) {
-		auto &p = world.get_or_emplace<previous_circle>(entity);
-		if(auto &c = world.get<circle>(entity); !world.all_of<metrics>(entity) || is_circle_dirty(c, p)) {
+	for(const auto entity: ctx.world.view<circle>()) {
+		auto &p = ctx.world.get_or_emplace<previous_circle>(entity);
+		if(auto &c = ctx.world.get<circle>(entity); !ctx.world.all_of<metrics>(entity) || is_circle_dirty(c, p)) {
 			calculate_circle_metrics(entity, c);
 			p.radius = c.radius;
 		}

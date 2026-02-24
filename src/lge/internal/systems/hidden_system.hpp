@@ -13,7 +13,7 @@ namespace lge {
 
 class hidden_system: public system {
 public:
-	explicit hidden_system(const phase p, entt::registry &world): system(p, world) {}
+	using system::system;
 	auto update(float dt) -> result<> override;
 
 private:

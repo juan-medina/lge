@@ -4,6 +4,7 @@
 #include <lge/components/hidden.hpp>
 #include <lge/components/hierarchy.hpp>
 #include <lge/internal/components/effective_hidden.hpp>
+#include <lge/internal/raylib/raylib_backend.hpp>
 #include <lge/internal/systems/hidden_system.hpp>
 
 #include <catch2/catch_test_macros.hpp>
@@ -11,9 +12,25 @@
 
 namespace {
 
-auto make_system(entt::registry &world) -> lge::hidden_system {
-	return lge::hidden_system{lge::phase::game_update, world};
-}
+auto backend    = lge::raylib_backend::create();
+auto dispatcher = lge::dispatcher{};
+
+struct test_fixture {
+	entt::registry       world;
+	lge::context         ctx;
+	lge::hidden_system   system;
+
+	explicit test_fixture()
+		: ctx{
+			.render    = *backend.renderer,
+			.actions   = *backend.input,
+			.resources = *backend.resource_manager,
+			.world     = world,
+			.events    = dispatcher,
+		  }
+	, system{lge::phase::global_update, ctx}
+	{}
+};
 
 auto add_entity(entt::registry &world) -> entt::entity {
 	return world.create();
@@ -36,29 +53,28 @@ auto is_hidden(const entt::registry &world, const entt::entity e) -> bool {
 // =============================================================================
 
 TEST_CASE("hidden: root entity", "[hidden]") {
-	entt::registry world;
-	auto system = make_system(world);
+	test_fixture f;
 
 	SECTION("visible entity is not effectively hidden") {
-		const auto e = add_entity(world);
-		REQUIRE(!system.update(0.F).has_error());
-		REQUIRE(!is_hidden(world, e));
+		const auto e = add_entity(f.world);
+		REQUIRE(!f.system.update(0.F).has_error());
+		REQUIRE(!is_hidden(f.world, e));
 	}
 
 	SECTION("hidden entity is effectively hidden") {
-		const auto e = add_entity(world);
-		world.emplace<lge::hidden>(e);
-		REQUIRE(!system.update(0.F).has_error());
-		REQUIRE(is_hidden(world, e));
+		const auto e = add_entity(f.world);
+		f.world.emplace<lge::hidden>(e);
+		REQUIRE(!f.system.update(0.F).has_error());
+		REQUIRE(is_hidden(f.world, e));
 	}
 
 	SECTION("removing hidden makes entity visible again") {
-		const auto e = add_entity(world);
-		world.emplace<lge::hidden>(e);
-		REQUIRE(!system.update(0.F).has_error());
-		world.remove<lge::hidden>(e);
-		REQUIRE(!system.update(0.F).has_error());
-		REQUIRE(!is_hidden(world, e));
+		const auto e = add_entity(f.world);
+		f.world.emplace<lge::hidden>(e);
+		REQUIRE(!f.system.update(0.F).has_error());
+		f.world.remove<lge::hidden>(e);
+		REQUIRE(!f.system.update(0.F).has_error());
+		REQUIRE(!is_hidden(f.world, e));
 	}
 }
 
@@ -67,42 +83,41 @@ TEST_CASE("hidden: root entity", "[hidden]") {
 // =============================================================================
 
 TEST_CASE("hidden: hierarchy", "[hidden][hierarchy]") {
-	entt::registry world;
-	auto system = make_system(world);
+	test_fixture f;
 
 	SECTION("visible parent does not hide visible child") {
-		const auto parent = add_entity(world);
-		const auto child = add_child(world, parent);
-		REQUIRE(!system.update(0.F).has_error());
-		REQUIRE(!is_hidden(world, parent));
-		REQUIRE(!is_hidden(world, child));
+		const auto parent = add_entity(f.world);
+		const auto child = add_child(f.world, parent);
+		REQUIRE(!f.system.update(0.F).has_error());
+		REQUIRE(!is_hidden(f.world, parent));
+		REQUIRE(!is_hidden(f.world, child));
 	}
 
 	SECTION("hidden parent hides visible child") {
-		const auto parent = add_entity(world);
-		const auto child = add_child(world, parent);
-		world.emplace<lge::hidden>(parent);
-		REQUIRE(!system.update(0.F).has_error());
-		REQUIRE(is_hidden(world, child));
+		const auto parent = add_entity(f.world);
+		const auto child = add_child(f.world, parent);
+		f.world.emplace<lge::hidden>(parent);
+		REQUIRE(!f.system.update(0.F).has_error());
+		REQUIRE(is_hidden(f.world, child));
 	}
 
 	SECTION("visible parent does not override hidden child") {
-		const auto parent = add_entity(world);
-		const auto child = add_child(world, parent);
-		world.emplace<lge::hidden>(child);
-		REQUIRE(!system.update(0.F).has_error());
-		REQUIRE(!is_hidden(world, parent));
-		REQUIRE(is_hidden(world, child));
+		const auto parent = add_entity(f.world);
+		const auto child = add_child(f.world, parent);
+		f.world.emplace<lge::hidden>(child);
+		REQUIRE(!f.system.update(0.F).has_error());
+		REQUIRE(!is_hidden(f.world, parent));
+		REQUIRE(is_hidden(f.world, child));
 	}
 
 	SECTION("unhiding parent makes child visible again") {
-		const auto parent = add_entity(world);
-		const auto child = add_child(world, parent);
-		world.emplace<lge::hidden>(parent);
-		REQUIRE(!system.update(0.F).has_error());
-		world.remove<lge::hidden>(parent);
-		REQUIRE(!system.update(0.F).has_error());
-		REQUIRE(!is_hidden(world, child));
+		const auto parent = add_entity(f.world);
+		const auto child = add_child(f.world, parent);
+		f.world.emplace<lge::hidden>(parent);
+		REQUIRE(!f.system.update(0.F).has_error());
+		f.world.remove<lge::hidden>(parent);
+		REQUIRE(!f.system.update(0.F).has_error());
+		REQUIRE(!is_hidden(f.world, child));
 	}
 }
 
@@ -111,28 +126,27 @@ TEST_CASE("hidden: hierarchy", "[hidden][hierarchy]") {
 // =============================================================================
 
 TEST_CASE("hidden: deep hierarchy", "[hidden][hierarchy][deep]") {
-	entt::registry world;
-	auto system = make_system(world);
+	test_fixture f;
 
 	SECTION("hidden grandparent hides all descendants") {
-		const auto grandparent = add_entity(world);
-		const auto parent = add_child(world, grandparent);
-		const auto child = add_child(world, parent);
-		world.emplace<lge::hidden>(grandparent);
-		REQUIRE(!system.update(0.F).has_error());
-		REQUIRE(is_hidden(world, grandparent));
-		REQUIRE(is_hidden(world, parent));
-		REQUIRE(is_hidden(world, child));
+		const auto grandparent = add_entity(f.world);
+		const auto parent = add_child(f.world, grandparent);
+		const auto child = add_child(f.world, parent);
+		f.world.emplace<lge::hidden>(grandparent);
+		REQUIRE(!f.system.update(0.F).has_error());
+		REQUIRE(is_hidden(f.world, grandparent));
+		REQUIRE(is_hidden(f.world, parent));
+		REQUIRE(is_hidden(f.world, child));
 	}
 
 	SECTION("hidden middle node hides descendants but not ancestors") {
-		const auto grandparent = add_entity(world);
-		const auto parent = add_child(world, grandparent);
-		const auto child = add_child(world, parent);
-		world.emplace<lge::hidden>(parent);
-		REQUIRE(!system.update(0.F).has_error());
-		REQUIRE(!is_hidden(world, grandparent));
-		REQUIRE(is_hidden(world, parent));
-		REQUIRE(is_hidden(world, child));
+		const auto grandparent = add_entity(f.world);
+		const auto parent = add_child(f.world, grandparent);
+		const auto child = add_child(f.world, parent);
+		f.world.emplace<lge::hidden>(parent);
+		REQUIRE(!f.system.update(0.F).has_error());
+		REQUIRE(!is_hidden(f.world, grandparent));
+		REQUIRE(is_hidden(f.world, parent));
+		REQUIRE(is_hidden(f.world, child));
 	}
 }

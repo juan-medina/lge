@@ -12,7 +12,7 @@
 #include <entt/entt.hpp>
 
 auto oscillation_system::update(const float dt) -> lge::result<> {
-	for(const auto view = world.view<lge::placement, effect>(entt::exclude<lge::hidden>); const auto e: view) {
+	for(const auto view = ctx.world.view<lge::placement, effect>(entt::exclude<lge::hidden>); const auto e: view) {
 		auto &plc = view.get<lge::placement>(e);
 		auto &[osc_scale, osc_rotation] = view.get<effect>(e);
 		plc.rotation = lge::effects::update_oscillator(osc_rotation, dt);

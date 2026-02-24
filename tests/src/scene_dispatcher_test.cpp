@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <lge/dispatcher/dispatcher.hpp>
+#include <lge/internal/raylib/raylib_backend.hpp>
 #include <lge/scene/scene.hpp>
 #include <lge/scene/scene_manager.hpp>
 
@@ -10,6 +11,29 @@
 #include <catch2/catch_test_macros.hpp>
 #include <entt/entt.hpp>
 #include <string>
+
+namespace {
+
+auto backend = lge::raylib_backend::create();
+auto dispatcher = lge::dispatcher{};
+
+struct test_fixture {
+	entt::registry world;
+	lge::context ctx;
+	lge::scene_manager scm;
+
+	explicit test_fixture()
+		: ctx{
+			  .render = *backend.renderer,
+			  .actions = *backend.input,
+			  .resources = *backend.resource_manager,
+			  .world = world,
+			  .events = dispatcher,
+		  },
+		  scm{ctx} {}
+};
+
+} // namespace
 
 // =============================================================================
 // Events (shared contract between scenes and the app)
@@ -56,7 +80,7 @@ public:
 	auto update(float /*dt*/) -> lge::result<> override {
 		test_log.emplace_back("gameplay_scene::update");
 		// Scene knows nothing about what happens next — it just reports what occurred.
-		events.post(level_completed{.score = 500});
+		ctx.events.post(level_completed{.score = 500});
 		return true;
 	}
 };
@@ -107,23 +131,21 @@ public:
 TEST_CASE("scene_manager + dispatcher: app-mediated scene transition", "[scene_manager][dispatcher][integration]") {
 	SECTION("app wires dispatcher to switch scene when gameplay posts level_completed") {
 		test_log.clear();
-		entt::registry world;
-		lge::dispatcher dispatcher;
-		auto scm = lge::scene_manager(world, dispatcher);
+		test_fixture f;
 
-		must(scm.register_scene<gameplay_scene>());
-		must(scm.register_scene<results_scene>());
+		must(f.scm.add<gameplay_scene>());
+		must(f.scm.add<results_scene>());
 
 		// The app (this test) decides what level_completed means: go to results_scene.
 		// Neither scene knows the other exists.
-		dispatcher.on<level_completed>(
-			[&scm](const level_completed &evt) -> void { must(scm.set_active_scene<results_scene>(evt)); });
+		f.ctx.events.on<level_completed>(
+			[&f](const level_completed &evt) -> void { must(f.scm.activate<results_scene>(evt)); });
 
-		must(scm.set_active_scene<gameplay_scene>());
+		must(f.scm.activate<gameplay_scene>());
 		test_log.clear();
 
 		// One tick: gameplay fires the event; app handler switches to results.
-		must(scm.update(0.16F));
+		must(f.scm.update(0.16F));
 
 		require_log({
 			"gameplay_scene::update",			 // scene runs first
@@ -134,39 +156,35 @@ TEST_CASE("scene_manager + dispatcher: app-mediated scene transition", "[scene_m
 
 	SECTION("results_scene is the active scene on the following tick") {
 		test_log.clear();
-		entt::registry world;
-		lge::dispatcher dispatcher;
-		auto scm = lge::scene_manager(world, dispatcher);
+		test_fixture f;
 
-		must(scm.register_scene<gameplay_scene>());
-		must(scm.register_scene<results_scene>());
+		must(f.scm.add<gameplay_scene>());
+		must(f.scm.add<results_scene>());
 
 		dispatcher.on<level_completed>(
-			[&scm](const level_completed &evt) -> void { must(scm.set_active_scene<results_scene>(evt)); });
+			[&f](const level_completed &evt) -> void { must(f.scm.activate<results_scene>(evt)); });
 
-		must(scm.set_active_scene<gameplay_scene>());
-		must(scm.update(0.16F)); // triggers transition
+		must(f.scm.activate<gameplay_scene>());
+		must(f.scm.update(0.16F)); // triggers transition
 		test_log.clear();
 
 		// Second tick must drive results_scene, not gameplay_scene.
-		must(scm.update(0.16F));
+		must(f.scm.update(0.16F));
 		require_log({"results_scene::update"});
 	}
 
 	SECTION("score value posted by gameplay_scene arrives intact at results_scene") {
 		test_log.clear();
-		entt::registry world;
-		lge::dispatcher dispatcher;
-		auto scm = lge::scene_manager(world, dispatcher);
+		test_fixture f;
 
-		must(scm.register_scene<gameplay_scene>());
-		must(scm.register_scene<results_scene>());
+		must(f.scm.add<gameplay_scene>());
+		must(f.scm.add<results_scene>());
 
 		dispatcher.on<level_completed>(
-			[&scm](const level_completed &evt) -> void { must(scm.set_active_scene<results_scene>(evt)); });
+			[&f](const level_completed &evt) -> void { must(f.scm.activate<results_scene>(evt)); });
 
-		must(scm.set_active_scene<gameplay_scene>());
-		must(scm.update(0.16F));
+		must(f.scm.activate<gameplay_scene>());
+		must(f.scm.update(0.16F));
 
 		// Exactly one entry for results_scene::on_enter and it carries the right score.
 		const auto it = std::ranges::find(test_log, "results_scene::on_enter:score=500");

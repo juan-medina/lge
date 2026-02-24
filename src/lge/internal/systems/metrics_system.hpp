@@ -19,8 +19,7 @@ namespace lge {
 
 class metrics_system: public system {
 public:
-	explicit metrics_system(const phase p, entt::registry &world, renderer &renderer)
-		: system(p, world), renderer_{renderer} {}
+	using system::system;
 	auto update(float dt) -> result<> override;
 
 private:
@@ -38,8 +37,6 @@ private:
 	auto handle_rects() const -> void;
 	auto handle_circles() const -> void;
 	auto handle_sprites() const -> void;
-
-	renderer &renderer_;
 };
 
 } // namespace lge

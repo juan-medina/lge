@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <lge/app/context.hpp>
 #include <lge/core/result.hpp>
 
 #include <cstdint>
@@ -16,7 +17,7 @@ enum class phase : std::uint8_t { game_update, local_update, global_update, rend
 
 class system {
 public:
-	explicit system(const phase p, entt::registry &w): world{w}, phase_{p} {}
+	explicit system(const phase p, context &app_context): ctx{app_context}, phase_{p} {}
 	virtual ~system() = default;
 
 	// Disable copying and moving — system are not copyable or movable
@@ -33,7 +34,7 @@ public:
 	}
 
 protected:
-	entt::registry &world;
+	context &ctx;
 
 private:
 	phase phase_;

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <lge/app/context.hpp>
 #include <lge/core/result.hpp>
 #include <lge/dispatcher/dispatcher.hpp>
 
@@ -14,8 +15,7 @@ namespace lge {
 
 class scene {
 public:
-	explicit scene(const entt::id_type id, entt::registry &the_world, dispatcher &the_events)
-		: id_{id}, world{the_world}, events{the_events} {}
+	explicit scene(context &the_context): ctx{the_context} {}
 	virtual ~scene() = default;
 
 	scene(const scene &) = delete;
@@ -23,24 +23,28 @@ public:
 	auto operator=(const scene &) -> scene & = delete;
 	auto operator=(scene &&) -> scene & = delete;
 
-	[[nodiscard]] virtual auto end() -> result<> = 0;
+	[[nodiscard]] virtual auto end() -> result<> {
+		return true;
+	}
 
-	[[nodiscard]] virtual auto on_pause() -> result<> = 0;
-	[[nodiscard]] virtual auto on_resume() -> result<> = 0;
-	[[nodiscard]] virtual auto on_exit() -> result<> = 0;
+	[[nodiscard]] virtual auto on_pause() -> result<> {
+		return true;
+	}
+	[[nodiscard]] virtual auto on_resume() -> result<> {
+		return true;
+	}
+	[[nodiscard]] virtual auto on_exit() -> result<> {
+		return true;
+	}
 
-	[[nodiscard]] virtual auto update(float dt) -> result<> = 0;
-
-	[[nodiscard]] auto get_id() const noexcept -> entt::id_type {
-		return id_;
+	[[nodiscard]] virtual auto update(float) -> result<> {
+		return true;
 	}
 
 protected:
-	entt::registry &world;
-	dispatcher &events;
+	context &ctx;
 
 private:
-	entt::id_type id_ = entt::null;
 };
 
 } // namespace lge

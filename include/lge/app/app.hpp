@@ -4,10 +4,12 @@
 #pragma once
 
 #include <lge/app/app_config.hpp>
+#include <lge/app/context.hpp>
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
 #include <lge/core/types.hpp>
 #include <lge/dispatcher/dispatcher.hpp>
+#include <lge/interface/backend.hpp>
 #include <lge/interface/input.hpp>
 #include <lge/interface/renderer.hpp>
 #include <lge/interface/resource_manager.hpp>
@@ -56,38 +58,10 @@ protected:
 	template<typename T, typename... Args>
 		requires std::is_base_of_v<system, T>
 	void register_system(phase p, Args &&...args) {
-		auto system = std::make_unique<T>(p, world, std::forward<Args>(args)...);
+		auto system = std::make_unique<T>(p, ctx, std::forward<Args>(args)...);
 		const auto type_name = get_type_name<T>();
 		systems_.push_back(std::move(system));
 		log::debug("system of type `{}` registered", type_name);
-	}
-
-	// =============================================================================
-	// Subsystem access
-	// =============================================================================
-
-	[[nodiscard]] auto get_renderer() noexcept -> renderer & {
-		return *renderer_;
-	}
-
-	[[nodiscard]] auto get_renderer() const noexcept -> const renderer & {
-		return *renderer_;
-	}
-
-	[[nodiscard]] auto get_input() noexcept -> input & {
-		return *input_;
-	}
-
-	[[nodiscard]] auto get_input() const noexcept -> const input & {
-		return *input_;
-	}
-
-	[[nodiscard]] auto get_resource_manager() noexcept -> resource_manager & {
-		return *resource_manager_;
-	}
-
-	[[nodiscard]] auto get_resource_manager() const noexcept -> const resource_manager & {
-		return *resource_manager_;
 	}
 
 	// =============================================================================
@@ -100,12 +74,19 @@ protected:
 #endif
 	}
 
+private:
 	// =============================================================================
 	// Core state
 	// =============================================================================
+	backend backend_;
+	entt::registry registry_;
+	dispatcher dispatcher_;
 
-	entt::registry world;
-	dispatcher events;
+protected:
+	// =============================================================================
+	// Context
+	// =============================================================================
+	context ctx;
 	scene_manager scenes;
 
 private:

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <lge/app/context.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/core/result.hpp>
 #include <lge/systems/system.hpp>
@@ -16,14 +17,14 @@ namespace lge {
 
 class transform_system: public system {
 public:
-	explicit transform_system(phase p, entt::registry &world);
+	explicit transform_system(phase p, context &ctx);
 	static auto compose_transform(const placement &node_placement, const glm::vec2 &pivot_offset) -> glm::mat3;
 	auto update(float dt) -> result<> override;
 
 private:
 	std::vector<entt::entity> transform_stack_;
-	static auto on_child_detached(entt::registry &world, entt::entity child) -> void;
-	static auto on_parent_children_cleared(entt::registry &world, entt::entity parent) -> void;
+	auto on_child_detached(entt::registry &world, entt::entity child) -> void;
+	auto on_parent_children_cleared(entt::registry &world, entt::entity parent) -> void;
 };
 
 } // namespace lge

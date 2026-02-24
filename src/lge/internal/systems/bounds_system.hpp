@@ -12,7 +12,7 @@ namespace lge {
 
 class bounds_system: public system {
 public:
-	explicit bounds_system(const phase p, entt::registry &world): system(p, world) {}
+	using system::system;
 	auto update(float dt) -> result<> override;
 };
 

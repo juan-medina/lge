@@ -32,17 +32,16 @@ auto layers::init() -> lge::result<> {
 
 	static constexpr auto game_res = get_game_res();
 
-	top_text_entity_ = world.create();
-	world.emplace<lge::label>(top_text_entity_, "");
-	world.emplace<lge::placement>(
+	top_text_entity_ = ctx.world.create();
+	ctx.world.emplace<lge::label>(top_text_entity_, "");
+	ctx.world.emplace<lge::placement>(
 		top_text_entity_, 0.0F, -game_res.y / 2, 0.0F, glm::vec2{1.F, 1.F}, lge::pivot::top_center);
 
-	auto &input = get_input();
-	input.bind(change_top_action,
-			   {
-				   .keys = {lge::input::key::one},
-				   .buttons = {lge::input::button::right_face_down},
-			   });
+	ctx.actions.bind(change_top_action,
+					 {
+						 .keys = {lge::input::key::one},
+						 .buttons = {lge::input::button::right_face_down},
+					 });
 
 	create_random_shapes();
 	change_top_color(top_color::none);
@@ -51,9 +50,7 @@ auto layers::init() -> lge::result<> {
 }
 
 auto layers::update(const float dt) -> lge::result<> {
-	const auto &input = get_input();
-
-	if(input.get(change_top_action).pressed) {
+	if(ctx.actions.get(change_top_action).pressed) {
 		switch(top_color_) {
 		case top_color::none:
 			change_top_color(top_color::red);
@@ -98,19 +95,19 @@ auto layers::change_top_color(const top_color new_top_color) -> void {
 		break;
 	}
 
-	auto &lbl = world.get<lge::label>(top_text_entity_);
+	auto &lbl = ctx.world.get<lge::label>(top_text_entity_);
 	lbl.text = txt;
 	lbl.text_color = color;
 
-	world.get<lge::order>(red_root_).layer = (top_color_ == top_color::red) ? 1 : 0;
-	world.get<lge::order>(green_root_).layer = (top_color_ == top_color::green) ? 1 : 0;
-	world.get<lge::order>(blue_root_).layer = (top_color_ == top_color::blue) ? 1 : 0;
+	ctx.world.get<lge::order>(red_root_).layer = (top_color_ == top_color::red) ? 1 : 0;
+	ctx.world.get<lge::order>(green_root_).layer = (top_color_ == top_color::green) ? 1 : 0;
+	ctx.world.get<lge::order>(blue_root_).layer = (top_color_ == top_color::blue) ? 1 : 0;
 }
 
 auto layers::create_root() -> entt::entity {
-	const auto root_entity = world.create();
-	world.emplace<lge::order>(root_entity);
-	world.emplace<lge::placement>(root_entity, 0.F, 0.F); // center of the screen
+	const auto root_entity = ctx.world.create();
+	ctx.world.emplace<lge::order>(root_entity);
+	ctx.world.emplace<lge::placement>(root_entity, 0.F, 0.F); // center of the screen
 	return root_entity;
 }
 
@@ -174,7 +171,7 @@ auto layers::create_random_shapes() -> void {
 			break;
 		}
 
-		lge::attach(world, parent_entity, created_entity);
+		lge::attach(ctx.world, parent_entity, created_entity);
 	}
 }
 
@@ -207,16 +204,16 @@ auto layers::create_rectangle(float pos_x, float pos_y, const lge::color &color,
 	}
 
 	// create rectangle entity
-	const entt::entity rect_ent = world.create();
+	const entt::entity rect_ent = ctx.world.create();
 
-	auto &rect = world.emplace<lge::rect>(rect_ent);
+	auto &rect = ctx.world.emplace<lge::rect>(rect_ent);
 	rect.size = {width, height};
 	rect.fill_color = color;
 	rect.border_color = shapes_border_color;
 	rect.border_thickness = shapes_border_thickness;
 
 	// placement is the center of the rect
-	world.emplace<lge::placement>(rect_ent, pos_x, pos_y);
+	ctx.world.emplace<lge::placement>(rect_ent, pos_x, pos_y);
 
 	return rect_ent;
 }
@@ -253,14 +250,14 @@ auto layers::create_circle(float pos_x, float pos_y, const lge::color &color, st
 	}
 
 	// create rectangle entity with calculated dimensions and position
-	const auto circle_ent = world.create();
-	auto &circle = world.emplace<lge::circle>(circle_ent);
+	const auto circle_ent = ctx.world.create();
+	auto &circle = ctx.world.emplace<lge::circle>(circle_ent);
 	circle.radius = radius;
 	circle.fill_color = color;
 	circle.border_color = shapes_border_color;
 	circle.border_thickness = shapes_border_thickness;
 
-	world.emplace<lge::placement>(circle_ent, pos_x, pos_y);
+	ctx.world.emplace<lge::placement>(circle_ent, pos_x, pos_y);
 	return circle_ent;
 }
 

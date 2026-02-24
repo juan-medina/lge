@@ -3,16 +3,15 @@
 
 #pragma once
 
+#include <lge/app/context.hpp>
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
 #include <lge/core/types.hpp>
-#include <lge/dispatcher/dispatcher.hpp>
 #include <lge/scene/scene.hpp>
 
 #include <cstddef>
 #include <entt/core/fwd.hpp>
 #include <entt/core/type_info.hpp>
-#include <entt/entity/fwd.hpp>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -22,7 +21,7 @@ namespace lge {
 
 class scene_manager {
 public:
-	explicit scene_manager(entt::registry &world, dispatcher &dispatcher): world_{world}, events_{dispatcher} {}
+	explicit scene_manager(context &the_context): ctx_{the_context} {}
 	~scene_manager() = default;
 
 	scene_manager(const scene_manager &) = delete;
@@ -33,7 +32,7 @@ public:
 	[[nodiscard]] auto init() -> result<>;
 	[[nodiscard]] auto end() -> result<>;
 
-	[[nodiscard]] auto update(float dt) -> result<> {
+	[[nodiscard]] auto update(const float dt) -> result<> {
 		if(!current_scene_.has_value()) {
 			return true;
 		}
@@ -56,13 +55,13 @@ public:
 
 	template<typename T, typename... Args>
 		requires std::is_base_of_v<scene, T>
-	[[nodiscard]] auto register_scene(Args &&...args) -> result<> {
+	[[nodiscard]] auto add(Args &&...args) -> result<> {
 		const auto key = entt::type_hash<T>::value();
 		if(scenes_.contains(key)) {
 			const auto type_name = get_type_name<T>();
 			return error(std::format("scene of type `{}` already registered", type_name));
 		}
-		auto new_scene = std::make_unique<T>(key, world_, events_);
+		auto new_scene = std::make_unique<T>(ctx_);
 		const auto type_name = get_type_name<T>();
 		if(const auto err = new_scene->init(std::forward<Args>(args)...).unwrap(); err) [[unlikely]] {
 			return error(std::format("error initializing scene of type `{}`", type_name), *err);
@@ -74,7 +73,7 @@ public:
 
 	template<typename T, typename... Args>
 		requires std::is_base_of_v<scene, T>
-	[[nodiscard]] auto set_active_scene(Args &&...args) -> result<> {
+	[[nodiscard]] auto activate(Args &&...args) -> result<> {
 		const auto key = entt::type_hash<T>::value();
 		const auto it = scenes_.find(key);
 		if(it == scenes_.end()) {
@@ -99,8 +98,7 @@ public:
 	}
 
 private:
-	entt::registry &world_;
-	dispatcher &events_;
+	context ctx_;
 	std::optional<std::reference_wrapper<scene>> current_scene_;
 	std::unordered_map<entt::id_type, std::unique_ptr<scene>> scenes_;
 };

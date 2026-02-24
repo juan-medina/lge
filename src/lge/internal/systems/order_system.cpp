@@ -14,9 +14,9 @@
 namespace lge {
 
 auto order_system::update(const float /*dt*/) -> result<> {
-	for(const auto entity: world.view<order>(entt::exclude<parent>)) {
-		const auto &local = world.get<order>(entity);
-		world.emplace_or_replace<render_order>(entity, render_order{.layer = local.layer, .index = local.index});
+	for(const auto entity: ctx.world.view<order>(entt::exclude<parent>)) {
+		const auto &local = ctx.world.get<order>(entity);
+		ctx.world.emplace_or_replace<render_order>(entity, render_order{.layer = local.layer, .index = local.index});
 		order_stack_.push_back(entity);
 	}
 
@@ -24,15 +24,16 @@ auto order_system::update(const float /*dt*/) -> result<> {
 		const auto entity = order_stack_.back();
 		order_stack_.pop_back();
 
-		const auto &parent_render_order = world.get<render_order>(entity);
+		const auto &parent_render_order = ctx.world.get<render_order>(entity);
 
-		if(world.any_of<children>(entity)) {
-			for(const auto &kids = world.get<children>(entity).ids; const auto child: kids) {
-				const auto &local = world.get_or_emplace<order>(child);
+		if(ctx.world.any_of<children>(entity)) {
+			for(const auto &kids = ctx.world.get<children>(entity).ids; const auto child: kids) {
+				const auto &local = ctx.world.get_or_emplace<order>(child);
 				const auto child_layer = parent_render_order.layer;
 				const auto child_index = parent_render_order.index + local.index;
 
-				world.emplace_or_replace<render_order>(child, render_order{.layer = child_layer, .index = child_index});
+				ctx.world.emplace_or_replace<render_order>(child,
+														   render_order{.layer = child_layer, .index = child_index});
 				order_stack_.push_back(child);
 			}
 		}

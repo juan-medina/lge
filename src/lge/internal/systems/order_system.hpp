@@ -13,7 +13,7 @@ namespace lge {
 
 class order_system: public system {
 public:
-	explicit order_system(phase p, entt::registry &world): system(p, world) {}
+	using system::system;
 	auto update(float dt) -> result<> override;
 
 private:

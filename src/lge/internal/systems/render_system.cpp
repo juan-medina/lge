@@ -29,12 +29,12 @@ namespace lge {
 auto render_system::update(const float /*dt*/) -> result<> {
 	render_entries_.clear();
 
-	const auto view = world.view<transform, metrics>(entt::exclude<effective_hidden>);
+	const auto view = ctx.world.view<transform, metrics>(entt::exclude<effective_hidden>);
 	render_entries_.reserve(view.size_hint());
 
 	for(const auto entity: view) {
-		if(world.all_of<render_order>(entity)) {
-			const auto &[layer, index] = world.get<render_order>(entity);
+		if(ctx.world.all_of<render_order>(entity)) {
+			const auto &[layer, index] = ctx.world.get<render_order>(entity);
 			render_entries_.push_back({.layer = layer, .index = index, .entity = entity});
 		} else {
 			render_entries_.push_back({.layer = 0, .index = 0, .entity = entity});
@@ -44,25 +44,25 @@ auto render_system::update(const float /*dt*/) -> result<> {
 	std::ranges::sort(render_entries_);
 
 	for(const auto &[layer, index, entity]: render_entries_) {
-		const auto &world_transform = world.get<transform>(entity).world;
+		const auto &world_transform = ctx.world.get<transform>(entity).world;
 
-		if(world.all_of<label>(entity)) {
+		if(ctx.world.all_of<label>(entity)) {
 			handle_label(entity, world_transform);
 		}
 
-		if(world.all_of<rect>(entity)) {
+		if(ctx.world.all_of<rect>(entity)) {
 			handle_rect(entity, world_transform);
 		}
 
-		if(world.all_of<circle>(entity)) {
+		if(ctx.world.all_of<circle>(entity)) {
 			handle_circle(entity, world_transform);
 		}
 
-		if(world.all_of<sprite>(entity)) {
+		if(ctx.world.all_of<sprite>(entity)) {
 			handle_sprite(entity, world_transform);
 		}
 
-		if(world.all_of<bounds>(entity) && renderer_.is_debug_draw()) {
+		if(ctx.world.all_of<bounds>(entity) && ctx.render.is_debug_draw()) {
 			handle_bounds(entity, world_transform);
 		}
 	}
@@ -90,9 +90,9 @@ auto render_system::get_scale(const glm::mat3 &m) -> glm::vec2 {
 }
 
 auto render_system::handle_label(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
-	const auto &lbl = world.get<label>(entity);
-	const auto &m = world.get<metrics>(entity);
-	const auto &plc = world.get<placement>(entity);
+	const auto &lbl = ctx.world.get<label>(entity);
+	const auto &m = ctx.world.get<metrics>(entity);
+	const auto &plc = ctx.world.get<placement>(entity);
 
 	const auto pivot_world = transform_point(world_transform, plc.pivot * m.size);
 	const auto rotation = get_rotation(world_transform);
@@ -101,18 +101,18 @@ auto render_system::handle_label(const entt::entity entity, const glm::mat3 &wor
 
 	const auto pivot_to_top_left_local = -plc.pivot * m.size * world_scale;
 
-	renderer_.render_label(lbl.font,
-						   lbl.text,
-						   static_cast<int>(final_font_size),
-						   lbl.text_color,
-						   pivot_world,
-						   pivot_to_top_left_local,
-						   rotation);
+	ctx.render.render_label(lbl.font,
+							lbl.text,
+							static_cast<int>(final_font_size),
+							lbl.text_color,
+							pivot_world,
+							pivot_to_top_left_local,
+							rotation);
 }
 auto render_system::handle_rect(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
-	const auto &r = world.get<rect>(entity);
-	const auto &m = world.get<metrics>(entity);
-	const auto &plc = world.get<placement>(entity);
+	const auto &r = ctx.world.get<rect>(entity);
+	const auto &m = ctx.world.get<metrics>(entity);
+	const auto &plc = ctx.world.get<placement>(entity);
 
 	const auto center = transform_point(world_transform, plc.pivot * m.size);
 	const auto rotation = get_rotation(world_transform);
@@ -120,13 +120,13 @@ auto render_system::handle_rect(const entt::entity entity, const glm::mat3 &worl
 	const auto scaled_size = m.size * world_scale;
 	const auto scaled_border_thickness = r.border_thickness * ((world_scale.x + world_scale.y) * 0.5F);
 
-	renderer_.render_rect(center, scaled_size, rotation, r.border_color, r.fill_color, scaled_border_thickness);
+	ctx.render.render_rect(center, scaled_size, rotation, r.border_color, r.fill_color, scaled_border_thickness);
 }
 
 auto render_system::handle_circle(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
-	const auto c = world.get<circle>(entity);
-	const auto &m = world.get<metrics>(entity);
-	const auto &plc = world.get<placement>(entity);
+	const auto c = ctx.world.get<circle>(entity);
+	const auto &m = ctx.world.get<metrics>(entity);
+	const auto &plc = ctx.world.get<placement>(entity);
 
 	const auto center_world = transform_point(world_transform, plc.pivot * m.size);
 	const auto world_scale = get_scale(world_transform);
@@ -134,27 +134,27 @@ auto render_system::handle_circle(const entt::entity entity, const glm::mat3 &wo
 	const auto scaled_radius = c.radius * avg_scale;
 	const auto scaled_border_thickness = c.border_thickness * avg_scale;
 
-	renderer_.render_circle(center_world, scaled_radius, c.border_color, c.fill_color, scaled_border_thickness);
+	ctx.render.render_circle(center_world, scaled_radius, c.border_color, c.fill_color, scaled_border_thickness);
 }
 
 auto render_system::handle_sprite(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
-	const auto &spr = world.get<sprite>(entity);
-	const auto &m = world.get<metrics>(entity);
-	const auto &plc = world.get<placement>(entity);
+	const auto &spr = ctx.world.get<sprite>(entity);
+	const auto &m = ctx.world.get<metrics>(entity);
+	const auto &plc = ctx.world.get<placement>(entity);
 
 	const auto pivot_world = transform_point(world_transform, plc.pivot * m.size);
 	const auto rotation = get_rotation(world_transform);
 	const auto world_scale = get_scale(world_transform);
 	const auto scaled_size = m.size * world_scale;
 
-	renderer_.render_sprite(
+	ctx.render.render_sprite(
 		spr.sheet, spr.frame, pivot_world, scaled_size, plc.pivot, rotation, spr.flip_horizontal, spr.flip_vertical);
 }
 
 auto render_system::handle_bounds(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
-	const auto &[p0, p1, p2, p3] = world.get<bounds>(entity);
-	const auto &m = world.get<metrics>(entity);
-	const auto &plc = world.get<placement>(entity);
+	const auto &[p0, p1, p2, p3] = ctx.world.get<bounds>(entity);
+	const auto &m = ctx.world.get<metrics>(entity);
+	const auto &plc = ctx.world.get<placement>(entity);
 
 	const auto pivot_world = transform_point(world_transform, plc.pivot * m.size);
 	const auto rotation_rad = glm::radians(get_rotation(world_transform));
@@ -167,7 +167,7 @@ auto render_system::handle_bounds(const entt::entity entity, const glm::mat3 &wo
 		return pivot_world + glm::vec2{(scaled.x * cr) - (scaled.y * sr), (scaled.x * sr) + (scaled.y * cr)};
 	};
 
-	renderer_.render_quad(
+	ctx.render.render_quad(
 		transform_local(p0), transform_local(p1), transform_local(p2), transform_local(p3), bounds_color);
 }
 

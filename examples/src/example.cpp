@@ -29,31 +29,30 @@ auto example::init() -> lge::result<> {
 		return lge::error("error init the app", *err);
 	}
 
-	message_ent_ = world.create();
-	world.emplace<lge::label>(message_ent_, kb_message_);
-	world.emplace<lge::placement>(
+	message_ent_ = ctx.world.create();
+	ctx.world.emplace<lge::label>(message_ent_, kb_message_);
+	ctx.world.emplace<lge::placement>(
 		message_ent_, 0.0F, game_res.y / 2, 0.0F, glm::vec2{1.F, 1.F}, lge::pivot::bottom_center);
 
-	world.emplace<lge::order>(message_ent_, 999); // layer 999: render on top of most things
+	ctx.world.emplace<lge::order>(message_ent_, 999); // layer 999: render on top of most things
 	bind_common_actions();
 
 	return true;
 }
 
 auto example::bind_common_actions() -> void {
-	auto &input = get_input();
-	input.bind(fullscreen_action,
+	ctx.actions.bind(fullscreen_action,
 			   {
 				   .keys = {lge::input::key::f11},
 				   .buttons = {lge::input::button::middle_left},
 			   });
 
-	input.bind(exit_action,
+	ctx.actions.bind(exit_action,
 			   {
 				   .keys = {lge::input::key::escape},
 				   .buttons = {lge::input::button::right_face_right},
 			   });
-	input.bind(debug_action,
+	ctx.actions.bind(debug_action,
 			   {
 				   .keys = {lge::input::key::f5},
 				   .buttons = {lge::input::button::middle_right},
@@ -61,25 +60,24 @@ auto example::bind_common_actions() -> void {
 }
 
 auto example::handle_common_input() -> void {
-	const auto &input = get_input();
 
-	if(input.get(fullscreen_action).pressed) {
-		get_renderer().toggle_fullscreen();
+	if(ctx.actions.get(fullscreen_action).pressed) {
+		ctx.render.toggle_fullscreen();
 	}
 
-	if(input.get(exit_action).pressed) {
+	if(ctx.actions.get(exit_action).pressed) {
 		exit();
 	}
 
-	if(input.get(debug_action).pressed) {
-		get_renderer().toggle_debug_draw();
+	if(ctx.actions.get(debug_action).pressed) {
+		ctx.render.toggle_debug_draw();
 	}
 }
 
 auto example::update_controller_mode_message() -> void {
-	if(const auto in_controller_mode = get_input().is_controller_available();
+	if(const auto in_controller_mode = ctx.actions.is_controller_available();
 	   in_controller_mode != was_in_controller_mode_) {
-		auto &message_label = world.get<lge::label>(message_ent_);
+		auto &message_label = ctx.world.get<lge::label>(message_ent_);
 		if(in_controller_mode) {
 			message_label.text = controller_message_;
 		} else {

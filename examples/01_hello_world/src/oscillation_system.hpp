@@ -12,7 +12,7 @@
 
 class oscillation_system: public lge::system {
 public:
-	explicit oscillation_system(const lge::phase p, entt::registry &w): system(p, w) {}
+	using system::system;
 	auto update(float dt) -> lge::result<> override;
 
 	struct effect {

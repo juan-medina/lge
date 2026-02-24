@@ -3,6 +3,7 @@
 
 #include "transform_system.hpp"
 
+#include <lge/app/context.hpp>
 #include <lge/components/hierarchy.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/core/result.hpp>
@@ -19,9 +20,9 @@
 
 namespace lge {
 
-transform_system::transform_system(const phase p, entt::registry &world): system(p, world) {
-	world.on_destroy<parent>().connect<&transform_system::on_child_detached>();
-	world.on_destroy<children>().connect<&transform_system::on_parent_children_cleared>();
+transform_system::transform_system(const phase p, context &ctx): system(p, ctx) {
+	ctx.world.on_destroy<parent>().connect<&transform_system::on_child_detached>(this);
+	ctx.world.on_destroy<children>().connect<&transform_system::on_parent_children_cleared>(this);
 }
 
 auto transform_system::compose_transform(const placement &node_placement, const glm::vec2 &pivot_offset) -> glm::mat3 {
@@ -44,12 +45,12 @@ auto transform_system::compose_transform(const placement &node_placement, const 
 }
 
 auto transform_system::update(const float /*dt*/) -> result<> {
-	for(const auto entity: world.view<placement>(entt::exclude<parent>)) {
-		const auto &local = world.get<placement>(entity);
+	for(const auto entity: ctx.world.view<placement>(entt::exclude<parent>)) {
+		const auto &local = ctx.world.get<placement>(entity);
 		const auto pivot_offset =
-			world.all_of<metrics>(entity) ? local.pivot * world.get<metrics>(entity).size : glm::vec2{0.F, 0.F};
+			ctx.world.all_of<metrics>(entity) ? local.pivot * ctx.world.get<metrics>(entity).size : glm::vec2{0.F, 0.F};
 		const auto world_mat = compose_transform(local, pivot_offset);
-		world.emplace_or_replace<transform>(entity, transform{.world = world_mat});
+		ctx.world.emplace_or_replace<transform>(entity, transform{.world = world_mat});
 		transform_stack_.push_back(entity);
 	}
 
@@ -57,24 +58,25 @@ auto transform_system::update(const float /*dt*/) -> result<> {
 		const auto entity = transform_stack_.back();
 		transform_stack_.pop_back();
 
-		if(!world.any_of<children>(entity)) {
+		if(!ctx.world.any_of<children>(entity)) {
 			continue;
 		}
 
-		const auto &parent_world = world.get<transform>(entity).world;
-		const auto &parent_placement = world.get<placement>(entity);
-		const auto parent_pivot_offset = world.all_of<metrics>(entity)
-											 ? parent_placement.pivot * world.get<metrics>(entity).size
+		const auto &parent_world = ctx.world.get<transform>(entity).world;
+		const auto &parent_placement = ctx.world.get<placement>(entity);
+		const auto parent_pivot_offset = ctx.world.all_of<metrics>(entity)
+											 ? parent_placement.pivot * ctx.world.get<metrics>(entity).size
 											 : glm::vec2{0.F, 0.F};
 
 		// The parent's pivot in world space — same calculation render_system uses
 		const auto pv = parent_world * glm::vec3{parent_pivot_offset.x, parent_pivot_offset.y, 1.F};
 		const auto parent_pos = glm::vec2{pv.x, pv.y};
 
-		for(const auto &kids = world.get<children>(entity).ids; const auto child: kids) {
-			const auto &local = world.get<placement>(child);
-			const auto child_pivot_offset =
-				world.all_of<metrics>(child) ? local.pivot * world.get<metrics>(child).size : glm::vec2{0.F, 0.F};
+		for(const auto &kids = ctx.world.get<children>(entity).ids; const auto child: kids) {
+			const auto &local = ctx.world.get<placement>(child);
+			const auto child_pivot_offset = ctx.world.all_of<metrics>(child)
+												? local.pivot * ctx.world.get<metrics>(child).size
+												: glm::vec2{0.F, 0.F};
 
 			// Extract accumulated rotation from parent world matrix
 			const float parent_rad = -glm::atan(parent_world[0][1], parent_world[0][0]);
@@ -106,7 +108,7 @@ auto transform_system::update(const float /*dt*/) -> result<> {
 			const auto child_world_mat = glm::mat3{glm::vec3{c * child_scale.x, -s * child_scale.y, 0.F},
 												   glm::vec3{s * child_scale.x, c * child_scale.y, 0.F},
 												   glm::vec3{render_pos, 1.F}};
-			world.emplace_or_replace<transform>(child, transform{.world = child_world_mat});
+			ctx.world.emplace_or_replace<transform>(child, transform{.world = child_world_mat});
 			transform_stack_.push_back(child);
 		}
 	}
@@ -114,16 +116,16 @@ auto transform_system::update(const float /*dt*/) -> result<> {
 	return true;
 }
 
-auto transform_system::on_child_detached(entt::registry &world, const entt::entity child) -> void {
-	if(const entt::entity p = world.get<parent>(child).id; world.all_of<children>(p)) {
-		auto &kids = world.get<children>(p).ids;
+auto transform_system::on_child_detached(entt::registry &, const entt::entity child) -> void {
+	if(const entt::entity p = ctx.world.get<parent>(child).id; ctx.world.all_of<children>(p)) {
+		auto &kids = ctx.world.get<children>(p).ids;
 		std::erase(kids, child);
 	}
 }
 
-auto transform_system::on_parent_children_cleared(entt::registry &world, const entt::entity parent) -> void {
-	for(const auto kids = world.get<children>(parent).ids; const entt::entity child: kids) {
-		world.destroy(child);
+auto transform_system::on_parent_children_cleared(entt::registry &, const entt::entity parent) -> void {
+	for(const auto kids = ctx.world.get<children>(parent).ids; const entt::entity child: kids) {
+		ctx.world.destroy(child);
 	}
 }
 

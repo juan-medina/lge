@@ -9,8 +9,8 @@ namespace lge {
 
 // local space position, rotation, scale, and pivot
 struct placement {
-	placement(const float x,
-			  const float y,
+	placement(const float x = 0.F,
+			  const float y = 0.F,
 			  const float rot = 0.F,
 			  const glm::vec2 scl = {1.F, 1.F},
 			  const glm::vec2 pvt = {0.5F, 0.5F})

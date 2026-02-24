@@ -17,7 +17,7 @@ public:
 	template<typename Event>
 	auto on(handler<Event> h) -> void {
 		const auto key = entt::type_hash<Event>::value();
-		handlers_[key] = [h = std::move(h)](const void *evt) { h(*static_cast<const Event *>(evt)); };
+		handlers_[key] = [h = std::move(h)](const void *evt) -> auto { h(*static_cast<const Event *>(evt)); };
 	}
 
 	template<typename Event>

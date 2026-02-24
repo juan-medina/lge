@@ -15,11 +15,11 @@
 namespace lge {
 
 auto hidden_system::update(const float /*dt*/) -> result<> {
-	for(const auto entity: world.view<entt::entity>(entt::exclude<parent>)) {
-		if(world.any_of<hidden>(entity)) {
-			world.emplace_or_replace<effective_hidden>(entity);
+	for(const auto entity: ctx.world.view<entt::entity>(entt::exclude<parent>)) {
+		if(ctx.world.any_of<hidden>(entity)) {
+			ctx.world.emplace_or_replace<effective_hidden>(entity);
 		} else {
-			world.remove<effective_hidden>(entity);
+			ctx.world.remove<effective_hidden>(entity);
 		}
 		hidden_stack_.push_back(entity);
 	}
@@ -29,19 +29,19 @@ auto hidden_system::update(const float /*dt*/) -> result<> {
 		hidden_stack_.pop_back();
 
 		// if the parent is hidden, all children are hidden, otherwise we need to check each child
-		const bool parent_hidden = world.any_of<effective_hidden>(entity);
-		if(world.any_of<children>(entity)) {
+		const bool parent_hidden = ctx.world.any_of<effective_hidden>(entity);
+		if(ctx.world.any_of<children>(entity)) {
 			if(parent_hidden) {
-				for(auto child: world.get<children>(entity).ids) {
-					world.emplace_or_replace<effective_hidden>(child);
+				for(auto child: ctx.world.get<children>(entity).ids) {
+					ctx.world.emplace_or_replace<effective_hidden>(child);
 					hidden_stack_.push_back(child);
 				}
 			} else {
-				for(auto child: world.get<children>(entity).ids) {
-					if(world.any_of<hidden>(child)) {
-						world.emplace_or_replace<effective_hidden>(child);
+				for(auto child: ctx.world.get<children>(entity).ids) {
+					if(ctx.world.any_of<hidden>(child)) {
+						ctx.world.emplace_or_replace<effective_hidden>(child);
 					} else {
-						world.remove<effective_hidden>(child);
+						ctx.world.remove<effective_hidden>(child);
 					}
 					hidden_stack_.push_back(child);
 				}

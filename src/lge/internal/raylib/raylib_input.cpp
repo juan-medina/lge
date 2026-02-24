@@ -19,7 +19,7 @@ auto raylib_input::update(const float /*delta_time*/) -> void {
 	const auto stick = update_virtual_dpad_states();
 
 	for(std::size_t bid = 0; bid < max_actions; ++bid) {
-		auto &st      = states[bid];
+		auto &st = states[bid];
 		auto &binding = bindings[bid];
 		accumulate_key_states(st, binding);
 		if(controller_available && default_controller >= 0) {
@@ -33,18 +33,19 @@ auto raylib_input::update(const float /*delta_time*/) -> void {
 auto raylib_input::accumulate_key_states(state &st, const binding &b) const -> void {
 	for(const auto k: b.keys) {
 		const auto rk = key_to_raylib(k);
-		st.pressed  = st.pressed  || IsKeyPressed(rk);
+		st.pressed = st.pressed || IsKeyPressed(rk);
 		st.released = st.released || IsKeyReleased(rk);
-		st.down     = st.down     || IsKeyDown(rk);
+		st.down = st.down || IsKeyDown(rk);
 	}
 }
 
-auto raylib_input::accumulate_button_states(state &st, const binding &b, const std::array<bool, 4> &stick) const -> void {
+auto raylib_input::accumulate_button_states(state &st, const binding &b, const std::array<bool, 4> &stick) const
+	-> void {
 	for(const auto btn: b.buttons) {
 		const auto rb = button_to_raylib(btn);
-		st.pressed  = st.pressed  || IsGamepadButtonPressed(default_controller, rb);
+		st.pressed = st.pressed || IsGamepadButtonPressed(default_controller, rb);
 		st.released = st.released || IsGamepadButtonReleased(default_controller, rb);
-		st.down     = st.down     || IsGamepadButtonDown(default_controller, rb);
+		st.down = st.down || IsGamepadButtonDown(default_controller, rb);
 		apply_stick_dpad(st, btn, stick);
 	}
 }
@@ -54,11 +55,11 @@ auto raylib_input::apply_stick_dpad(state &st, const button b, const std::array<
 	if(idx < 0) {
 		return;
 	}
-	const auto cur  = stick[idx];
+	const auto cur = stick[idx];
 	const auto prev = prev_stick_dpad_[idx];
-	st.pressed  = st.pressed  || (cur && !prev);
+	st.pressed = st.pressed || (cur && !prev);
 	st.released = st.released || (!cur && prev);
-	st.down     = st.down     || cur;
+	st.down = st.down || cur;
 }
 
 auto raylib_input::stick_dpad_index(const button b) -> int {
@@ -85,9 +86,9 @@ auto raylib_input::update_virtual_dpad_states() const -> std::array<bool, 4> {
 		const auto yr = GetGamepadAxisMovement(default_controller, GAMEPAD_AXIS_RIGHT_Y);
 
 		stick[0] = xl < -controller_axis_dead_zone || xr < -controller_axis_dead_zone;
-		stick[1] = xl >  controller_axis_dead_zone || xr >  controller_axis_dead_zone;
+		stick[1] = xl > controller_axis_dead_zone || xr > controller_axis_dead_zone;
 		stick[2] = yl < -controller_axis_dead_zone || yr < -controller_axis_dead_zone;
-		stick[3] = yl >  controller_axis_dead_zone || yr >  controller_axis_dead_zone;
+		stick[3] = yl > controller_axis_dead_zone || yr > controller_axis_dead_zone;
 	}
 	return stick;
 }

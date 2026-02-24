@@ -17,8 +17,8 @@
 namespace lge {
 
 auto animation_system::advance_animation(const entt::entity entity, sprite_animation &anim, const float dt) -> void {
-	auto &spr = world.get_or_emplace<sprite>(entity);
-	auto &previous_anim = world.get_or_emplace<previous_sprite_animation>(entity);
+	auto &spr = ctx.world.get_or_emplace<sprite>(entity);
+	auto &previous_anim = ctx.world.get_or_emplace<previous_sprite_animation>(entity);
 	const auto anim_library_changed = previous_anim.handle != anim.handle;
 	const auto anim_named_changed = previous_anim.name != anim.name;
 
@@ -37,7 +37,7 @@ auto animation_system::advance_animation(const entt::entity entity, sprite_anima
 		// We need to update the sprite sheet only if we change the animation library, since the sprite sheet is
 		//  shared across all animations in the library
 		if(anim_library_changed) [[unlikely]] {
-			if(const auto err = resource_manager_.get_animation_sprite_sheet(anim.handle).unwrap(spr.sheet); err)
+			if(const auto err = ctx.resources.get_animation_sprite_sheet(anim.handle).unwrap(spr.sheet); err)
 				[[unlikely]] {
 				log::error("failed to get sprite sheet for animation library, skipping");
 				return;
@@ -46,7 +46,7 @@ auto animation_system::advance_animation(const entt::entity entity, sprite_anima
 	}
 
 	animation_library_anim clip{};
-	if(const auto err = resource_manager_.get_animation(anim.handle, anim.name).unwrap(clip); err) [[unlikely]] {
+	if(const auto err = ctx.resources.get_animation(anim.handle, anim.name).unwrap(clip); err) [[unlikely]] {
 		log::error("animation clip '{}' not found, skipping", anim.name.data());
 		return;
 	}
@@ -57,14 +57,15 @@ auto animation_system::advance_animation(const entt::entity entity, sprite_anima
 		anim.elapsed -= frame_duration;
 		anim.current_frame = (anim.current_frame + 1) % static_cast<int>(clip.frames.size());
 	}
-	spr.frame = clip.frames[static_cast<std::size_t>(anim.current_frame)];;
+	spr.frame = clip.frames[static_cast<std::size_t>(anim.current_frame)];
+	;
 
 	spr.frame = clip.frames[static_cast<std::size_t>(anim.current_frame)];
 }
 
 auto animation_system::update(const float dt) -> result<> {
-	for(const auto entity: world.view<sprite_animation>()) {
-		auto &anim = world.get<sprite_animation>(entity);
+	for(const auto entity: ctx.world.view<sprite_animation>()) {
+		auto &anim = ctx.world.get<sprite_animation>(entity);
 		advance_animation(entity, anim, dt);
 	}
 	return true;
