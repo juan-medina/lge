@@ -8,8 +8,11 @@
 #include <lge/core/result.hpp>
 #include <lge/scene/scene.hpp>
 
+#include "../actions.hpp"
+
+namespace examples {
 auto menu_scene::init() -> lge::result<> {
-	ctx.actions.bind(go_to_game_action,
+	ctx.actions.bind(actions::go_to_game_action,
 					 {
 						 .keys = {lge::input::key::one},
 						 .buttons = {lge::input::button::right_face_down},
@@ -27,7 +30,7 @@ auto menu_scene::on_enter() -> lge::result<> {
 }
 
 auto menu_scene::update(const float dt) -> lge::result<> {
-	if(ctx.actions.get(go_to_game_action).pressed) {
+	if(ctx.actions.get(actions::go_to_game_action).pressed) {
 		if(const auto err = ctx.events.post(go_to_game{}).unwrap(); err) [[unlikely]] {
 			return lge::error("failed to post go_to_game event", *err);
 		}
@@ -35,3 +38,5 @@ auto menu_scene::update(const float dt) -> lge::result<> {
 
 	return scene::update(dt);
 }
+
+} // namespace examples

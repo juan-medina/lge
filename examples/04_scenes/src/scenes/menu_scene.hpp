@@ -6,6 +6,8 @@
 #include <lge/core/result.hpp>
 #include <lge/scene/scene.hpp>
 
+namespace examples {
+
 class menu_scene: public lge::scene {
 public:
 	using scene::scene;
@@ -15,7 +17,6 @@ public:
 	[[nodiscard]] auto update(float dt) -> lge::result<> override;
 
 	struct go_to_game {};
-
-private:
-	static constexpr auto go_to_game_action = 10;
 };
+
+} // namespace examples

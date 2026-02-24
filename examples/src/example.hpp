@@ -36,10 +36,6 @@ protected:
 	[[nodiscard]] static constexpr auto get_game_res() -> glm::vec2 {
 		return game_res;
 	}
-	static constexpr std::size_t fullscreen_action = 0;
-	static constexpr std::size_t exit_action = 1;
-	static constexpr std::size_t debug_action = 2;
-	static constexpr std::size_t total_base_actions = 3;
 
 private:
 	static constexpr auto default_clear_color = lge::colors::black;

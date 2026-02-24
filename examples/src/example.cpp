@@ -11,6 +11,8 @@
 #include <lge/core/result.hpp>
 #include <lge/interface/renderer.hpp>
 
+#include "actions.hpp"
+
 namespace examples {
 
 auto example::update(const float dt) -> lge::result<> {
@@ -41,35 +43,34 @@ auto example::init() -> lge::result<> {
 }
 
 auto example::bind_common_actions() -> void {
-	ctx.actions.bind(fullscreen_action,
-			   {
-				   .keys = {lge::input::key::f11},
-				   .buttons = {lge::input::button::middle_left},
-			   });
+	ctx.actions.bind(actions::fullscreen_action,
+					 {
+						 .keys = {lge::input::key::f11},
+						 .buttons = {lge::input::button::middle_left},
+					 });
 
-	ctx.actions.bind(exit_action,
-			   {
-				   .keys = {lge::input::key::escape},
-				   .buttons = {lge::input::button::right_face_right},
-			   });
-	ctx.actions.bind(debug_action,
-			   {
-				   .keys = {lge::input::key::f5},
-				   .buttons = {lge::input::button::middle_right},
-			   });
+	ctx.actions.bind(actions::exit_action,
+					 {
+						 .keys = {lge::input::key::escape},
+						 .buttons = {lge::input::button::right_face_right},
+					 });
+	ctx.actions.bind(actions::debug_action,
+					 {
+						 .keys = {lge::input::key::f5},
+						 .buttons = {lge::input::button::middle_right},
+					 });
 }
 
 auto example::handle_common_input() -> void {
-
-	if(ctx.actions.get(fullscreen_action).pressed) {
+	if(ctx.actions.get(actions::fullscreen_action).pressed) {
 		ctx.render.toggle_fullscreen();
 	}
 
-	if(ctx.actions.get(exit_action).pressed) {
+	if(ctx.actions.get(actions::exit_action).pressed) {
 		exit();
 	}
 
-	if(ctx.actions.get(debug_action).pressed) {
+	if(ctx.actions.get(actions::debug_action).pressed) {
 		ctx.render.toggle_debug_draw();
 	}
 }
