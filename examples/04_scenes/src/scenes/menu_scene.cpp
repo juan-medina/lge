@@ -28,7 +28,9 @@ auto menu_scene::on_enter() -> lge::result<> {
 
 auto menu_scene::update(const float dt) -> lge::result<> {
 	if(ctx.actions.get(go_to_game_action).pressed) {
-		ctx.events.post(go_to_game{});
+		if(const auto err = ctx.events.post(go_to_game{}).unwrap(); err) [[unlikely]] {
+			return lge::error("failed to post go_to_game event", *err);
+		}
 	}
 
 	return scene::update(dt);

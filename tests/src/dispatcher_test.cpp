@@ -28,9 +28,12 @@ TEST_CASE("dispatcher: posting events", "[dispatcher]") {
 		test_log.clear();
 		lge::dispatcher dispatcher;
 
-		dispatcher.on<event_a>([](const event_a &) -> void { test_log.emplace_back("event_a"); });
+		dispatcher.on<event_a>([](const event_a &) -> lge::result<> {
+			test_log.emplace_back("event_a");
+			return true;
+		});
 
-		dispatcher.post(event_a{});
+		must(dispatcher.post(event_a{}));
 		require_log({"event_a"});
 	}
 
@@ -38,7 +41,7 @@ TEST_CASE("dispatcher: posting events", "[dispatcher]") {
 		test_log.clear();
 		lge::dispatcher dispatcher;
 
-		dispatcher.post(event_a{});
+		must(dispatcher.post(event_a{}));
 		require_log({});
 	}
 
@@ -46,10 +49,12 @@ TEST_CASE("dispatcher: posting events", "[dispatcher]") {
 		test_log.clear();
 		lge::dispatcher dispatcher;
 
-		dispatcher.on<event_b>(
-			[](const event_b &e) -> void { test_log.emplace_back("event_b:" + std::to_string(e.value)); });
+		dispatcher.on<event_b>([](const event_b &e) -> lge::result<> {
+			test_log.emplace_back("event_b:" + std::to_string(e.value));
+			return true;
+		});
 
-		dispatcher.post(event_b{.value = 42});
+		must(dispatcher.post(event_b{.value = 42}));
 		require_log({"event_b:42"});
 	}
 
@@ -57,9 +62,12 @@ TEST_CASE("dispatcher: posting events", "[dispatcher]") {
 		test_log.clear();
 		lge::dispatcher dispatcher;
 
-		dispatcher.on<event_c>([](const event_c &e) -> void { test_log.emplace_back("event_c:" + e.text); });
+		dispatcher.on<event_c>([](const event_c &e) -> lge::result<> {
+			test_log.emplace_back("event_c:" + e.text);
+			return true;
+		});
 
-		dispatcher.post(event_c{.text = "hello"});
+		must(dispatcher.post(event_c{.text = "hello"}));
 		require_log({"event_c:hello"});
 	}
 }
@@ -69,12 +77,17 @@ TEST_CASE("dispatcher: multiple event types", "[dispatcher]") {
 		test_log.clear();
 		lge::dispatcher dispatcher;
 
-		dispatcher.on<event_a>([](const event_a &) -> void { test_log.emplace_back("event_a"); });
-		dispatcher.on<event_b>(
-			[](const event_b &e) -> void { test_log.emplace_back("event_b:" + std::to_string(e.value)); });
+		dispatcher.on<event_a>([](const event_a &) -> lge::result<> {
+			test_log.emplace_back("event_a");
+			return true;
+		});
+		dispatcher.on<event_b>([](const event_b &e) -> lge::result<> {
+			test_log.emplace_back("event_b:" + std::to_string(e.value));
+			return true;
+		});
 
-		dispatcher.post(event_a{});
-		dispatcher.post(event_b{.value = 7});
+		must(dispatcher.post(event_a{}));
+		must(dispatcher.post(event_b{.value = 7}));
 		require_log({"event_a", "event_b:7"});
 	}
 
@@ -82,10 +95,16 @@ TEST_CASE("dispatcher: multiple event types", "[dispatcher]") {
 		test_log.clear();
 		lge::dispatcher dispatcher;
 
-		dispatcher.on<event_a>([](const event_a &) -> void { test_log.emplace_back("event_a"); });
-		dispatcher.on<event_b>([](const event_b &) -> void { test_log.emplace_back("event_b"); });
+		dispatcher.on<event_a>([](const event_a &) -> lge::result<> {
+			test_log.emplace_back("event_a");
+			return true;
+		});
+		dispatcher.on<event_b>([](const event_b &) -> lge::result<> {
+			test_log.emplace_back("event_b");
+			return true;
+		});
 
-		dispatcher.post(event_a{});
+		must(dispatcher.post(event_a{}));
 		require_log({"event_a"});
 	}
 }
@@ -95,10 +114,34 @@ TEST_CASE("dispatcher: resubscription", "[dispatcher]") {
 		test_log.clear();
 		lge::dispatcher dispatcher;
 
-		dispatcher.on<event_a>([](const event_a &) -> void { test_log.emplace_back("first"); });
-		dispatcher.on<event_a>([](const event_a &) -> void { test_log.emplace_back("second"); });
+		dispatcher.on<event_a>([](const event_a &) -> lge::result<> {
+			test_log.emplace_back("first");
+			return true;
+		});
+		dispatcher.on<event_a>([](const event_a &) -> lge::result<> {
+			test_log.emplace_back("second");
+			return true;
+		});
 
-		dispatcher.post(event_a{});
+		must(dispatcher.post(event_a{}));
 		require_log({"second"});
+	}
+}
+
+TEST_CASE("dispatcher: error propagation", "[dispatcher]") {
+	SECTION("error returned from handler is propagated by post") {
+		lge::dispatcher dispatcher;
+
+		dispatcher.on<event_a>([](const event_a &) -> lge::result<> { return lge::error("handler failed"); });
+
+		const auto result = dispatcher.post(event_a{});
+		REQUIRE(result.has_error());
+	}
+
+	SECTION("post with no handler returns success") {
+		lge::dispatcher dispatcher;
+
+		const auto result = dispatcher.post(event_a{});
+		REQUIRE(result.has_value());
 	}
 }

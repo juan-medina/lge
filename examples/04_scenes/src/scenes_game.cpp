@@ -31,10 +31,11 @@ auto scenes_game::init() -> lge::result<> {
 		return lge::error("failed to set active scene to menu scene", *err);
 	}
 
-	ctx.events.on<menu_scene::go_to_game>([this](const auto &) -> void {
+	ctx.events.on<menu_scene::go_to_game>([this](const auto &) -> lge::result<> {
 		if(const auto err = scenes.activate<game_scene>().unwrap(); err) [[unlikely]] {
-			lge::error("failed to set active scene to game scene");
+			return lge::error("failed to set active scene to game scene", *err);
 		}
+		return true;
 	});
 
 	return true;

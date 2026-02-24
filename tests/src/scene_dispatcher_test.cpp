@@ -80,8 +80,7 @@ public:
 	auto update(float /*dt*/) -> lge::result<> override {
 		test_log.emplace_back("gameplay_scene::update");
 		// Scene knows nothing about what happens next — it just reports what occurred.
-		ctx.events.post(level_completed{.score = 500});
-		return true;
+		return ctx.events.post(level_completed{.score = 500});
 	}
 };
 
@@ -139,7 +138,7 @@ TEST_CASE("scene_manager + dispatcher: app-mediated scene transition", "[scene_m
 		// The app (this test) decides what level_completed means: go to results_scene.
 		// Neither scene knows the other exists.
 		f.ctx.events.on<level_completed>(
-			[&f](const level_completed &evt) -> void { must(f.scm.activate<results_scene>(evt)); });
+			[&f](const level_completed &evt) -> lge::result<> { return f.scm.activate<results_scene>(evt); });
 
 		must(f.scm.activate<gameplay_scene>());
 		test_log.clear();
@@ -162,7 +161,7 @@ TEST_CASE("scene_manager + dispatcher: app-mediated scene transition", "[scene_m
 		must(f.scm.add<results_scene>());
 
 		dispatcher.on<level_completed>(
-			[&f](const level_completed &evt) -> void { must(f.scm.activate<results_scene>(evt)); });
+			[&f](const level_completed &evt) -> lge::result<> { return f.scm.activate<results_scene>(evt); });
 
 		must(f.scm.activate<gameplay_scene>());
 		must(f.scm.update(0.16F)); // triggers transition
@@ -181,7 +180,7 @@ TEST_CASE("scene_manager + dispatcher: app-mediated scene transition", "[scene_m
 		must(f.scm.add<results_scene>());
 
 		dispatcher.on<level_completed>(
-			[&f](const level_completed &evt) -> void { must(f.scm.activate<results_scene>(evt)); });
+			[&f](const level_completed &evt) -> lge::result<> { return f.scm.activate<results_scene>(evt); });
 
 		must(f.scm.activate<gameplay_scene>());
 		must(f.scm.update(0.16F));
