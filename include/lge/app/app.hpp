@@ -39,9 +39,7 @@ public:
 		return app_config{};
 	}
 
-	[[nodiscard]] virtual auto update(float /*dt*/) -> result<> {
-		return true;
-	}
+	[[nodiscard]] virtual auto update(float dt) -> result<>;
 
 protected:
 	// =============================================================================

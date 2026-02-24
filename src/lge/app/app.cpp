@@ -13,6 +13,7 @@
 #include <lge/internal/systems/order_system.hpp>
 #include <lge/internal/systems/render_system.hpp>
 #include <lge/internal/systems/transform_system.hpp>
+#include <lge/internal/systems/transition_system.hpp>
 #include <lge/systems/system.hpp>
 
 #include <memory>
@@ -72,6 +73,10 @@ auto app::run() -> result<> {
 	return true;
 }
 
+auto app::update(float) -> result<> {
+	return true;
+}
+
 auto app::init() -> result<> {
 	log::init();
 
@@ -90,6 +95,7 @@ auto app::init() -> result<> {
 	register_system<transform_system>(phase::global_update);
 	register_system<order_system>(phase::global_update);
 	register_system<render_system>(phase::render);
+	register_system<transition_system>(phase::post_render, scenes);
 
 	log::info("application initialized successfully");
 

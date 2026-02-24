@@ -50,6 +50,8 @@ public:
 
 	auto get_delta_time() -> float override;
 
+	[[nodiscard]] auto get_drawing_resolution() const -> glm::vec2 override;
+
 	auto render_label(font_handle font,
 					  const std::string &text,
 					  const int &size,

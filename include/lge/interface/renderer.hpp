@@ -82,6 +82,8 @@ public:
 
 	virtual auto get_delta_time() -> float = 0;
 
+	[[nodiscard]] virtual auto get_drawing_resolution() const -> glm::vec2 = 0;
+
 	auto set_debug_draw(const bool debug_draw) -> void {
 		debug_draw_ = debug_draw;
 	}

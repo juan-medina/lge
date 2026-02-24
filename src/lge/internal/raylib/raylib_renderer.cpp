@@ -183,6 +183,10 @@ auto raylib_renderer::get_delta_time() -> float {
 	return GetFrameTime();
 }
 
+auto raylib_renderer::get_drawing_resolution() const -> glm::vec2 {
+	return drawing_resolution_;
+}
+
 auto raylib_renderer::get_label_size(const font_handle font, const std::string &text, const int &size) -> glm::vec2 {
 	auto rl_font = GetFontDefault();
 
