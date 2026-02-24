@@ -14,24 +14,23 @@
 
 namespace {
 
-auto backend    = lge::raylib_backend::create();
+auto backend = lge::raylib_backend::create();
 auto dispatcher = lge::dispatcher{};
 
 struct test_fixture {
-	entt::registry       world;
-	lge::context         ctx;
-	lge::bounds_system   system;
+	entt::registry world;
+	lge::context ctx;
+	lge::bounds_system system;
 
 	explicit test_fixture()
 		: ctx{
-			.render    = *backend.renderer,
-			.actions   = *backend.input,
-			.resources = *backend.resource_manager,
-			.world     = world,
-			.events    = dispatcher,
-		  }
-	, system{lge::phase::global_update, ctx}
-	{}
+			  .render = *backend.renderer_ptr,
+			  .actions = *backend.input_ptr,
+			  .resources = *backend.resource_manager_ptr,
+			  .world = world,
+			  .events = dispatcher,
+		  },
+		  system{lge::phase::global_update, ctx} {}
 };
 
 auto add_entity(entt::registry &world, const lge::placement &p, const glm::vec2 &size) -> entt::entity {
@@ -51,7 +50,8 @@ TEST_CASE("bounds: pivot offsets", "[bounds]") {
 	test_fixture f;
 
 	SECTION("center pivot produces centered quad") {
-		const auto e = add_entity(f.world, lge::placement{0.F, 0.F, 0.F, {1.F, 1.F}, lge::pivot::center}, {100.F, 200.F});
+		const auto e =
+			add_entity(f.world, lge::placement{0.F, 0.F, 0.F, {1.F, 1.F}, lge::pivot::center}, {100.F, 200.F});
 		REQUIRE(!f.system.update(0.F).has_error());
 		const auto &b = f.world.get<lge::bounds>(e);
 		REQUIRE(b.p0 == glm::vec2{-50.F, -100.F});

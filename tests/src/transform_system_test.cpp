@@ -35,9 +35,9 @@ struct test_fixture {
 
 	explicit test_fixture()
 		: ctx{
-			  .render = *backend.renderer,
-			  .actions = *backend.input,
-			  .resources = *backend.resource_manager,
+			  .render = *backend.renderer_ptr,
+			  .actions = *backend.input_ptr,
+			  .resources = *backend.resource_manager_ptr,
 			  .world = world,
 			  .events = dispatcher,
 		  },

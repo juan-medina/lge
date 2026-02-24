@@ -12,24 +12,23 @@
 
 namespace {
 
-auto backend    = lge::raylib_backend::create();
+auto backend = lge::raylib_backend::create();
 auto dispatcher = lge::dispatcher{};
 
 struct test_fixture {
-	entt::registry       world;
-	lge::context         ctx;
-	lge::hidden_system   system;
+	entt::registry world;
+	lge::context ctx;
+	lge::hidden_system system;
 
 	explicit test_fixture()
 		: ctx{
-			.render    = *backend.renderer,
-			.actions   = *backend.input,
-			.resources = *backend.resource_manager,
-			.world     = world,
-			.events    = dispatcher,
-		  }
-	, system{lge::phase::global_update, ctx}
-	{}
+			  .render = *backend.renderer_ptr,
+			  .actions = *backend.input_ptr,
+			  .resources = *backend.resource_manager_ptr,
+			  .world = world,
+			  .events = dispatcher,
+		  },
+		  system{lge::phase::global_update, ctx} {}
 };
 
 auto add_entity(entt::registry &world) -> entt::entity {
