@@ -26,9 +26,9 @@ namespace lge {
 app::app()
 	: backend_{raylib_backend::create()},
 	  ctx{
-		  .render = *backend_.renderer,
-		  .actions = *backend_.input,
-		  .resources = *backend_.resource_manager,
+		  .render = *backend_.renderer_ptr,
+		  .actions = *backend_.input_ptr,
+		  .resources = *backend_.resource_manager_ptr,
 		  .world = registry_,
 		  .events = dispatcher_,
 	  },
@@ -54,10 +54,10 @@ auto app::run() -> result<> {
 #else
 
 #	ifdef NDEBUG
-	backend_.renderer->set_fullscreen(true);
+	backend_.renderer_ptr->set_fullscreen(true);
 #	endif
 	while(!should_exit_) {
-		should_exit_ = should_exit_ || backend_.renderer->should_close();
+		should_exit_ = should_exit_ || backend_.renderer_ptr->should_close();
 		if(const auto err = main_loop().unwrap(); err) [[unlikely]] {
 			return error("error during main loop", *err);
 		}
@@ -75,11 +75,11 @@ auto app::run() -> result<> {
 auto app::init() -> result<> {
 	log::init();
 
-	if(const auto err = backend_.renderer->init(configure()).unwrap(); err) [[unlikely]] {
+	if(const auto err = backend_.renderer_ptr->init(configure()).unwrap(); err) [[unlikely]] {
 		return error("failed to initialize renderer", *err);
 	}
 
-	if(const auto err = backend_.resource_manager->init().unwrap(); err) [[unlikely]] {
+	if(const auto err = backend_.resource_manager_ptr->init().unwrap(); err) [[unlikely]] {
 		return error("failed to initialize resource manager", *err);
 	}
 
@@ -97,11 +97,11 @@ auto app::init() -> result<> {
 }
 
 auto app::end() -> result<> {
-	if(const auto err = backend_.resource_manager->end().unwrap(); err) [[unlikely]] {
+	if(const auto err = backend_.resource_manager_ptr->end().unwrap(); err) [[unlikely]] {
 		return error("failed to shutdown resource manager", *err);
 	}
 
-	if(const auto err = backend_.renderer->end().unwrap(); err) [[unlikely]] {
+	if(const auto err = backend_.renderer_ptr->end().unwrap(); err) [[unlikely]] {
 		return error("failed to shutdown renderer", *err);
 	}
 
@@ -109,15 +109,15 @@ auto app::end() -> result<> {
 }
 
 auto app::main_loop() -> result<> {
-	if(const auto err = backend_.renderer->begin_frame().unwrap(); err) [[unlikely]] {
+	if(const auto err = backend_.renderer_ptr->begin_frame().unwrap(); err) [[unlikely]] {
 		return error("failed to begin frame", *err);
 	}
 
-	const auto delta_time = backend_.renderer->get_delta_time();
+	const auto delta_time = backend_.renderer_ptr->get_delta_time();
 
-	backend_.input->update(delta_time);
+	backend_.input_ptr->update(delta_time);
 
-	backend_.renderer->show_cursor(!backend_.input->is_controller_available());
+	backend_.renderer_ptr->show_cursor(!backend_.input_ptr->is_controller_available());
 
 	if(const auto err = update(delta_time).unwrap(); err) [[unlikely]] {
 		return error("failed to update the application", *err);
@@ -147,7 +147,7 @@ auto app::main_loop() -> result<> {
 		return error("failed to update systems in post render phase", *err);
 	}
 
-	if(const auto err = backend_.renderer->end_frame().unwrap(); err) [[unlikely]] {
+	if(const auto err = backend_.renderer_ptr->end_frame().unwrap(); err) [[unlikely]] {
 		return error("failed to end frame", *err);
 	}
 
