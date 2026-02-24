@@ -8,8 +8,8 @@
 #include <lge/scene/scene_manager.hpp>
 
 #include "../../src/example.hpp"
-#include "scenes/menu_scene.hpp"
 #include "scenes/game_scene.hpp"
+#include "scenes/menu_scene.hpp"
 
 LGE_MAIN(examples::scenes_game);
 
@@ -30,6 +30,12 @@ auto scenes_game::init() -> lge::result<> {
 	if(const auto err = scenes.activate<menu_scene>().unwrap(); err) [[unlikely]] {
 		return lge::error("failed to set active scene to menu scene", *err);
 	}
+
+	ctx.events.on<menu_scene::go_to_game>([this](const auto &) -> void {
+		if(const auto err = scenes.activate<game_scene>().unwrap(); err) [[unlikely]] {
+			lge::error("failed to set active scene to game scene");
+		}
+	});
 
 	return true;
 }

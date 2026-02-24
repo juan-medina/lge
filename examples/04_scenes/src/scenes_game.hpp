@@ -21,8 +21,7 @@ protected:
 private:
 	static constexpr auto example_title = "scenes_game!";
 	static constexpr auto kb_message = "xxx, F5 debug draw,\nF11: toggle fullscreen, Esc: exit";
-	static constexpr auto controller_message =
-		"xxx,\nSTART: debug draw, SELECT: toggle fullscreen, B: exit";
+	static constexpr auto controller_message = "xxx,\nSTART: debug draw, SELECT: toggle fullscreen, B: exit";
 };
 
 } // namespace examples

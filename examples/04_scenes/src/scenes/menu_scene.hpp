@@ -11,4 +11,11 @@ public:
 	using scene::scene;
 	[[nodiscard]] auto init() -> lge::result<>;
 	[[nodiscard]] auto on_enter() -> lge::result<>;
+
+	[[nodiscard]] auto update(float dt) -> lge::result<> override;
+
+	struct go_to_game {};
+
+private:
+	static constexpr auto go_to_game_action = 10;
 };
