@@ -83,6 +83,7 @@ public:
 			if(const auto err = current_scene_->get().on_exit().unwrap(); err) [[unlikely]] {
 				return error("error exiting current scene", *err);
 			}
+			current_scene_->get().clear_owned();
 		}
 		auto *concrete = static_cast<T *>(it->second.get());
 		if(const auto err = concrete->on_enter(std::forward<Args>(args)...).unwrap(); err) [[unlikely]] {

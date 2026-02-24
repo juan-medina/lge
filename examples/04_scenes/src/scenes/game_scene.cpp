@@ -12,7 +12,7 @@ auto game_scene::init() -> lge::result<> { // NOLINT(*-convert-member-functions-
 }
 
 auto game_scene::on_enter() -> lge::result<> {
-	const auto text_label = ctx.world.create();
+	const auto text_label = create_entity();
 	ctx.world.emplace<lge::label>(text_label, "Game Scene", lge::colors::magenta);
 	ctx.world.emplace<lge::placement>(text_label);
 

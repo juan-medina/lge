@@ -41,10 +41,22 @@ public:
 		return true;
 	}
 
+	[[nodiscard]] auto create_entity() -> entt::entity {
+		const auto entity = ctx.world.create();
+		ctx.world.emplace<scene_owned>(entity);
+		return entity;
+	}
+
+	auto clear_owned() -> void {
+		const auto view = ctx.world.view<scene_owned>();
+		ctx.world.destroy(view.begin(), view.end());
+	}
+
 protected:
 	context &ctx;
 
 private:
+	struct scene_owned {};
 };
 
 } // namespace lge
