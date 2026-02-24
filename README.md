@@ -160,11 +160,9 @@ auto my_game::init() -> lge::result<> {
         return lge::error("error initializing app", *err);
     }
 
-    auto& world = get_world();
-
-    const auto label_ent = world.create();
-    world.emplace<lge::label>(label_ent, "Hello, lge!");
-    world.emplace<lge::placement>(label_ent, 0.0F, 0.0F); // center of the screen
+    const auto label_ent = ctx.world.create();
+    ctx.world.emplace<lge::label>(label_ent, "Hello, lge!");
+    ctx.world.emplace<lge::placement>(label_ent, 0.0F, 0.0F); // center of the screen
 
     return true;
 }
