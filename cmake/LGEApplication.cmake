@@ -72,7 +72,7 @@ function(lge_add_application TARGET_NAME)
     # Resource Merging
     # =============================================================================
     set(MERGED_RESOURCES_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources")
-    set(ENGINE_RESOURCES_SRC "${CMAKE_SOURCE_DIR}/resources")
+    set(ENGINE_RESOURCES_SRC "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../resources")
     set(ENGINE_RESOURCES_DST "${MERGED_RESOURCES_DIR}/lge")
 
     # Create resource copy target (unique per application)
