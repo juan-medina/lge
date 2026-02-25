@@ -11,5 +11,7 @@ fi
 
 # run clang-format in-place for all source files
 find "src" -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -o -name "*.c" \) -exec clang-format -i {} \;
+find "include" -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -o -name "*.c" \) -exec clang-format -i {} \;
+find "examples" -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -o -name "*.c" \) -exec clang-format -i {} \;
 
 echo "Formatted all source files in src/ with clang-format."

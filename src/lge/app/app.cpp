@@ -8,6 +8,7 @@
 #include <lge/internal/raylib/raylib_backend.hpp>
 #include <lge/internal/systems/animation_system.hpp>
 #include <lge/internal/systems/bounds_system.hpp>
+#include <lge/internal/systems/collision_system.hpp>
 #include <lge/internal/systems/hidden_system.hpp>
 #include <lge/internal/systems/metrics_system.hpp>
 #include <lge/internal/systems/order_system.hpp>
@@ -94,6 +95,7 @@ auto app::init() -> result<> {
 	register_system<hidden_system>(phase::game_update);
 	register_system<transform_system>(phase::global_update);
 	register_system<order_system>(phase::global_update);
+	register_system<collision_system>(phase::global_update);
 	register_system<render_system>(phase::render);
 	register_system<transition_system>(phase::post_render, scenes);
 
