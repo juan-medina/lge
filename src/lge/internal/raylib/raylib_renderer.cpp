@@ -16,6 +16,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <entt/core/fwd.hpp>
+#include <format>
 #include <glm/ext/vector_float4.hpp>
 #include <glm/trigonometric.hpp>
 #include <spdlog/common.h>
@@ -47,6 +48,19 @@ auto raylib_renderer::init(const app_config &config) -> result<> {
 
 	SetExitKey(KEY_NULL);
 	SetTargetFPS(60);
+#ifndef __EMSCRIPTEN__
+	const auto &icon_path = config.window_icon_path.empty() ? std::string_view{default_icon_path}
+															: std::string_view{config.window_icon_path};
+
+	// NOLINTNEXTLINE(*-suspicious-stringview-data-usage)
+	if(const auto icon = LoadImage(icon_path.data()); icon.data != nullptr) {
+		SetWindowIcon(icon);
+		UnloadImage(icon);
+		log::debug("window icon set from: {}", icon_path);
+	} else {
+		return error(std::format("failed to load game icon: {}", icon_path));
+	}
+#endif
 
 	initialized_ = true;
 

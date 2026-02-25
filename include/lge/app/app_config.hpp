@@ -14,6 +14,7 @@ struct app_config {
 	glm::vec2 design_resolution{640, 360};
 	color clear_color{colors::black};
 	std::string window_title{"LGE Game"};
+	std::string window_icon_path;
 };
 
 } // namespace lge

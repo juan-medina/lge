@@ -48,45 +48,76 @@ include(external/lge/cmake/LGEApplication.cmake)
 # Define your application
 file(GLOB_RECURSE GAME_SOURCES "src/*.cpp")
 
-# Optionally specify your own resources folder
-set(GAME_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
-
 lge_add_application(my_game
 	SOURCES ${GAME_SOURCES}
 	EMSCRIPTEN_SHELL ${CMAKE_CURRENT_SOURCE_DIR}/web/template.html
-	EMSCRIPTEN_ASSETS ${CMAKE_CURRENT_SOURCE_DIR}/web/favicon.ico
-	GAME_RESOURCES ${GAME_RESOURCES_DIR}
+	EMSCRIPTEN_ASSETS
+	${CMAKE_CURRENT_SOURCE_DIR}/web/favicon.ico
+	${CMAKE_CURRENT_SOURCE_DIR}/web/favicon.svg
+	${CMAKE_CURRENT_SOURCE_DIR}/web/favicon-96x96.png
+	${CMAKE_CURRENT_SOURCE_DIR}/web/apple-touch-icon.png
+	${CMAKE_CURRENT_SOURCE_DIR}/web/web-app-manifest-192x192.png
+	${CMAKE_CURRENT_SOURCE_DIR}/web/web-app-manifest-512x512.png
+	${CMAKE_CURRENT_SOURCE_DIR}/web/site.webmanifest
+	APP_ICON_WIN ${CMAKE_CURRENT_SOURCE_DIR}/web/favicon.ico
+	APP_ICON_MAC ${CMAKE_CURRENT_SOURCE_DIR}/web/web-app-manifest-512x512.png
+	GAME_RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/resources
 )
 ```
 
 ### lge_add_application Options
 
-| Option              | Required | Description                                                         |
-|---------------------|----------|---------------------------------------------------------------------|
-| `SOURCES`           | Yes      | List of source files for your application                           |
-| `EMSCRIPTEN_SHELL`  | No       | Path to custom HTML shell template for WebAssembly builds           |
-| `EMSCRIPTEN_ASSETS` | No       | List of asset files to copy for WebAssembly builds                  |
-| `GAME_RESOURCES`    | No       | Path to your game's resources folder (merged with engine resources) |
+| Option              | Required | Description                                                                        |
+|---------------------|----------|------------------------------------------------------------------------------------|
+| `SOURCES`           | Yes      | List of source files for your application                                          |
+| `EMSCRIPTEN_SHELL`  | No       | Path to custom HTML shell template for WebAssembly builds                          |
+| `EMSCRIPTEN_ASSETS` | No       | List of asset files to copy alongside the WebAssembly output (favicons, manifest)  |
+| `GAME_RESOURCES`    | No       | Path to your game's resources folder (merged with engine resources)                |
+| `APP_ICON_WIN`      | No       | Path to a `.ico` file to embed into the Windows executable                         |
+| `APP_ICON_MAC`      | No       | Path to a `.png` file to generate a `.icns` bundle icon for macOS (via `sips`)     |
 
 The function automatically configures:
 
 - Linking to the lge library
 - Windows subsystem settings (console for Debug, Windows for Release)
+- On Windows, embeds `APP_ICON_WIN` into the `.exe` via a generated `.rc` file
+- On macOS, generates a `.icns` from `APP_ICON_MAC` at build time using `sips` + `iconutil` and bundles it
 - Emscripten/WebAssembly build options (GLFW, memory growth, exports)
 - Merges engine resources and your game resources into the build output directory:
 	- `resources/lge` (engine)
 	- `resources/game` (your game, if provided)
 - For Emscripten, preloads the merged resources folder for use in the browser
 
+### Window Icon
+
+The engine ships a default window icon used for the titlebar and taskbar on Windows, Linux, and macOS. To
+override it with your own, set `window_icon_path` in your `app_config`:
+
+```cpp
+auto my_game::configure() -> lge::app_config {
+	return {
+		.design_resolution = {640, 360},
+		.clear_color       = lge::colors::black,
+		.window_title      = "My Game",
+		.window_icon_path  = "resources/game/icon.png",
+	};
+}
+```
+
+If `window_icon_path` is left empty, the engine default is used automatically. On Emscripten, the window
+icon has no effect and is silently skipped.
+
 ---
 
 ## Running the Tests
 
-Tests cover engine internals that have no dependency on raylib or a render context. They are off by default and do not affect library consumers.
+Tests cover engine internals that have no dependency on raylib or a render context. They are off by default
+and do not affect library consumers.
 
 ### Testing philosophy
 
-Tests in lge are targeted and pragmatic. The goal is to catch regressions in engine subsystems where bugs are silent and hard to diagnose — not to achieve coverage metrics or test every line of code.
+Tests in lge are targeted and pragmatic. The goal is to catch regressions in engine subsystems where bugs are
+silent and hard to diagnose — not to achieve coverage metrics or test every line of code.
 
 **What is worth testing:**
 - Pure logic with no external dependencies — math, transforms, hierarchy relationships, error propagation
@@ -98,22 +129,26 @@ Tests in lge are targeted and pragmatic. The goal is to catch regressions in eng
 - Gameplay feel, timing, or visual correctness
 - Scene logic or application lifecycle
 
-Tests use a real `entt::registry` — no mocking. If a system needs a window to run, it is not a candidate for testing here.
+Tests use a real `entt::registry` — no mocking. If a system needs a window to run, it is not a candidate
+for testing here.
 
 ### Building with tests enabled
+
 ```bash
 cmake -B cmake-build-debug -DCMAKE_BUILD_TYPE=Debug -DLGE_BUILD_TESTS=ON
 cmake --build cmake-build-debug
 ```
 
 ### Running the tests
+
 ```bash
 ctest --test-dir cmake-build-debug/tests --output-on-failure
 ```
 
 ### Continuous integration
 
-Tests run automatically on every push via GitHub Actions across Linux (GCC), macOS (Apple Clang), and Windows (MSVC).
+Tests run automatically on every push via GitHub Actions across Linux (GCC), macOS (Apple Clang), and
+Windows (MSVC).
 
 ---
 
@@ -191,15 +226,21 @@ auto my_game::init() -> lge::result<> {
 
 *Engine assets:*
 
-- [Peaberry Pixel Font by emhuo](https://emhuo.itch.io/peaberry-pixel-font) (licensed under Open Font License Version
-  1.1).
+- [Peaberry Pixel Font by emhuo](https://emhuo.itch.io/peaberry-pixel-font) (licensed under Open Font License
+  Version 1.1).
 
 *Examples assets:*
 
-- [Pixelart Hiker by Chroma Dave](https://chroma-dave.itch.io/pixelart-hiker) (free to use in any project per the
-  author).
-- [Demon Woods Parallax Background by Aethrall](https://aethrall.itch.io/demon-woods-parallax-background) (set as free
-  by the author).
+- [Pixelart Hiker by Chroma Dave](https://chroma-dave.itch.io/pixelart-hiker) (free to use in any project per
+  the author).
+- [Demon Woods Parallax Background by Aethrall](https://aethrall.itch.io/demon-woods-parallax-background) (set
+  as free by the author).
+
+**Tools**
+
+- [RealFaviconGenerator](https://realfavicongenerator.net/) — used to generate the multi-platform favicon and
+  web app icon set from the engine logo.
+- [Free Tex Packer](https://free-tex-packer.com/) — used to generate sprite sheets from individual frames.
 
 **License**
 
@@ -207,7 +248,8 @@ auto my_game::init() -> lge::result<> {
 
 **Contributing**
 
-- Feel free to open issues or pull requests. For code changes, follow the existing style and keep changes focused.
+- Feel free to open issues or pull requests. For code changes, follow the existing style and keep changes
+  focused.
 
 **Contact**
 

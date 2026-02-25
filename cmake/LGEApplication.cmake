@@ -11,6 +11,8 @@
 #       [EMSCRIPTEN_SHELL <path-to-shell-template>]
 #       [EMSCRIPTEN_ASSETS <asset_files...>]
 #       [GAME_RESOURCES <path-to-game-resources>]
+#       [APP_ICON_WIN <path-to-.ico>]
+#       [APP_ICON_MAC <path-to-.png>]
 #   )
 #
 # Parameters:
@@ -19,12 +21,16 @@
 #   EMSCRIPTEN_SHELL      - Path to custom HTML shell template for Emscripten builds (optional)
 #   EMSCRIPTEN_ASSETS     - List of asset files to copy for Emscripten builds (optional)
 #   GAME_RESOURCES        - Path to the game's resources folder to merge with engine resources (optional)
+#   APP_ICON_WIN          - Path to a .ico file to embed in the Windows executable (optional)
+#   APP_ICON_MAC          - Path to a .png file to generate a .icns bundle icon for macOS (optional)
 #
 # This function will:
 #   - Always copy engine resources from /resources to resources/lge in the build output
 #   - Optionally copy game resources to resources/game if GAME_RESOURCES is provided
 #   - For Emscripten, set up the merged resources folder as a preload file
 #   - Resources are refreshed on every build
+#   - On Windows, embed APP_ICON_WIN into the executable via a generated .rc file
+#   - On macOS, generate a .icns from APP_ICON_MAC using sips + iconutil and bundle it
 #
 # Example:
 #   lge_add_application(my_game
@@ -32,11 +38,13 @@
 #       EMSCRIPTEN_SHELL ${CMAKE_CURRENT_SOURCE_DIR}/web/template.html
 #       EMSCRIPTEN_ASSETS ${CMAKE_CURRENT_SOURCE_DIR}/web/favicon.ico
 #       GAME_RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/resources
+#       APP_ICON_WIN ${CMAKE_CURRENT_SOURCE_DIR}/web/favicon.ico
+#       APP_ICON_MAC ${CMAKE_CURRENT_SOURCE_DIR}/web/web-app-manifest-512x512.png
 #   )
 
 function(lge_add_application TARGET_NAME)
     set(options "")
-    set(oneValueArgs EMSCRIPTEN_SHELL GAME_RESOURCES)
+    set(oneValueArgs EMSCRIPTEN_SHELL GAME_RESOURCES APP_ICON_WIN APP_ICON_MAC)
     set(multiValueArgs SOURCES EMSCRIPTEN_ASSETS)
     cmake_parse_arguments(LGE_APP "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -101,6 +109,44 @@ function(lge_add_application TARGET_NAME)
                 NOMINMAX
                 NOUSER
                 NOGDI
+        )
+
+        # Embed icon into the executable via a generated .rc file
+        if (LGE_APP_APP_ICON_WIN)
+            set(RC_FILE "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}_icon.rc")
+            file(WRITE "${RC_FILE}" "IDI_ICON1 ICON \"${LGE_APP_APP_ICON_WIN}\"\n")
+            target_sources(${TARGET_NAME} PRIVATE "${RC_FILE}")
+        endif ()
+    endif ()
+
+    # macOS-specific settings
+    if (APPLE AND LGE_APP_APP_ICON_MAC)
+        set(ICONSET_DIR "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.iconset")
+        set(ICNS_FILE "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.icns")
+
+        add_custom_command(
+                OUTPUT "${ICNS_FILE}"
+                COMMAND ${CMAKE_COMMAND} -E make_directory "${ICONSET_DIR}"
+                COMMAND sips -z 16 16 "${LGE_APP_APP_ICON_MAC}" --out "${ICONSET_DIR}/icon_16x16.png"
+                COMMAND sips -z 32 32 "${LGE_APP_APP_ICON_MAC}" --out "${ICONSET_DIR}/icon_32x32.png"
+                COMMAND sips -z 64 64 "${LGE_APP_APP_ICON_MAC}" --out "${ICONSET_DIR}/icon_64x64.png"
+                COMMAND sips -z 128 128 "${LGE_APP_APP_ICON_MAC}" --out "${ICONSET_DIR}/icon_128x128.png"
+                COMMAND sips -z 256 256 "${LGE_APP_APP_ICON_MAC}" --out "${ICONSET_DIR}/icon_256x256.png"
+                COMMAND sips -z 512 512 "${LGE_APP_APP_ICON_MAC}" --out "${ICONSET_DIR}/icon_512x512.png"
+                COMMAND iconutil -c icns "${ICONSET_DIR}" -o "${ICNS_FILE}"
+                DEPENDS "${LGE_APP_APP_ICON_MAC}"
+                COMMENT "Generating ${TARGET_NAME}.icns"
+                VERBATIM
+        )
+
+        get_filename_component(ICNS_NAME "${ICNS_FILE}" NAME)
+        target_sources(${TARGET_NAME} PRIVATE "${ICNS_FILE}")
+        set_source_files_properties("${ICNS_FILE}" PROPERTIES
+                MACOSX_PACKAGE_LOCATION "Resources"
+        )
+        set_target_properties(${TARGET_NAME} PROPERTIES
+                MACOSX_BUNDLE TRUE
+                MACOSX_BUNDLE_ICON_FILE "${ICNS_NAME}"
         )
     endif ()
 
