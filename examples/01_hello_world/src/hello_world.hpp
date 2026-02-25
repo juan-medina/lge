@@ -5,6 +5,7 @@
 
 #include <lge/core/result.hpp>
 
+#include "../../src/actions.hpp"
 #include "../../src/example.hpp"
 #include "entity/fwd.hpp"
 
@@ -29,8 +30,8 @@ private:
 	static constexpr auto controller_message = "Press controller A: hide hello+world, X: hide world,\n"
 											   "START: debug draw, SELECT: toggle fullscreen, B: exit";
 
-	static constexpr size_t hide_hello_world_action = total_base_actions + 0;
-	static constexpr size_t hide_world_action = total_base_actions + 1;
+	static constexpr size_t hide_hello_world_action = actions::total_base_actions + 0;
+	static constexpr size_t hide_world_action = actions::total_base_actions + 1;
 
 	entt::entity center_ent_ = entt::null;
 	entt::entity world_text_ent_ = entt::null;

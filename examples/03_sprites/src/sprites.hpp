@@ -7,6 +7,7 @@
 #include <lge/core/result.hpp>
 #include <lge/interface/resources.hpp>
 
+#include "../../src/actions.hpp"
 #include "../../src/example.hpp"
 
 #include <array>
@@ -45,8 +46,8 @@ private:
 	static constexpr auto idle_anim = "idle"_hs;
 	static constexpr auto run_anim = "run"_hs;
 
-	static constexpr size_t left_action = total_base_actions + 0;
-	static constexpr size_t right_action = total_base_actions + 1;
+	static constexpr size_t left_action = actions::total_base_actions + 0;
+	static constexpr size_t right_action = actions::total_base_actions + 1;
 
 	lge::animation_library_handle animation_library_{lge::invalid_animation_library};
 
