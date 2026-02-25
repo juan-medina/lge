@@ -110,7 +110,7 @@ public:
 
 	template<typename T, typename... Args>
 		requires std::is_base_of_v<scene, T>
-	[[nodiscard]] auto transition_activate(float duration = default_transition_duration, Args &&...args) -> result<> {
+	[[nodiscard]] auto transition_activate(Args &&...args) -> result<> {
 		if(!current_scene_.has_value()) {
 			// First scene — activate immediately with no effect.
 			return activate<T>(std::forward<Args>(args)...);
@@ -147,7 +147,7 @@ public:
 			return true;
 		};
 
-		transition_duration_ = duration;
+		transition_duration_ = transition_duration;
 		transition_elapsed_ = 0.0F;
 		state_ = transition_state::fade_out;
 
@@ -171,14 +171,14 @@ private:
 
 	enum class transition_state : uint8_t { idle, fade_out, fade_in };
 
-	static constexpr float default_transition_duration = 0.8F;
+	static constexpr float transition_duration = 0.4F;
 
 	context ctx_;
 	std::optional<std::reference_wrapper<scene>> current_scene_;
 	std::unordered_map<entt::id_type, std::unique_ptr<scene>> scenes_;
 
 	transition_state state_ = transition_state::idle;
-	float transition_duration_ = default_transition_duration;
+	float transition_duration_ = transition_duration;
 	float transition_elapsed_ = 0.0F;
 	uint8_t overlay_alpha_ = 0;
 	std::function<result<>()> pending_activate_;

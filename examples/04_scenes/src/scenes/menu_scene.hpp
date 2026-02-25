@@ -6,6 +6,11 @@
 #include <lge/core/result.hpp>
 #include <lge/scene/scene.hpp>
 
+#include "../events.hpp"
+
+#include <entt/entity/entity.hpp>
+#include <entt/entity/fwd.hpp>
+
 namespace examples {
 
 class menu_scene: public lge::scene {
@@ -16,7 +21,14 @@ public:
 
 	[[nodiscard]] auto update(float dt) -> lge::result<> override;
 
-	struct go_to_game {};
+private:
+	game_type selected_game_{game_type::red};
+
+	auto change_selection(game_type type) -> void;
+
+	entt::entity menu_message_ent_ = entt::null;
+	static constexpr auto kb_message = "Cursor left/right & enter to choose";
+	static constexpr auto controller_message = "Controller left/right & A to choose";
 };
 
 } // namespace examples

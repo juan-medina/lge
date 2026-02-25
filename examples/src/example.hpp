@@ -37,6 +37,14 @@ protected:
 		return game_res;
 	}
 
+	auto set_kb_message(std::string_view message) -> void {
+		kb_message_ = message;
+	}
+
+	auto set_controller_message(std::string_view message) -> void {
+		controller_message_ = message;
+	}
+
 private:
 	static constexpr auto default_clear_color = lge::colors::black;
 	lge::color clear_color_ = default_clear_color;

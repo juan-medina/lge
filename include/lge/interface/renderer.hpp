@@ -6,7 +6,7 @@
 #include <lge/app/app_config.hpp>
 #include <lge/core/colors.hpp>
 #include <lge/core/result.hpp>
-#include <lge/interface/resource_manager.hpp>
+#include <lge/interface/resources.hpp>
 
 #include <entt/core/fwd.hpp>
 #include <glm/ext/vector_float2.hpp>
@@ -95,6 +95,8 @@ public:
 	auto toggle_debug_draw() -> void {
 		debug_draw_ = !debug_draw_;
 	}
+
+	virtual auto set_clear_color(const color &clear_color) -> void = 0;
 
 private:
 	bool debug_draw_ = false;

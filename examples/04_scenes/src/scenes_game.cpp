@@ -8,6 +8,7 @@
 #include <lge/scene/scene_manager.hpp>
 
 #include "../../src/example.hpp"
+#include "events.hpp"
 #include "scenes/game_scene.hpp"
 #include "scenes/menu_scene.hpp"
 
@@ -31,14 +32,14 @@ auto scenes_game::init() -> lge::result<> {
 		return lge::error("failed to set active scene to menu scene", *err);
 	}
 
-	ctx.events.on<menu_scene::go_to_game>([this](const auto &) -> lge::result<> {
-		if(const auto err = scenes.transition_activate<game_scene>().unwrap(); err) [[unlikely]] {
+	ctx.events.on<go_to_game>([this](const auto &evt) -> lge::result<> {
+		if(const auto err = scenes.transition_activate<game_scene>(evt.type).unwrap(); err) [[unlikely]] {
 			return lge::error("failed to set active scene to game scene", *err);
 		}
 		return true;
 	});
 
-	ctx.events.on<game_scene::go_to_menu>([this](const auto &) -> lge::result<> {
+	ctx.events.on<go_to_menu>([this](const auto &) -> lge::result<> {
 		if(const auto err = scenes.transition_activate<menu_scene>().unwrap(); err) [[unlikely]] {
 			return lge::error("failed to set active scene to menu scene", *err);
 		}

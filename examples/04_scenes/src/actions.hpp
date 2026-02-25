@@ -9,7 +9,12 @@
 
 namespace examples::actions {
 
-static constexpr lge::input::id go_to_game_action = total_base_actions + 0;
-static constexpr lge::input::id go_to_menu_action = total_base_actions + 1;
+// menu actions
+static constexpr lge::input::id left_action = total_base_actions + 0;
+static constexpr lge::input::id right_action = total_base_actions + 1;
+static constexpr lge::input::id go_to_game_action = total_base_actions + 2;
+
+// game actions
+static constexpr lge::input::id go_to_menu_action = go_to_game_action + 1;
 
 } // namespace examples::actions

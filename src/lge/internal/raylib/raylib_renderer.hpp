@@ -88,6 +88,8 @@ public:
 					   const color &fill_color,
 					   float border_thickness) const -> void override;
 
+	auto set_clear_color(const color &clear_color) -> void override;
+
 private:
 	raylib_resource_manager &resource_manager_;
 	static auto setup_raylib_log() -> void;

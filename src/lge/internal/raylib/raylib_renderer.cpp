@@ -475,4 +475,8 @@ auto raylib_renderer::render_circle(const glm::vec2 &center,
 	}
 }
 
+auto raylib_renderer::set_clear_color(const color &clear_color) -> void {
+	clear_color_ = color_to_raylib(clear_color);
+}
+
 } // namespace lge
