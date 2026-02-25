@@ -242,6 +242,11 @@ auto my_game::init() -> lge::result<> {
   web app icon set from the engine logo.
 - [Free Tex Packer](https://free-tex-packer.com/) — used to generate sprite sheets from individual frames.
 
+## Documentation
+
+- [Design Philosophy](DESIGN.md) — why the engine is the way it is
+
+
 **License**
 
 - This project is licensed under the MIT License — see `LICENSE` for details.
