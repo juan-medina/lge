@@ -3,15 +3,22 @@
 # SPDX-License-Identifier: MIT
 set -euo pipefail
 
-# Ensure we are run from project root ---
-if [ ! -d "src" ]; then
-    echo "Error: run this script from the project root (where src/ exists)."
+dirs=("src" "include" "examples" "tests")
+
+for dir in "${dirs[@]}"; do
+    if [ ! -d "$dir" ]; then
+        echo "Error: directory '$dir' not found. Run this script from the project root."
+        exit 1
+    fi
+done
+
+if ! command -v clang-format &> /dev/null; then
+    echo "Error: clang-format not found."
     exit 1
 fi
 
-# run clang-format in-place for all source files
-find "src" -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -o -name "*.c" \) -exec clang-format -i {} \;
-find "include" -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -o -name "*.c" \) -exec clang-format -i {} \;
-find "examples" -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -o -name "*.c" \) -exec clang-format -i {} \;
+find "${dirs[@]}" \
+    -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -o -name "*.c" \) \
+    -exec clang-format -i {} +
 
-echo "Formatted all source files in src/ with clang-format."
+echo "Formatted all source files with clang-format."

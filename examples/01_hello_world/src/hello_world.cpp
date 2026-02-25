@@ -24,24 +24,24 @@ auto hello_world::init() -> lge::result<> {
 	}
 
 	ctx.actions.bind(hide_hello_world_action,
-			   {
-				   .keys = {lge::input::key::one},
-				   .buttons = {lge::input::button::right_face_down},
-			   });
+					 {
+						 .keys = {lge::input::key::one},
+						 .buttons = {lge::input::button::right_face_down},
+					 });
 
 	ctx.actions.bind(hide_world_action,
-			   {
-				   .keys = {lge::input::key::two},
-				   .buttons = {lge::input::button::right_face_left},
-			   });
+					 {
+						 .keys = {lge::input::key::two},
+						 .buttons = {lge::input::button::right_face_left},
+					 });
 
 	center_ent_ = ctx.world.create();
 	ctx.world.emplace<lge::placement>(center_ent_, 0, 0);
 	ctx.world.emplace<oscillation_system::effect>(center_ent_,
-											  oscillation_system::effect{
-												  .scale = {.min = 1.0F, .max = 3.0F, .period = 8.0F},
-												  .rotation = {.min = 0.0F, .max = 360.0F, .period = 4.0F},
-											  });
+												  oscillation_system::effect{
+													  .scale = {.min = 1.0F, .max = 3.0F, .period = 8.0F},
+													  .rotation = {.min = 0.0F, .max = 360.0F, .period = 4.0F},
+												  });
 
 	static constexpr auto gap_between_labels = 10.0F;
 

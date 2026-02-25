@@ -7,6 +7,7 @@
 #include <lge/interface/input.hpp>
 #include <lge/interface/renderer.hpp>
 #include <lge/interface/resource_manager.hpp>
+
 #include "entity/fwd.hpp"
 
 #include <entt/entt.hpp>
