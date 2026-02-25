@@ -15,6 +15,7 @@ struct app_config {
 	color clear_color{colors::black};
 	std::string window_title{"LGE Game"};
 	std::string window_icon_path;
+	bool resizable_window{false};
 };
 
 } // namespace lge

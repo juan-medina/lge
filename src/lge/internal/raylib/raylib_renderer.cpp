@@ -17,7 +17,6 @@
 #include <cstdio>
 #include <entt/core/fwd.hpp>
 #include <format>
-#include <glm/ext/vector_float4.hpp>
 #include <glm/trigonometric.hpp>
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
@@ -34,11 +33,35 @@ auto raylib_renderer::init(const app_config &config) -> result<> {
 	setup_raylib_log();
 
 #if defined(_WIN32) || defined(__EMSCRIPTEN__)
+	// we need to create a window before we can get the monitor size
 	InitWindow(1920, 1080, title_.c_str());
+
+	// calculate the aspect ratio of the design resolution
+	const auto res_x = config.design_resolution.x;
+	const auto res_y = config.design_resolution.y;
+	const auto aspect_ratio = res_x / res_y;
+
+	// get the size of the monitor where the window is currently located (default monitor usually)
+	const auto monitor = GetCurrentMonitor();
+	const auto mon_y = GetMonitorHeight(monitor);
+
+	// our window size will be 2/3 of the monitor size, but with the aspect ratio of the design resolution
+	const auto win_y = static_cast<int>(static_cast<float>(mon_y) * 2.F / 3.F);
+	const auto win_x = static_cast<int>(static_cast<float>(win_y) * aspect_ratio);
+	SetWindowSize(win_x, win_y);
+
+	// center the window on the monitor
+	const auto center_x = (GetMonitorWidth(monitor) - win_x) / 2;
+	const auto center_y = (mon_y - win_y) / 2;
+	SetWindowPosition(center_x, center_y);
+
 #else
 	InitWindow(0, 0, title_.c_str());
 #endif
-	SetWindowState(FLAG_WINDOW_RESIZABLE);
+
+	if(config.resizable_window) [[unlikely]] {
+		SetWindowState(FLAG_WINDOW_RESIZABLE);
+	}
 
 #ifndef __EMSCRIPTEN__
 	if(!IsWindowReady()) [[unlikely]] {
@@ -424,7 +447,7 @@ auto raylib_renderer::render_rect(const glm::vec2 &center,
 	auto rec = Rectangle{.x = screen_center.x, .y = screen_center.y, .width = size.x, .height = size.y};
 	DrawRectanglePro(rec, {.x = size.x * 0.5F, .y = size.y * 0.5F}, rotation, fill);
 
-	if(border_color.a > 0.0F && border_thickness > 0.0F) {
+	if(border_color.a > 0 && border_thickness > 0.0F) {
 		const auto rotation_rad = glm::radians(rotation);
 		const auto cos_r = glm::cos(rotation_rad);
 		const auto sin_r = glm::sin(rotation_rad);
@@ -479,12 +502,12 @@ auto raylib_renderer::render_circle(const glm::vec2 &center,
 	const auto ray_center = Vector2{.x = screen_center.x, .y = screen_center.y};
 
 	// has fill, draw the filled circle
-	if(fill_color.a > 0.0F) {
+	if(fill_color.a > 0) {
 		DrawCircleV({.x = screen_center.x, .y = screen_center.y}, radius, ray_fill_color);
 	}
 
 	// has border, draw the border
-	if(border_color.a > 0.0F && border_thickness > 0.0F) {
+	if(border_color.a > 0 && border_thickness > 0.0F) {
 		DrawRing(ray_center, radius - border_thickness, radius, 0.0F, 360.0F, 100, ray_border_color);
 	}
 }

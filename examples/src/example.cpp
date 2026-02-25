@@ -23,7 +23,10 @@ auto example::update(const float dt) -> lge::result<> {
 }
 
 auto example::configure() -> lge::app_config {
-	return {.design_resolution = game_res, .clear_color = clear_color_, .window_title = game_title_};
+	return {.design_resolution = game_res,
+			.clear_color = clear_color_,
+			.window_title = game_title_,
+			.resizable_window = true};
 }
 
 auto example::init() -> lge::result<> {
