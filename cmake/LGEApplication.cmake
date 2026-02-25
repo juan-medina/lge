@@ -53,6 +53,13 @@ function(lge_add_application TARGET_NAME)
     endif ()
 
     # Set log levels
+    if(NOT LGE_ACTIVE_LOG_LEVEL)
+        if(CMAKE_BUILD_TYPE STREQUAL "Release")
+            set(LGE_ACTIVE_LOG_LEVEL "LGE_LOG_LEVEL_ERROR")
+        else()
+            set(LGE_ACTIVE_LOG_LEVEL "LGE_LOG_LEVEL_DEBUG")
+        endif()
+    endif()
     target_compile_definitions(lge PUBLIC LGE_ACTIVE_LOG_LEVEL=${LGE_ACTIVE_LOG_LEVEL})
     target_compile_definitions(lge PUBLIC SPDLOG_ACTIVE_LEVEL=${LGE_ACTIVE_LOG_LEVEL})
 
