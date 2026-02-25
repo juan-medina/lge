@@ -1,21 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
-#include <lge/components/hierarchy.hpp>
 #include <lge/components/placement.hpp>
-#include <lge/internal/components/metrics.hpp>
 #include <lge/internal/components/transform.hpp>
-#include <lge/internal/raylib/raylib_backend.hpp>
 #include <lge/internal/systems/transform_system.hpp>
-#include <lge/systems/system.hpp>
+
+#include "test_helpers.hpp"
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <cmath>
-#include <entt/entity/fwd.hpp>
-#include <entt/entt.hpp>
-#include <glm/ext/vector_float2.hpp>
-#include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>
 #include <ranges>
 
@@ -25,51 +19,7 @@ namespace {
 
 constexpr auto tolerance = 1e-4F;
 
-auto backend = lge::raylib_backend::create();
-auto dispatcher = lge::dispatcher{};
-
-struct test_fixture {
-	entt::registry world;
-	lge::context ctx;
-	lge::transform_system system;
-
-	explicit test_fixture()
-		: ctx{
-			  .render = *backend.renderer_ptr,
-			  .actions = *backend.input_ptr,
-			  .resources = *backend.resource_manager_ptr,
-			  .world = world,
-			  .events = dispatcher,
-		  },
-		  system{lge::phase::global_update, ctx} {}
-};
-
-auto add_entity(entt::registry &world, const lge::placement &p) -> entt::entity {
-	const auto e = world.create();
-	world.emplace<lge::placement>(e, p);
-	return e;
-}
-
-auto add_child(entt::registry &world, const entt::entity parent_entity, const lge::placement &p) -> entt::entity {
-	const auto child = world.create();
-	world.emplace<lge::placement>(child, p);
-	world.emplace<lge::parent>(child, parent_entity);
-	if(!world.all_of<lge::children>(parent_entity)) {
-		world.emplace<lge::children>(parent_entity);
-	}
-	world.get<lge::children>(parent_entity).ids.push_back(child);
-	return child;
-}
-
-auto world_pos(const entt::registry &world, const entt::entity e) -> glm::vec2 {
-	const auto &mat = world.get<lge::transform>(e).world;
-	return {mat[2][0], mat[2][1]};
-}
-
-auto world_scale(const entt::registry &world, const entt::entity e) -> glm::vec2 {
-	const auto &mat = world.get<lge::transform>(e).world;
-	return {glm::length(glm::vec2{mat[0][0], mat[0][1]}), glm::length(glm::vec2{mat[1][0], mat[1][1]})};
-}
+using fixture = system_fixture<lge::transform_system>;
 
 } // namespace
 
@@ -78,7 +28,7 @@ auto world_scale(const entt::registry &world, const entt::entity e) -> glm::vec2
 // =============================================================================
 
 TEST_CASE("transform: root entity", "[transform]") {
-	test_fixture f;
+	fixture f;
 
 	SECTION("position is applied directly") {
 		const auto e = add_entity(f.world, lge::placement{100.F, 200.F});
@@ -126,7 +76,7 @@ TEST_CASE("transform: root entity", "[transform]") {
 // =============================================================================
 
 TEST_CASE("transform: pivot with metrics", "[transform][pivot]") {
-	test_fixture f;
+	fixture f;
 
 	SECTION("center pivot offsets by half size") {
 		const auto e = f.world.create();
@@ -183,7 +133,7 @@ TEST_CASE("transform: pivot with metrics", "[transform][pivot]") {
 // =============================================================================
 
 TEST_CASE("transform: child inherits parent transform", "[transform][hierarchy]") {
-	test_fixture f;
+	fixture f;
 
 	SECTION("child position adds to parent position") {
 		const auto parent = add_entity(f.world, lge::placement{100.F, 0.F});
@@ -240,7 +190,7 @@ TEST_CASE("transform: child inherits parent transform", "[transform][hierarchy]"
 // =============================================================================
 
 TEST_CASE("transform: deep hierarchy", "[transform][hierarchy][deep]") {
-	test_fixture f;
+	fixture f;
 
 	SECTION("grandchild accumulates all ancestor positions") {
 		const auto grandparent = add_entity(f.world, lge::placement{100.F, 0.F});
@@ -271,7 +221,7 @@ TEST_CASE("transform: deep hierarchy", "[transform][hierarchy][deep]") {
 // =============================================================================
 
 TEST_CASE("transform: hierarchy mutation", "[transform][hierarchy]") {
-	test_fixture f;
+	fixture f;
 
 	SECTION("detaching child removes it from parent children list") {
 		const auto parent = add_entity(f.world, lge::placement{0.F, 0.F});

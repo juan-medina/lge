@@ -1,47 +1,23 @@
 // SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
-#include <lge/app/context.hpp>
 #include <lge/components/hierarchy.hpp>
 #include <lge/components/order.hpp>
 #include <lge/internal/components/render_order.hpp>
-#include <lge/internal/raylib/raylib_backend.hpp>
 #include <lge/internal/systems/order_system.hpp>
 
 #include "test_helpers.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <entt/entt.hpp>
 
-namespace {
-
-auto backend = lge::raylib_backend::create();
-auto dispatcher = lge::dispatcher{};
-
-struct test_fixture {
-	entt::registry world;
-	lge::context ctx;
-	lge::order_system system;
-
-	explicit test_fixture()
-		: ctx{
-			  .render = *backend.renderer_ptr,
-			  .actions = *backend.input_ptr,
-			  .resources = *backend.resource_manager_ptr,
-			  .world = world,
-			  .events = dispatcher,
-		  },
-		  system{lge::phase::global_update, ctx} {}
-};
-
-} // namespace
+using fixture = system_fixture<lge::order_system>;
 
 // =============================================================================
 // Root entity
 // =============================================================================
 
 TEST_CASE("order: root entity", "[order]") {
-	test_fixture f;
+	fixture f;
 
 	SECTION("order component produces correct render_order") {
 		const auto e = f.world.create();
@@ -64,7 +40,7 @@ TEST_CASE("order: root entity", "[order]") {
 // =============================================================================
 
 TEST_CASE("order: hierarchy", "[order][hierarchy]") {
-	test_fixture f;
+	fixture f;
 
 	SECTION("child inherits parent layer") {
 		const auto parent = f.world.create();

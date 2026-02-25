@@ -1,44 +1,17 @@
 // SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
-#include <lge/app/context.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/internal/components/bounds.hpp>
-#include <lge/internal/components/metrics.hpp>
-#include <lge/internal/raylib/raylib_backend.hpp>
 #include <lge/internal/systems/bounds_system.hpp>
 
+#include "test_helpers.hpp"
+
 #include <catch2/catch_test_macros.hpp>
-#include <entt/entt.hpp>
-#include <glm/ext/vector_float2.hpp>
 
 namespace {
 
-auto backend = lge::raylib_backend::create();
-auto dispatcher = lge::dispatcher{};
-
-struct test_fixture {
-	entt::registry world;
-	lge::context ctx;
-	lge::bounds_system system;
-
-	explicit test_fixture()
-		: ctx{
-			  .render = *backend.renderer_ptr,
-			  .actions = *backend.input_ptr,
-			  .resources = *backend.resource_manager_ptr,
-			  .world = world,
-			  .events = dispatcher,
-		  },
-		  system{lge::phase::global_update, ctx} {}
-};
-
-auto add_entity(entt::registry &world, const lge::placement &p, const glm::vec2 &size) -> entt::entity {
-	const auto e = world.create();
-	world.emplace<lge::placement>(e, p);
-	world.emplace<lge::metrics>(e, lge::metrics{size});
-	return e;
-}
+using fixture = system_fixture<lge::bounds_system>;
 
 } // namespace
 
@@ -47,7 +20,7 @@ auto add_entity(entt::registry &world, const lge::placement &p, const glm::vec2 
 // =============================================================================
 
 TEST_CASE("bounds: pivot offsets", "[bounds]") {
-	test_fixture f;
+	fixture f;
 
 	SECTION("center pivot produces centered quad") {
 		const auto e =
@@ -94,7 +67,8 @@ TEST_CASE("bounds: pivot offsets", "[bounds]") {
 }
 
 TEST_CASE("bounds: missing components", "[bounds]") {
-	test_fixture f;
+	fixture f;
+
 	SECTION("entity without metrics does not get bounds") {
 		const auto e = f.world.create();
 		f.world.emplace<lge::placement>(e, lge::placement{0.F, 0.F});

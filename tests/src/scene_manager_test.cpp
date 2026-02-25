@@ -3,41 +3,16 @@
 
 #include <lge/components/hierarchy.hpp>
 #include <lge/components/order.hpp>
-#include <lge/dispatcher/dispatcher.hpp>
 #include <lge/internal/components/render_order.hpp>
-#include <lge/internal/raylib/raylib_backend.hpp>
 #include <lge/scene/scene.hpp>
 #include <lge/scene/scene_manager.hpp>
 
 #include "test_helpers.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <entt/entt.hpp>
 #include <string>
 #include <vector>
 
-namespace {
-
-auto backend = lge::raylib_backend::create();
-auto dispatcher = lge::dispatcher{};
-
-struct test_fixture {
-	entt::registry world;
-	lge::context ctx;
-	lge::scene_manager scm;
-
-	explicit test_fixture()
-		: ctx{
-			  .render = *backend.renderer_ptr,
-			  .actions = *backend.input_ptr,
-			  .resources = *backend.resource_manager_ptr,
-			  .world = world,
-			  .events = dispatcher,
-		  },
-		  scm{ctx} {}
-};
-
-} // namespace
 // =============================================================================
 // Test Scenes
 // =============================================================================
@@ -149,7 +124,7 @@ public:
 TEST_CASE("scene_manager: registering scenes", "[scene_manager]") {
 	SECTION("registering one scene succeeds and calls init") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		const auto res = f.scm.add<test_scene1>();
 		REQUIRE(res.has_value());
@@ -159,7 +134,7 @@ TEST_CASE("scene_manager: registering scenes", "[scene_manager]") {
 
 	SECTION("registering multiple scenes calls init on each") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		must(f.scm.add<test_scene1>());
 		const auto res = f.scm.add<test_scene2>();
@@ -170,8 +145,7 @@ TEST_CASE("scene_manager: registering scenes", "[scene_manager]") {
 
 	SECTION("registering same scene twice returns error") {
 		test_log.clear();
-		test_fixture f;
-		;
+		scene_fixture f;
 
 		must(f.scm.add<test_scene1>());
 		test_log.clear();
@@ -190,7 +164,7 @@ TEST_CASE("scene_manager: registering scenes", "[scene_manager]") {
 TEST_CASE("scene_manager: changing scene", "[scene_manager]") {
 	SECTION("first activation calls on_enter") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		must(f.scm.add<test_scene1>());
 		test_log.clear();
@@ -202,7 +176,7 @@ TEST_CASE("scene_manager: changing scene", "[scene_manager]") {
 
 	SECTION("switching scenes calls on_exit then on_enter") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		must(f.scm.add<test_scene1>());
 		must(f.scm.add<test_scene2>());
@@ -216,7 +190,7 @@ TEST_CASE("scene_manager: changing scene", "[scene_manager]") {
 
 	SECTION("switching to non-existing scene returns error") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		must(f.scm.add<test_scene1>());
 		test_log.clear();
@@ -228,7 +202,7 @@ TEST_CASE("scene_manager: changing scene", "[scene_manager]") {
 
 	SECTION("on_enter receives data passed to activate") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		must(f.scm.add<test_scene_with_data>());
 		test_log.clear();
@@ -246,7 +220,7 @@ TEST_CASE("scene_manager: changing scene", "[scene_manager]") {
 TEST_CASE("scene_manager: update", "[scene_manager]") {
 	SECTION("update calls update on active scene only") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		must(f.scm.add<test_scene1>());
 		must(f.scm.add<test_scene2>());
@@ -260,7 +234,7 @@ TEST_CASE("scene_manager: update", "[scene_manager]") {
 
 	SECTION("update with no active scene does nothing") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		must(f.scm.add<test_scene1>());
 		test_log.clear();
@@ -278,7 +252,7 @@ TEST_CASE("scene_manager: update", "[scene_manager]") {
 TEST_CASE("scene_manager: pause and resume", "[scene_manager]") {
 	SECTION("pause calls on_pause on active scene") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		must(f.scm.add<test_scene1>());
 		must(f.scm.activate<test_scene1>());
@@ -291,7 +265,7 @@ TEST_CASE("scene_manager: pause and resume", "[scene_manager]") {
 
 	SECTION("resume calls on_resume on active scene") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		must(f.scm.add<test_scene1>());
 		must(f.scm.activate<test_scene1>());
@@ -304,7 +278,7 @@ TEST_CASE("scene_manager: pause and resume", "[scene_manager]") {
 
 	SECTION("pause with no active scene does nothing") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		must(f.scm.add<test_scene1>());
 		test_log.clear();
@@ -316,7 +290,7 @@ TEST_CASE("scene_manager: pause and resume", "[scene_manager]") {
 
 	SECTION("resume with no active scene does nothing") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		must(f.scm.add<test_scene1>());
 		test_log.clear();
@@ -334,7 +308,7 @@ TEST_CASE("scene_manager: pause and resume", "[scene_manager]") {
 TEST_CASE("scene_manager: end", "[scene_manager]") {
 	SECTION("end calls end on all registered scenes") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		must(f.scm.add<test_scene1>());
 		must(f.scm.add<test_scene2>());

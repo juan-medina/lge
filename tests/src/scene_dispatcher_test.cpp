@@ -1,39 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Juan Medina
 // SPDX-License-Identifier: MIT
 
-#include <lge/dispatcher/dispatcher.hpp>
-#include <lge/internal/raylib/raylib_backend.hpp>
 #include <lge/scene/scene.hpp>
 #include <lge/scene/scene_manager.hpp>
 
 #include "test_helpers.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <entt/entt.hpp>
 #include <string>
-
-namespace {
-
-auto backend = lge::raylib_backend::create();
-auto dispatcher = lge::dispatcher{};
-
-struct test_fixture {
-	entt::registry world;
-	lge::context ctx;
-	lge::scene_manager scm;
-
-	explicit test_fixture()
-		: ctx{
-			  .render = *backend.renderer_ptr,
-			  .actions = *backend.input_ptr,
-			  .resources = *backend.resource_manager_ptr,
-			  .world = world,
-			  .events = dispatcher,
-		  },
-		  scm{ctx} {}
-};
-
-} // namespace
 
 // =============================================================================
 // Events (shared contract between scenes and the app)
@@ -130,7 +104,7 @@ public:
 TEST_CASE("scene_manager + dispatcher: app-mediated scene transition", "[scene_manager][dispatcher][integration]") {
 	SECTION("app wires dispatcher to switch scene when gameplay posts level_completed") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		must(f.scm.add<gameplay_scene>());
 		must(f.scm.add<results_scene>());
@@ -155,12 +129,12 @@ TEST_CASE("scene_manager + dispatcher: app-mediated scene transition", "[scene_m
 
 	SECTION("results_scene is the active scene on the following tick") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		must(f.scm.add<gameplay_scene>());
 		must(f.scm.add<results_scene>());
 
-		dispatcher.on<level_completed>(
+		f.ctx.events.on<level_completed>(
 			[&f](const level_completed &evt) -> lge::result<> { return f.scm.activate<results_scene>(evt); });
 
 		must(f.scm.activate<gameplay_scene>());
@@ -174,12 +148,12 @@ TEST_CASE("scene_manager + dispatcher: app-mediated scene transition", "[scene_m
 
 	SECTION("score value posted by gameplay_scene arrives intact at results_scene") {
 		test_log.clear();
-		test_fixture f;
+		scene_fixture f;
 
 		must(f.scm.add<gameplay_scene>());
 		must(f.scm.add<results_scene>());
 
-		dispatcher.on<level_completed>(
+		f.ctx.events.on<level_completed>(
 			[&f](const level_completed &evt) -> lge::result<> { return f.scm.activate<results_scene>(evt); });
 
 		must(f.scm.activate<gameplay_scene>());

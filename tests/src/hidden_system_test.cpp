@@ -2,44 +2,16 @@
 // SPDX-License-Identifier: MIT
 
 #include <lge/components/hidden.hpp>
-#include <lge/components/hierarchy.hpp>
 #include <lge/internal/components/effective_hidden.hpp>
-#include <lge/internal/raylib/raylib_backend.hpp>
 #include <lge/internal/systems/hidden_system.hpp>
 
+#include "test_helpers.hpp"
+
 #include <catch2/catch_test_macros.hpp>
-#include <entt/entt.hpp>
 
 namespace {
 
-auto backend = lge::raylib_backend::create();
-auto dispatcher = lge::dispatcher{};
-
-struct test_fixture {
-	entt::registry world;
-	lge::context ctx;
-	lge::hidden_system system;
-
-	explicit test_fixture()
-		: ctx{
-			  .render = *backend.renderer_ptr,
-			  .actions = *backend.input_ptr,
-			  .resources = *backend.resource_manager_ptr,
-			  .world = world,
-			  .events = dispatcher,
-		  },
-		  system{lge::phase::global_update, ctx} {}
-};
-
-auto add_entity(entt::registry &world) -> entt::entity {
-	return world.create();
-}
-
-auto add_child(entt::registry &world, const entt::entity parent_entity) -> entt::entity {
-	const auto child = world.create();
-	lge::attach(world, parent_entity, child);
-	return child;
-}
+using fixture = system_fixture<lge::hidden_system>;
 
 auto is_hidden(const entt::registry &world, const entt::entity e) -> bool {
 	return world.all_of<lge::effective_hidden>(e);
@@ -52,7 +24,7 @@ auto is_hidden(const entt::registry &world, const entt::entity e) -> bool {
 // =============================================================================
 
 TEST_CASE("hidden: root entity", "[hidden]") {
-	test_fixture f;
+	fixture f;
 
 	SECTION("visible entity is not effectively hidden") {
 		const auto e = add_entity(f.world);
@@ -82,7 +54,7 @@ TEST_CASE("hidden: root entity", "[hidden]") {
 // =============================================================================
 
 TEST_CASE("hidden: hierarchy", "[hidden][hierarchy]") {
-	test_fixture f;
+	fixture f;
 
 	SECTION("visible parent does not hide visible child") {
 		const auto parent = add_entity(f.world);
@@ -125,7 +97,7 @@ TEST_CASE("hidden: hierarchy", "[hidden][hierarchy]") {
 // =============================================================================
 
 TEST_CASE("hidden: deep hierarchy", "[hidden][hierarchy][deep]") {
-	test_fixture f;
+	fixture f;
 
 	SECTION("hidden grandparent hides all descendants") {
 		const auto grandparent = add_entity(f.world);
