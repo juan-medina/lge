@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "version": "0.6.7"
+  },
+  "savePath": "",
+  "images": [
+    {
+      "name": "dice_1.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/CuteDice - AssetPack_v1.0/sheet/dice_1.png",
+      "folder": ""
+    },
+    {
+      "name": "dice_2.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/CuteDice - AssetPack_v1.0/sheet/dice_2.png",
+      "folder": ""
+    },
+    {
+      "name": "dice_3.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/CuteDice - AssetPack_v1.0/sheet/dice_3.png",
+      "folder": ""
+    },
+    {
+      "name": "dice_4.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/CuteDice - AssetPack_v1.0/sheet/dice_4.png",
+      "folder": ""
+    },
+    {
+      "name": "dice_5.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/CuteDice - AssetPack_v1.0/sheet/dice_5.png",
+      "folder": ""
+    },
+    {
+      "name": "dice_6.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/CuteDice - AssetPack_v1.0/sheet/dice_6.png",
+      "folder": ""
+    }
+  ],
+  "folders": [],
+  "packOptions": {
+    "textureName": "dices",
+    "textureFormat": "png",
+    "removeFileExtension": false,
+    "prependFolderName": true,
+    "base64Export": false,
+    "tinify": false,
+    "tinifyKey": "",
+    "scale": 1,
+    "filter": "none",
+    "exporter": "JSON (hash)",
+    "fileName": "pack-result",
+    "savePath": "",
+    "width": 2048,
+    "height": 2048,
+    "fixedSize": false,
+    "powerOfTwo": true,
+    "padding": 2,
+    "extrude": 2,
+    "allowRotation": true,
+    "allowTrim": true,
+    "trimMode": "trim",
+    "alphaThreshold": "0",
+    "detectIdentical": true,
+    "packer": "MaxRectsBin",
+    "packerMethod": "BestShortSideFit"
+  }
+}

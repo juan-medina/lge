@@ -235,6 +235,7 @@ auto my_game::init() -> lge::result<> {
   the author).
 - [Demon Woods Parallax Background by Aethrall](https://aethrall.itch.io/demon-woods-parallax-background) (set
   as free by the author).
+- [Cute Dice - Free Assets by DANI MACCARI.](https://dani-maccari.itch.io/cute-dice) (This asset pack is free for personal use or comercial projects as long as it's atributed).
 
 **Tools**
 
