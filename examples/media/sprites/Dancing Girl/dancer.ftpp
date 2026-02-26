@@ -1,0 +1,156 @@
+{
+  "meta": {
+    "version": "0.6.7"
+  },
+  "savePath": "",
+  "images": [
+    {
+      "name": "hips1.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/hips/hips1.png",
+      "folder": ""
+    },
+    {
+      "name": "hips2.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/hips/hips2.png",
+      "folder": ""
+    },
+    {
+      "name": "hips3.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/hips/hips3.png",
+      "folder": ""
+    },
+    {
+      "name": "hips4.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/hips/hips4.png",
+      "folder": ""
+    },
+    {
+      "name": "hips5.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/hips/hips5.png",
+      "folder": ""
+    },
+    {
+      "name": "hips6.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/hips/hips6.png",
+      "folder": ""
+    },
+    {
+      "name": "hips7.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/hips/hips7.png",
+      "folder": ""
+    },
+    {
+      "name": "hips8.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/hips/hips8.png",
+      "folder": ""
+    },
+    {
+      "name": "slide1.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/slide/slide1.png",
+      "folder": ""
+    },
+    {
+      "name": "slide2.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/slide/slide2.png",
+      "folder": ""
+    },
+    {
+      "name": "slide3.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/slide/slide3.png",
+      "folder": ""
+    },
+    {
+      "name": "slide4.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/slide/slide4.png",
+      "folder": ""
+    },
+    {
+      "name": "slide5.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/slide/slide5.png",
+      "folder": ""
+    },
+    {
+      "name": "slide6.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/slide/slide6.png",
+      "folder": ""
+    },
+    {
+      "name": "slide7.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/slide/slide7.png",
+      "folder": ""
+    },
+    {
+      "name": "slide8.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/slide/slide8.png",
+      "folder": ""
+    },
+    {
+      "name": "snap1.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/snap/snap1.png",
+      "folder": ""
+    },
+    {
+      "name": "snap2.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/snap/snap2.png",
+      "folder": ""
+    },
+    {
+      "name": "snap3.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/snap/snap3.png",
+      "folder": ""
+    },
+    {
+      "name": "snap4.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/snap/snap4.png",
+      "folder": ""
+    },
+    {
+      "name": "snap5.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/snap/snap5.png",
+      "folder": ""
+    },
+    {
+      "name": "snap6.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/snap/snap6.png",
+      "folder": ""
+    },
+    {
+      "name": "snap7.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/snap/snap7.png",
+      "folder": ""
+    },
+    {
+      "name": "snap8.png",
+      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Dancing Girl/Base/sprites/snap/snap8.png",
+      "folder": ""
+    }
+  ],
+  "folders": [],
+  "packOptions": {
+    "textureName": "dancer_sheet",
+    "textureFormat": "png",
+    "removeFileExtension": false,
+    "prependFolderName": true,
+    "base64Export": false,
+    "tinify": false,
+    "tinifyKey": "",
+    "scale": 1,
+    "filter": "none",
+    "exporter": "JSON (hash)",
+    "fileName": "pack-result",
+    "savePath": "",
+    "width": 2048,
+    "height": 2048,
+    "fixedSize": false,
+    "powerOfTwo": true,
+    "padding": 2,
+    "extrude": 2,
+    "allowRotation": true,
+    "allowTrim": false,
+    "trimMode": "trim",
+    "alphaThreshold": "0",
+    "detectIdentical": true,
+    "packer": "MaxRectsBin",
+    "packerMethod": "BestShortSideFit"
+  }
+}

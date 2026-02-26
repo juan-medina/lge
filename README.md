@@ -67,14 +67,14 @@ lge_add_application(my_game
 
 ### lge_add_application Options
 
-| Option              | Required | Description                                                                        |
-|---------------------|----------|------------------------------------------------------------------------------------|
-| `SOURCES`           | Yes      | List of source files for your application                                          |
-| `EMSCRIPTEN_SHELL`  | No       | Path to custom HTML shell template for WebAssembly builds                          |
-| `EMSCRIPTEN_ASSETS` | No       | List of asset files to copy alongside the WebAssembly output (favicons, manifest)  |
-| `GAME_RESOURCES`    | No       | Path to your game's resources folder (merged with engine resources)                |
-| `APP_ICON_WIN`      | No       | Path to a `.ico` file to embed into the Windows executable                         |
-| `APP_ICON_MAC`      | No       | Path to a `.png` file to generate a `.icns` bundle icon for macOS (via `sips`)     |
+| Option              | Required | Description                                                                       |
+|---------------------|----------|-----------------------------------------------------------------------------------|
+| `SOURCES`           | Yes      | List of source files for your application                                         |
+| `EMSCRIPTEN_SHELL`  | No       | Path to custom HTML shell template for WebAssembly builds                         |
+| `EMSCRIPTEN_ASSETS` | No       | List of asset files to copy alongside the WebAssembly output (favicons, manifest) |
+| `GAME_RESOURCES`    | No       | Path to your game's resources folder (merged with engine resources)               |
+| `APP_ICON_WIN`      | No       | Path to a `.ico` file to embed into the Windows executable                        |
+| `APP_ICON_MAC`      | No       | Path to a `.png` file to generate a `.icns` bundle icon for macOS (via `sips`)    |
 
 The function automatically configures:
 
@@ -120,11 +120,13 @@ Tests in lge are targeted and pragmatic. The goal is to catch regressions in eng
 silent and hard to diagnose — not to achieve coverage metrics or test every line of code.
 
 **What is worth testing:**
+
 - Pure logic with no external dependencies — math, transforms, hierarchy relationships, error propagation
 - Anything that has already caused a hard-to-diagnose bug and was fixed
 - Systems that can be exercised with a real `entt::registry` and no render context
 
 **What is not tested:**
+
 - Anything requiring a raylib window or render context
 - Gameplay feel, timing, or visual correctness
 - Scene logic or application lifecycle
@@ -241,7 +243,10 @@ Developed by [Juan Medina](https://juan-medina.com).
   the author).
 - [Demon Woods Parallax Background by Aethrall](https://aethrall.itch.io/demon-woods-parallax-background) (set
   as free by the author).
-- [Cute Dice - Free Assets by DANI MACCARI.](https://dani-maccari.itch.io/cute-dice) (This asset pack is free for personal use or comercial projects as long as it's atributed).
+- [Cute Dice - Free Assets by DANI MACCARI.](https://dani-maccari.itch.io/cute-dice) (This asset pack is free for
+  personal use or comercial projects as long as it's atributed).
+- [Dancing Girl Sprites by Luis Zuno (ansimuz](https://ansimuz.itch.io/dancing-girl-sprites) (licensed under Creative
+  Commons Zero (CC0)). This includes the song "World Wanderer" by the same author (licensed under Public License).
 
 ### Tools
 

@@ -1,0 +1,44 @@
+{
+	"sheet": "hiker_sheet.json",
+	"animations": {
+		"hips": {
+			"frames": [
+				"hips1.png",
+				"hips2.png",
+				"hips3.png",
+				"hips4.png",
+				"hips5.png",
+				"hips6.png",
+				"hips7.png",
+				"hips8.png"
+			],
+			"fps": 6
+		},
+		"slide": {
+			"frames": [
+				"slide1.png",
+				"slide2.png",
+				"slide3.png",
+				"slide4.png",
+				"slide5.png",
+				"slide6.png",
+				"slide7.png",
+				"slide8.png"
+			],
+			"fps": 6
+		},
+		"snap": {
+			"frames": [
+				"snap1.png",
+				"snap2.png",
+				"snap3.png",
+				"snap4.png",
+				"snap5.png",
+				"snap6.png",
+				"snap7.png",
+				"snap8.png"
+			],
+			"fps": 6
+		}
+	}
+}
