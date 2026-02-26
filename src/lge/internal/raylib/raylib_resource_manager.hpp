@@ -6,11 +6,13 @@
 #include <lge/core/result.hpp>
 #include <lge/interface/resources.hpp>
 #include <lge/internal/raylib/raylib_font.hpp>
+#include <lge/internal/raylib/raylib_sound.hpp>
 #include <lge/internal/raylib/raylib_texture.hpp>
 #include <lge/internal/resource_manager/base_resource_manager.hpp>
 
 #include <raylib.h>
 
+#include <functional>
 #include <string_view>
 
 namespace lge {
@@ -28,9 +30,19 @@ public:
 	[[nodiscard]] auto unload_texture(texture_handle handle) -> result<> override;
 	[[nodiscard]] auto get_raylib_texture(texture_handle handle) const -> result<Texture2D>;
 
+	// =============================================================================
+	// Sound
+	// =============================================================================
+
+	[[nodiscard]] auto load_sound(std::string_view uri) -> result<sound_handle> override;
+	[[nodiscard]] auto unload_sound(sound_handle handle) -> result<> override;
+	[[nodiscard]] auto get_raylib_sound(sound_handle handle) const -> result<Sound>;
+	auto for_each_sound(std::function<void(Sound)> fn) const -> void;
+
 private:
 	font_store fonts_;
 	texture_store textures_;
+	sound_store sounds_;
 };
 
 } // namespace lge

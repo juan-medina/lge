@@ -12,6 +12,7 @@
 #include <lge/systems/system.hpp>
 
 #include "../../src/example.hpp"
+#include "events.hpp"
 #include "movement.hpp"
 #include "movement_system.hpp"
 
@@ -42,9 +43,21 @@ auto collisions::init() -> lge::result<> {
 		return lge::error("failed to load dices sprite sheet", *err);
 	}
 
+	if(const auto err = ctx.resources.load_sound(dice_throw_sound).unwrap(dice_throw_sound_); err) [[unlikely]] {
+		return lge::error("failed to load dice throw sound", *err);
+	}
+
+	for(size_t i = 0; i < dice_hit_sounds.size(); ++i) {
+		const auto &hit_sound = dice_hit_sounds[i];
+		if(const auto err = ctx.resources.load_sound(hit_sound).unwrap(dice_hit_sounds_[i]); err) [[unlikely]] {
+			return lge::error("failed to load dice hit sound", *err);
+		}
+	}
+
 	register_system<movement_system>(lge::phase::game_update);
 
 	ctx.events.on<lge::collision>([this](const lge::collision &col) -> lge::result<> { return on_collision(col); });
+	ctx.events.on<dice_hit>([this](const dice_hit &hit) -> lge::result<> { return on_dice_hit(hit); });
 
 	dice_size_ = ctx.render.get_sprite_frame_size(dices_sheet_, dices_face_[0]);
 
@@ -53,7 +66,13 @@ auto collisions::init() -> lge::result<> {
 
 auto collisions::update(const float dt) -> lge::result<> {
 	if(ctx.actions.get(throw_action).pressed) {
-		throw_dices();
+		if(const auto err = throw_dices().unwrap(); err) [[unlikely]] {
+			return lge::error("failed to throw dices", *err);
+		}
+	}
+
+	if(hit_sound_cooldown_ > 0.0F) {
+		hit_sound_cooldown_ -= dt;
 	}
 
 	return example::update(dt);
@@ -64,11 +83,29 @@ auto collisions::end() -> lge::result<> {
 		return lge::error("failed to unload dices sprite sheet", *err);
 	}
 
+	if(const auto err = ctx.resources.unload_sound(dice_throw_sound_).unwrap(); err) [[unlikely]] {
+		return lge::error("failed to unload dice throw sound", *err);
+	}
+
+	for(const auto dice_hit_sound: dice_hit_sounds_) {
+		if(const auto err = ctx.resources.unload_sound(dice_hit_sound).unwrap(); err) [[unlikely]] {
+			return lge::error("failed to unload dice hit sound", *err);
+		}
+	}
+
 	return example::end();
 }
 
 // throw_dices — all from same corner, staggered by time
-auto collisions::throw_dices() -> void {
+auto collisions::throw_dices() -> lge::result<> {
+	ctx.audio.stop_all();
+	if(const auto err = ctx.audio.play(dice_throw_sound_).unwrap(); err) [[unlikely]] {
+		return lge::error("failed to play dice throw sound", *err);
+	}
+
+	// set cooldown to prevent hit sound from playing immediately after throw
+	hit_sound_cooldown_ = 0.5F;
+
 	// remove all existing dice before throwing new ones
 	const auto view = ctx.world.view<lge::collidable>();
 	for(const auto to_destroy = std::vector(view.begin(), view.end()); const auto entity: to_destroy) {
@@ -96,6 +133,7 @@ auto collisions::throw_dices() -> void {
 		const float delay = static_cast<float>(i) * dice_spawn_delay;
 		spawn_die(pos, target_min, target_max, delay, rng);
 	}
+	return true;
 }
 
 auto collisions::spawn_die(const glm::vec2 pos,
@@ -157,6 +195,20 @@ auto collisions::on_collision(const lge::collision &col) -> lge::result<> {
 		ctx.world.get<lge::sprite>(entity).frame = dices_face_[static_cast<size_t>(value - 1)];
 	}
 
+	// if we reach this point we have done a collision response, so we can play a hit sound
+	return ctx.events.post(dice_hit{});
+}
+
+auto collisions::on_dice_hit(const dice_hit & /*hit*/) -> lge::result<> {
+	if(hit_sound_cooldown_ > 0.0F) {
+		return true;
+	}
+
+	if(const auto err = ctx.audio.play(dice_hit_sounds_[next_hit_sound_index_]).unwrap(); err) [[unlikely]] {
+		return lge::error("failed to play dice hit sound", *err);
+	}
+	next_hit_sound_index_ = (next_hit_sound_index_ + 1) % dice_hit_sounds_.size();
+	hit_sound_cooldown_ = 0.1F;
 	return true;
 }
 

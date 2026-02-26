@@ -4,23 +4,27 @@
 #include "raylib_backend.hpp"
 
 #include <lge/interface/backend.hpp>
+#include <lge/internal/raylib/raylib_audio_manager.hpp>
 #include <lge/internal/raylib/raylib_input.hpp>
 #include <lge/internal/raylib/raylib_renderer.hpp>
 #include <lge/internal/raylib/raylib_resource_manager.hpp>
 
 #include <memory>
+#include <utility>
 
 namespace lge::raylib_backend {
 
 auto create() -> backend {
-	auto resource_manager = std::make_unique<raylib_resource_manager>();
+	auto resource_manager = std::make_shared<raylib_resource_manager>();
 	auto renderer = std::make_unique<raylib_renderer>(*resource_manager);
 	auto input = std::make_unique<raylib_input>();
+	auto audio = std::make_shared<raylib_audio_manager>(*resource_manager);
 
 	return backend{
 		.renderer_ptr = std::move(renderer),
 		.input_ptr = std::move(input),
-		.resource_manager_ptr = std::move(resource_manager),
+		.resource_manager_ptr = resource_manager,
+		.audio_manager_ptr = std::move(audio),
 	};
 }
 

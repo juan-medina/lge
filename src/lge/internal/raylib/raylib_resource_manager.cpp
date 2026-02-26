@@ -7,10 +7,12 @@
 #include <lge/core/result.hpp>
 #include <lge/interface/resources.hpp>
 #include <lge/internal/raylib/raylib_font.hpp>
+#include <lge/internal/raylib/raylib_sound.hpp>
 #include <lge/internal/raylib/raylib_texture.hpp>
 
 #include <raylib.h>
 
+#include <functional>
 #include <string>
 #include <string_view>
 
@@ -29,6 +31,10 @@ auto raylib_resource_manager::end() -> result<> {
 	log::debug("ending raylib resource manager");
 	return true;
 }
+
+// =============================================================================
+// Font
+// =============================================================================
 
 auto raylib_resource_manager::load_font(const std::string_view uri) -> result<font_handle> {
 	log::debug("loading font from uri `{}`", uri);
@@ -59,6 +65,10 @@ auto raylib_resource_manager::get_raylib_font(const font_handle handle) const ->
 	return data->raylib_native_font;
 }
 
+// =============================================================================
+// Texture
+// =============================================================================
+
 auto raylib_resource_manager::load_texture(const std::string_view uri) -> result<texture_handle> {
 	log::debug("loading texture from uri `{}`", uri);
 
@@ -86,6 +96,43 @@ auto raylib_resource_manager::get_raylib_texture(const texture_handle handle) co
 		return error("texture not found", *err);
 	}
 	return data->raylib_native_texture;
+}
+
+// =============================================================================
+// Sound
+// =============================================================================
+
+auto raylib_resource_manager::load_sound(const std::string_view uri) -> result<sound_handle> {
+	log::debug("loading sound from uri `{}`", uri);
+
+	if(!exists(uri)) [[unlikely]] {
+		return error("sound file does not exist: " + std::string(uri));
+	}
+
+	sound_handle handle;
+	if(const auto err = sounds_.load(uri).unwrap(handle); err) [[unlikely]] {
+		return error("failed to load sound", *err);
+	}
+	return handle;
+}
+
+auto raylib_resource_manager::unload_sound(const sound_handle handle) -> result<> {
+	if(const auto err = sounds_.unload(handle).unwrap(); err) [[unlikely]] {
+		return error("failed to unload sound", *err);
+	}
+	return true;
+}
+
+auto raylib_resource_manager::get_raylib_sound(const sound_handle handle) const -> result<Sound> {
+	const raylib_sound *data = nullptr;
+	if(const auto err = sounds_.get(handle).unwrap(data); err) [[unlikely]] {
+		return error("sound not found", *err);
+	}
+	return data->raylib_native_sound;
+}
+
+auto raylib_resource_manager::for_each_sound(std::function<void(Sound)> fn) const -> void {
+	sounds_.for_each([&fn](const raylib_sound &s) -> void { fn(s.raylib_native_sound); });
 }
 
 } // namespace lge

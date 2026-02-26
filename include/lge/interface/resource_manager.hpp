@@ -63,6 +63,13 @@ public:
 		-> result<animation_library_anim> = 0;
 	[[nodiscard]] virtual auto get_animation_sprite_sheet(animation_library_handle handle) const
 		-> result<sprite_sheet_handle> = 0;
+
+	// =============================================================================
+	// Sound
+	// =============================================================================
+
+	[[nodiscard]] virtual auto load_sound(std::string_view uri) -> result<sound_handle> = 0;
+	[[nodiscard]] virtual auto unload_sound(sound_handle handle) -> result<> = 0;
 };
 
-} //  namespace lge
+} // namespace lge

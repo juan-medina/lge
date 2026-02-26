@@ -242,6 +242,7 @@ auto my_game::init() -> lge::result<> {
 - [RealFaviconGenerator](https://realfavicongenerator.net/) — used to generate the multi-platform favicon and
   web app icon set from the engine logo.
 - [Free Tex Packer](https://free-tex-packer.com/) — used to generate sprite sheets from individual frames.
+- [Audacity](https://www.audacityteam.org/) — used for editing and creating audio assets.
 
 ## Documentation
 

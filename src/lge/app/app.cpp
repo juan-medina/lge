@@ -31,6 +31,7 @@ app::app()
 		  .render = *backend_.renderer_ptr,
 		  .actions = *backend_.input_ptr,
 		  .resources = *backend_.resource_manager_ptr,
+		  .audio = *backend_.audio_manager_ptr,
 		  .world = registry_,
 		  .events = dispatcher_,
 	  },
@@ -74,7 +75,7 @@ auto app::run() -> result<> {
 	return true;
 }
 
-auto app::update(float) -> result<> {
+auto app::update(float /*dt*/) -> result<> {
 	return true;
 }
 
@@ -87,6 +88,10 @@ auto app::init() -> result<> {
 
 	if(const auto err = backend_.resource_manager_ptr->init().unwrap(); err) [[unlikely]] {
 		return error("failed to initialize resource manager", *err);
+	}
+
+	if(const auto err = backend_.audio_manager_ptr->init().unwrap(); err) [[unlikely]] {
+		return error("failed to initialize audio manager", *err);
 	}
 
 	register_system<metrics_system>(phase::local_update);
@@ -105,6 +110,10 @@ auto app::init() -> result<> {
 }
 
 auto app::end() -> result<> {
+	if(const auto err = backend_.audio_manager_ptr->end().unwrap(); err) [[unlikely]] {
+		return error("failed to shutdown audio manager", *err);
+	}
+
 	if(const auto err = backend_.resource_manager_ptr->end().unwrap(); err) [[unlikely]] {
 		return error("failed to shutdown resource manager", *err);
 	}

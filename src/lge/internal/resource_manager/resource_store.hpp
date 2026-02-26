@@ -9,6 +9,7 @@
 #include <entt/core/fwd.hpp>
 #include <entt/entt.hpp>
 #include <format>
+#include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -70,6 +71,12 @@ public:
 			return error{std::format("resource not found with key: {}", key)};
 		}
 		return it->second.resource.get();
+	}
+
+	auto for_each(std::function<void(const T &)> fn) const -> void {
+		for(const auto &[key, e]: entries_) {
+			fn(*e.resource);
+		}
 	}
 
 private:

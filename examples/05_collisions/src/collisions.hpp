@@ -10,6 +10,7 @@
 
 #include "../../src/actions.hpp"
 #include "../../src/example.hpp"
+#include "events.hpp"
 
 #include <array>
 #include <cstddef>
@@ -17,6 +18,7 @@
 #include <entt/core/hashed_string.hpp>
 #include <glm/ext/vector_float2.hpp>
 #include <random>
+#include <string_view>
 
 namespace examples {
 
@@ -39,6 +41,16 @@ private:
 	static constexpr auto controller_message = "A: throw dice, \nSTART: debug draw, SELECT: fullscreen, B: exit";
 
 	static constexpr auto dices_path = "resources/game/sprites/dices.json";
+	static constexpr auto dice_throw_sound = "resources/game/sounds/dice_throw.wav";
+	static constexpr auto dice_hit_sounds = std::array<std::string_view, 2>{
+		"resources/game/sounds/dice_hit1.wav",
+		"resources/game/sounds/dice_hit2.wav",
+	};
+
+	lge::sound_handle dice_throw_sound_{};
+	std::array<lge::sound_handle, dice_hit_sounds.size()> dice_hit_sounds_{};
+	size_t next_hit_sound_index_ = 0;
+	float hit_sound_cooldown_{0.0F};
 
 	static constexpr size_t throw_action = actions::total_base_actions + 0;
 
@@ -56,7 +68,7 @@ private:
 
 	lge::sprite_sheet_handle dices_sheet_{};
 
-	auto throw_dices() -> void;
+	[[nodiscard]] auto throw_dices() -> lge::result<>;
 	auto throw_dice(glm::vec2 pos, glm::vec2 vel, int value, float delay, std::mt19937 &rng) -> void;
 	auto spawn_die(glm::vec2 pos, glm::vec2 target_min, glm::vec2 target_max, float delay, std::mt19937 &rng) -> void;
 
@@ -70,6 +82,8 @@ private:
 	};
 
 	auto on_collision(const lge::collision &col) -> lge::result<>;
+	auto on_dice_hit(const dice_hit &hit) -> lge::result<>;
+
 	glm::vec2 dice_size_{};
 };
 

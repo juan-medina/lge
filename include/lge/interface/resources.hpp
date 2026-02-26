@@ -50,6 +50,10 @@ struct animation_library_tag {};
 using animation_library_handle = resource_handle<animation_library_tag>;
 inline constexpr animation_library_handle invalid_animation_library{};
 
+struct sound_tag {};
+using sound_handle = resource_handle<sound_tag>;
+inline constexpr sound_handle invalid_sound{};
+
 // =============================================================================
 // Data
 // =============================================================================
