@@ -10,10 +10,63 @@
 #include "movement.hpp"
 
 #include <cmath>
+#include <entt/entity/fwd.hpp>
 #include <glm/ext/vector_float2.hpp>
 #include <glm/geometric.hpp>
 
 namespace examples {
+
+auto movement_system::bounce_wall(const entt::entity entity,
+								  lge::placement &plc,
+								  const movement &mov,
+								  const float half_width,
+								  const float half_height) -> lge::result<> {
+	if(plc.position.x - mov.half_size.x < -half_width) {
+		plc.position.x = -half_width + mov.half_size.x;
+		if(const auto err = ctx.events.post(dice_hit{.entity = entity, .normal = wall_normal_left}).unwrap(); err)
+			[[unlikely]] {
+			return lge::error("failed to post dice hit event", *err);
+		}
+	} else if(plc.position.x + mov.half_size.x > half_width) {
+		plc.position.x = half_width - mov.half_size.x;
+		if(const auto err = ctx.events.post(dice_hit{.entity = entity, .normal = wall_normal_right}).unwrap(); err)
+			[[unlikely]] {
+			return lge::error("failed to post dice hit event", *err);
+		}
+	}
+
+	if(plc.position.y - mov.half_size.y < -half_height) {
+		plc.position.y = -half_height + mov.half_size.y;
+		if(const auto err = ctx.events.post(dice_hit{.entity = entity, .normal = wall_normal_top}).unwrap(); err)
+			[[unlikely]] {
+			return lge::error("failed to post dice hit event", *err);
+		}
+	} else if(plc.position.y + mov.half_size.y > half_height) {
+		plc.position.y = half_height - mov.half_size.y;
+		if(const auto err = ctx.events.post(dice_hit{.entity = entity, .normal = wall_normal_bottom}).unwrap(); err)
+			[[unlikely]] {
+			return lge::error("failed to post dice hit event", *err);
+		}
+	}
+
+	return true;
+}
+
+auto movement_system::apply_friction(movement &mov, const float dt) -> void {
+	mov.velocity *= (1.0F - (friction * dt));
+	mov.rotation_speed *= (1.0F - (friction * dt));
+}
+
+auto movement_system::snap_to_rest(lge::placement &plc, movement &mov) -> void {
+	mov.velocity = {0.0F, 0.0F};
+
+	if(mov.rotation_speed >= 0.0F) {
+		plc.rotation = std::ceil(plc.rotation / snap_step) * snap_step;
+	} else {
+		plc.rotation = std::floor(plc.rotation / snap_step) * snap_step;
+	}
+	mov.rotation_speed = 0.0F;
+}
 
 auto movement_system::update(const float dt) -> lge::result<> {
 	const auto res = ctx.render.get_drawing_resolution();
@@ -33,51 +86,15 @@ auto movement_system::update(const float dt) -> lge::result<> {
 		plc.rotation += mov.rotation_speed * dt;
 
 		if(mov.half_size.x > 0.0F) {
-			if(plc.position.x - mov.half_size.x < -half_width) {
-				plc.position.x = -half_width + mov.half_size.x;
-				if(const auto err = ctx.events.post(dice_hit{.entity = entity, .normal = {1.0F, 0.0F}}).unwrap(); err)
-					[[unlikely]] {
-					return lge::error("failed to post dice hit event", *err);
-				}
-			} else if(plc.position.x + mov.half_size.x > half_width) {
-				plc.position.x = half_width - mov.half_size.x;
-				if(const auto err = ctx.events.post(dice_hit{.entity = entity, .normal = {-1.0F, 0.0F}}).unwrap(); err)
-					[[unlikely]] {
-					return lge::error("failed to post dice hit event", *err);
-				}
-			}
-
-			if(plc.position.y - mov.half_size.y < -half_height) {
-				plc.position.y = -half_height + mov.half_size.y;
-				if(const auto err = ctx.events.post(dice_hit{.entity = entity, .normal = {0.0F, 1.0F}}).unwrap(); err)
-					[[unlikely]] {
-					return lge::error("failed to post dice hit event", *err);
-				}
-			} else if(plc.position.y + mov.half_size.y > half_height) {
-				plc.position.y = half_height - mov.half_size.y;
-				if(const auto err = ctx.events.post(dice_hit{.entity = entity, .normal = {0.0F, -1.0F}}).unwrap(); err)
-					[[unlikely]] {
-					return lge::error("failed to post dice hit event", *err);
-				}
+			if(const auto err = bounce_wall(entity, plc, mov, half_width, half_height).unwrap(); err) [[unlikely]] {
+				return lge::error("failed to bounce wall", *err);
 			}
 		}
 
-		constexpr auto friction = 0.75F;
-		constexpr auto stop_threshold = 5.0F;
-
-		mov.velocity *= (1.0F - (friction * dt));
-		mov.rotation_speed *= (1.0F - (friction * dt));
+		apply_friction(mov, dt);
 
 		if(glm::length(mov.velocity) < stop_threshold) {
-			mov.velocity = {0.0F, 0.0F};
-
-			constexpr auto step = 22.5F;
-			if(mov.rotation_speed >= 0.0F) {
-				plc.rotation = std::ceil(plc.rotation / step) * step;
-			} else {
-				plc.rotation = std::floor(plc.rotation / step) * step;
-			}
-			mov.rotation_speed = 0.0F;
+			snap_to_rest(plc, mov);
 		}
 	}
 	return true;
