@@ -65,6 +65,31 @@ auto collision_system::to_world(const bounds &b, const glm::mat3 &world) noexcep
 	return {transform(b.p0), transform(b.p1), transform(b.p2), transform(b.p3)};
 }
 
+auto collision_system::point_in_triangle(const glm::vec2 &p,
+										 const glm::vec2 &a,
+										 const glm::vec2 &b,
+										 const glm::vec2 &c) noexcept -> bool {
+	const auto d1 = ((p.x - b.x) * (a.y - b.y)) - ((a.x - b.x) * (p.y - b.y));
+	const auto d2 = ((p.x - c.x) * (b.y - c.y)) - ((b.x - c.x) * (p.y - c.y));
+	const auto d3 = ((p.x - a.x) * (c.y - a.y)) - ((c.x - a.x) * (p.y - a.y));
+
+	const auto has_neg = (d1 < 0.0F) || (d2 < 0.0F) || (d3 < 0.0F);
+	const auto has_pos = (d1 > 0.0F) || (d2 > 0.0F) || (d3 > 0.0F);
+
+	return !(has_neg && has_pos);
+}
+
+auto collision_system::triangles_intersect(const glm::vec2 &a0,
+										   const glm::vec2 &a1,
+										   const glm::vec2 &a2,
+										   const glm::vec2 &b0,
+										   const glm::vec2 &b1,
+										   const glm::vec2 &b2) noexcept -> bool {
+	return point_in_triangle(b0, a0, a1, a2) || point_in_triangle(b1, a0, a1, a2) || point_in_triangle(b2, a0, a1, a2)
+		   || point_in_triangle(a0, b0, b1, b2) || point_in_triangle(a1, b0, b1, b2)
+		   || point_in_triangle(a2, b0, b1, b2);
+}
+
 auto collision_system::overlaps(const bounds &a,
 								const glm::mat3 &a_world,
 								const bounds &b,
@@ -72,17 +97,11 @@ auto collision_system::overlaps(const bounds &a,
 	const auto wa = to_world(a, a_world);
 	const auto wb = to_world(b, b_world);
 
-	const auto a_min_x = std::min({wa[0].x, wa[1].x, wa[2].x, wa[3].x});
-	const auto a_max_x = std::max({wa[0].x, wa[1].x, wa[2].x, wa[3].x});
-	const auto a_min_y = std::min({wa[0].y, wa[1].y, wa[2].y, wa[3].y});
-	const auto a_max_y = std::max({wa[0].y, wa[1].y, wa[2].y, wa[3].y});
-
-	const auto b_min_x = std::min({wb[0].x, wb[1].x, wb[2].x, wb[3].x});
-	const auto b_max_x = std::max({wb[0].x, wb[1].x, wb[2].x, wb[3].x});
-	const auto b_min_y = std::min({wb[0].y, wb[1].y, wb[2].y, wb[3].y});
-	const auto b_max_y = std::max({wb[0].y, wb[1].y, wb[2].y, wb[3].y});
-
-	return a_max_x > b_min_x && a_min_x < b_max_x && a_max_y > b_min_y && a_min_y < b_max_y;
+	// each quad splits into two triangles: (p0,p1,p3) and (p1,p2,p3)
+	return triangles_intersect(wa[0], wa[1], wa[3], wb[0], wb[1], wb[3])
+		   || triangles_intersect(wa[0], wa[1], wa[3], wb[1], wb[2], wb[3])
+		   || triangles_intersect(wa[1], wa[2], wa[3], wb[0], wb[1], wb[3])
+		   || triangles_intersect(wa[1], wa[2], wa[3], wb[1], wb[2], wb[3]);
 }
 
 } // namespace lge

@@ -28,6 +28,16 @@ private:
 	[[nodiscard]] static auto to_world(const bounds &b, const glm::mat3 &world) noexcept -> std::array<glm::vec2, 4>;
 
 	[[nodiscard]] static auto
+	point_in_triangle(const glm::vec2 &p, const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c) noexcept -> bool;
+
+	[[nodiscard]] static auto triangles_intersect(const glm::vec2 &a0,
+												  const glm::vec2 &a1,
+												  const glm::vec2 &a2,
+												  const glm::vec2 &b0,
+												  const glm::vec2 &b1,
+												  const glm::vec2 &b2) noexcept -> bool;
+
+	[[nodiscard]] static auto
 	overlaps(const bounds &a, const glm::mat3 &a_world, const bounds &b, const glm::mat3 &b_world) noexcept -> bool;
 };
 

@@ -10,6 +10,7 @@
 #include "movement.hpp"
 
 #include <cmath>
+#include <glm/ext/vector_float2.hpp>
 #include <glm/geometric.hpp>
 
 namespace examples {
@@ -34,32 +35,33 @@ auto movement_system::update(const float dt) -> lge::result<> {
 		plc.position += mov.velocity * dt;
 		plc.rotation += mov.rotation_speed * dt;
 
-		bool touch_wall = false;
 		if(mov.half_size.x > 0.0F) {
 			if(plc.position.x - mov.half_size.x < -half_width) {
 				plc.position.x = -half_width + mov.half_size.x;
-				mov.velocity.x = std::abs(mov.velocity.x);
-				touch_wall = true;
+				if(const auto err = ctx.events.post(dice_hit{.entity = entity, .normal = {1.0F, 0.0F}}).unwrap(); err)
+					[[unlikely]] {
+					return lge::error("failed to post dice hit event", *err);
+				}
 			} else if(plc.position.x + mov.half_size.x > half_width) {
 				plc.position.x = half_width - mov.half_size.x;
-				mov.velocity.x = -std::abs(mov.velocity.x);
-				touch_wall = true;
+				if(const auto err = ctx.events.post(dice_hit{.entity = entity, .normal = {-1.0F, 0.0F}}).unwrap(); err)
+					[[unlikely]] {
+					return lge::error("failed to post dice hit event", *err);
+				}
 			}
 
 			if(plc.position.y - mov.half_size.y < -half_height) {
 				plc.position.y = -half_height + mov.half_size.y;
-				mov.velocity.y = std::abs(mov.velocity.y);
-				touch_wall = true;
+				if(const auto err = ctx.events.post(dice_hit{.entity = entity, .normal = {0.0F, 1.0F}}).unwrap(); err)
+					[[unlikely]] {
+					return lge::error("failed to post dice hit event", *err);
+				}
 			} else if(plc.position.y + mov.half_size.y > half_height) {
 				plc.position.y = half_height - mov.half_size.y;
-				mov.velocity.y = -std::abs(mov.velocity.y);
-				touch_wall = true;
-			}
-		}
-
-		if(touch_wall) {
-			if(const auto err = ctx.events.post(dice_hit{}).unwrap(); err) [[unlikely]] {
-				return lge::error("failed to post dice hit event", *err);
+				if(const auto err = ctx.events.post(dice_hit{.entity = entity, .normal = {0.0F, -1.0F}}).unwrap(); err)
+					[[unlikely]] {
+					return lge::error("failed to post dice hit event", *err);
+				}
 			}
 		}
 

@@ -176,34 +176,37 @@ auto collisions::on_collision(const lge::collision &col) -> lge::result<> {
 	static std::random_device rd;
 	static std::mt19937 rng{rd()};
 
-	constexpr auto damping = 0.75F;
+	const auto pos_a = ctx.world.get<lge::placement>(col.first).position;
+	const auto pos_b = ctx.world.get<lge::placement>(col.second).position;
+	const auto normal_a = glm::normalize(pos_a - pos_b);
+	const auto normal_b = -normal_a;
 
-	auto &mov_a = ctx.world.get<movement>(col.first);
-	auto &mov_b = ctx.world.get<movement>(col.second);
-
-	std::swap(mov_a.velocity, mov_b.velocity);
-	std::swap(mov_a.rotation_speed, mov_b.rotation_speed);
-
-	mov_a.velocity *= damping;
-	mov_b.velocity *= damping;
-
-	mov_a.collision_cooldown = 0.3F;
-	mov_b.collision_cooldown = 0.3F;
+	ctx.world.get<movement>(col.first).collision_cooldown = 0.3F;
+	ctx.world.get<movement>(col.second).collision_cooldown = 0.3F;
 
 	for(const auto entity: {col.first, col.second}) {
 		const int value = std::uniform_int_distribution{1, 6}(rng);
 		ctx.world.get<lge::sprite>(entity).frame = dices_face_[static_cast<size_t>(value - 1)];
 	}
 
-	// if we reach this point we have done a collision response, so we can play a hit sound
-	return ctx.events.post(dice_hit{});
+	if(const auto err = ctx.events.post(dice_hit{.entity = col.first, .normal = normal_a}).unwrap(); err) [[unlikely]] {
+		return lge::error("failed to post dice hit event", *err);
+	}
+	return ctx.events.post(dice_hit{.entity = col.second, .normal = normal_b});
 }
 
-auto collisions::on_dice_hit(const dice_hit & /*hit*/) -> lge::result<> {
+auto collisions::on_dice_hit(const dice_hit &hit) -> lge::result<> {
+	constexpr auto damping = 0.75F;
+	constexpr auto bounce_boost = 1.3F;
+
+	auto &mov = ctx.world.get<movement>(hit.entity);
+	const auto n = hit.normal;
+	mov.velocity = (mov.velocity - 2.0F * glm::dot(mov.velocity, n) * n) * damping * bounce_boost;
+	mov.rotation_speed = -mov.rotation_speed * damping * bounce_boost;
+
 	if(hit_sound_cooldown_ > 0.0F) {
 		return true;
 	}
-
 	if(const auto err = ctx.audio.play(dice_hit_sounds_[next_hit_sound_index_]).unwrap(); err) [[unlikely]] {
 		return lge::error("failed to play dice hit sound", *err);
 	}
