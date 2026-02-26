@@ -57,6 +57,7 @@ struct system_fixture {
 		.render = *backend.renderer_ptr,
 		.actions = *backend.input_ptr,
 		.resources = *backend.resource_manager_ptr,
+		.audio = *backend.audio_manager_ptr,
 		.world = world,
 		.events = dispatcher,
 	};
@@ -72,6 +73,7 @@ struct scene_fixture {
 		.render = *backend.renderer_ptr,
 		.actions = *backend.input_ptr,
 		.resources = *backend.resource_manager_ptr,
+		.audio = *backend.audio_manager_ptr,
 		.world = world,
 		.events = dispatcher,
 	};
