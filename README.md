@@ -114,7 +114,7 @@ icon has no effect and is silently skipped.
 Tests cover engine internals that have no dependency on raylib or a render context. They are off by default
 and do not affect library consumers.
 
-### Testing philosophy
+### Testing Philosophy
 
 Tests in lge are targeted and pragmatic. The goal is to catch regressions in engine subsystems where bugs are
 silent and hard to diagnose — not to achieve coverage metrics or test every line of code.
@@ -132,27 +132,27 @@ silent and hard to diagnose — not to achieve coverage metrics or test every li
 Tests use a real `entt::registry` — no mocking. If a system needs a window to run, it is not a candidate
 for testing here.
 
-### Building with tests enabled
+### Building with Tests Enabled
 
 ```bash
 cmake -B cmake-build-debug -DCMAKE_BUILD_TYPE=Debug -DLGE_BUILD_TESTS=ON
 cmake --build cmake-build-debug
 ```
 
-### Running the tests
+### Running the Tests
 
 ```bash
 ctest --test-dir cmake-build-debug/tests --output-on-failure
 ```
 
-### Continuous integration
+### Continuous Integration
 
 Tests run automatically on every push via GitHub Actions across Linux (GCC), macOS (Apple Clang), and
 Windows (MSVC).
 
 ---
 
-### Minimal Example
+## Minimal Example
 
 **src/my_game.hpp**
 
@@ -205,11 +205,17 @@ auto my_game::init() -> lge::result<> {
 
 ---
 
-**Credits**
+## Examples
 
-- Developed by [Juan Medina](https://juan-medina.com).
+See the [examples](examples/) for annotated, self-contained demonstrations of engine features.
 
-**Third-party libraries:**
+---
+
+## Credits
+
+Developed by [Juan Medina](https://juan-medina.com).
+
+### Third-Party Libraries
 
 - [raylib](https://www.raylib.com/) v5.5 (licensed under zlib/libpng License)
 - [entt](https://github.com/skypjack/entt) v3.16.0 (licensed under MIT License)
@@ -218,11 +224,11 @@ auto my_game::init() -> lge::result<> {
 - [jsoncons](https://github.com/danielaparker/jsoncons) v1.5.0 (licensed under Boost Software License)
 - [Boxer](https://github.com/aaronmjacobs/Boxer) (licensed under MIT License)
 
-**Testing:**
+### Testing
 
 - [Catch2](https://github.com/catchorg/Catch2) v3.13.0 (licensed under BSL-1.0 License)
 
-**Graphics**
+### Graphics
 
 *Engine assets:*
 
@@ -237,27 +243,33 @@ auto my_game::init() -> lge::result<> {
   as free by the author).
 - [Cute Dice - Free Assets by DANI MACCARI.](https://dani-maccari.itch.io/cute-dice) (This asset pack is free for personal use or comercial projects as long as it's atributed).
 
-**Tools**
+### Tools
 
 - [RealFaviconGenerator](https://realfavicongenerator.net/) — used to generate the multi-platform favicon and
   web app icon set from the engine logo.
 - [Free Tex Packer](https://free-tex-packer.com/) — used to generate sprite sheets from individual frames.
 - [Audacity](https://www.audacityteam.org/) — used for editing and creating audio assets.
 
+---
+
 ## Documentation
 
 - [Design Philosophy](DESIGN.md) — why the engine is the way it is
 
+---
 
-**License**
+## License
 
-- This project is licensed under the MIT License — see `LICENSE` for details.
+This project is licensed under the MIT License — see `LICENSE` for details.
 
-**Contributing**
+---
 
-- Feel free to open issues or pull requests. For code changes, follow the existing style and keep changes
-  focused.
+## Contributing
 
-**Contact**
+Feel free to open issues or pull requests. For code changes, follow the existing style and keep changes focused.
 
-- Author: Juan Medina (copyright 2026)
+---
+
+## Contact
+
+Author: Juan Medina (copyright 2026)
