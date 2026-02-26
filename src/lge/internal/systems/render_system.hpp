@@ -44,7 +44,9 @@ private:
 	auto handle_sprite(entt::entity entity, const glm::mat3 &world_transform) const -> void;
 	auto handle_bounds(entt::entity entity, const glm::mat3 &world_transform) const -> void;
 
-	static constexpr auto bounds_color = color::from_hex(0xFF00007F); // Red with 50% opacity
+	static constexpr auto bounds_color = color::from_hex(0xFF00007F);	  // Red with 50% opacity
+	static constexpr auto overlap_color = color::from_hex(0x00FF007F);	  // Green with 50% opacity
+	static constexpr auto collidable_color = color::from_hex(0xFFFF007F); // Yellow with 50% opacity
 };
 
 } // namespace lge

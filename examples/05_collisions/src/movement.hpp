@@ -11,7 +11,6 @@ struct movement {
 	glm::vec2 velocity{};
 	float rotation_speed{};
 	float delay{0.0F};
-	float collision_cooldown{0.0F};
 	glm::vec2 half_size{};
 };
 

@@ -27,9 +27,6 @@ auto movement_system::update(const float dt) -> lge::result<> {
 			mov.delay -= dt;
 			continue;
 		}
-		if(mov.collision_cooldown > 0.0F) {
-			mov.collision_cooldown -= dt;
-		}
 
 		auto &plc = view.get<lge::placement>(entity);
 		plc.position += mov.velocity * dt;

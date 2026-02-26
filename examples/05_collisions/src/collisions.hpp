@@ -59,10 +59,10 @@ private:
 	static constexpr float max_throw_speed = 1200.0F;
 	static constexpr float min_rotation_speed = 120.0F;
 	static constexpr float max_rotation_speed = 400.0F;
-	static constexpr float dice_spawn_offset = 40.0F; // how far off-screen the corner spawn is
-	static constexpr float dice_spawn_jitter = 5.0F;  // tiny position noise at spawn
-	static constexpr float dice_spawn_delay = 0.12F;  // seconds between each die entering
-	static constexpr float board_area = 0.6F;		  // fraction of screen that is the "board" target zone
+	static constexpr float dice_spawn_offset = 40.0F;  // how far off-screen the corner spawn is
+	static constexpr float dice_spawn_jitter = 100.0F; // tiny position noise at spawn
+	static constexpr float dice_spawn_delay = 0.15F;   // seconds between each die entering
+	static constexpr float board_area = 0.6F;		   // fraction of screen that is the "board" target zone
 	static constexpr auto min_dices = 10;
 	static constexpr auto max_dices = 15;
 

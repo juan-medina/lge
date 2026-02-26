@@ -3,14 +3,17 @@
 
 #include "render_system.hpp"
 
+#include <lge/components/collidable.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/components/shapes.hpp>
 #include <lge/components/sprite.hpp>
+#include <lge/core/colors.hpp>
 #include <lge/core/result.hpp>
 #include <lge/internal/components/bounds.hpp>
 #include <lge/internal/components/effective_hidden.hpp>
 #include <lge/internal/components/metrics.hpp>
+#include <lge/internal/components/overlapping.hpp>
 #include <lge/internal/components/render_order.hpp>
 #include <lge/internal/components/transform.hpp>
 
@@ -167,8 +170,13 @@ auto render_system::handle_bounds(const entt::entity entity, const glm::mat3 &wo
 		return pivot_world + glm::vec2{(scaled.x * cr) - (scaled.y * sr), (scaled.x * sr) + (scaled.y * cr)};
 	};
 
+	color quad_color = bounds_color;
+	if(ctx.world.all_of<collidable>(entity)) {
+		quad_color = ctx.world.all_of<overlapping>(entity) ? overlap_color : collidable_color;
+	}
+
 	ctx.render.render_quad(
-		transform_local(p0), transform_local(p1), transform_local(p2), transform_local(p3), bounds_color);
+		transform_local(p0), transform_local(p1), transform_local(p2), transform_local(p3), quad_color);
 }
 
 } // namespace lge

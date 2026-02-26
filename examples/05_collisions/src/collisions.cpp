@@ -21,7 +21,6 @@
 #include <glm/ext/vector_float2.hpp>
 #include <glm/geometric.hpp>
 #include <random>
-#include <utility>
 #include <vector>
 
 LGE_MAIN(examples::collisions);
@@ -126,7 +125,7 @@ auto collisions::throw_dices() -> lge::result<> {
 	const glm::vec2 target_max{half_width * board_area, half_height * board_area};
 
 	for(int i = 0; i < num_dices; ++i) {
-		const float jx = std::uniform_real_distribution{-dice_spawn_jitter, dice_spawn_jitter}(rng);
+		const float jx = dice_size_.x * 2;
 		const float jy = std::uniform_real_distribution{-dice_spawn_jitter, dice_spawn_jitter}(rng);
 		const glm::vec2 pos{corner.x + jx, corner.y + jy};
 
@@ -162,13 +161,9 @@ auto collisions::on_collision(const lge::collision &col) -> lge::result<> {
 		}
 
 		const auto &pos = ctx.world.get<lge::placement>(entity).position;
-		const auto off_screen = pos.x + half_dice_w < -half_width || pos.x - half_dice_w > half_width
-								|| pos.y + half_dice_h < -half_height || pos.y - half_dice_h > half_height;
+		const auto off_screen = pos.x - half_dice_w < -half_width || pos.x + half_dice_w > half_width
+								|| pos.y - half_dice_h < -half_height || pos.y + half_dice_h > half_height;
 		if(off_screen) {
-			return true;
-		}
-
-		if(ctx.world.get<movement>(entity).collision_cooldown > 0.0F) {
 			return true;
 		}
 	}
@@ -180,9 +175,6 @@ auto collisions::on_collision(const lge::collision &col) -> lge::result<> {
 	const auto pos_b = ctx.world.get<lge::placement>(col.second).position;
 	const auto normal_a = glm::normalize(pos_a - pos_b);
 	const auto normal_b = -normal_a;
-
-	ctx.world.get<movement>(col.first).collision_cooldown = 0.3F;
-	ctx.world.get<movement>(col.second).collision_cooldown = 0.3F;
 
 	for(const auto entity: {col.first, col.second}) {
 		const int value = std::uniform_int_distribution{1, 6}(rng);
@@ -197,7 +189,7 @@ auto collisions::on_collision(const lge::collision &col) -> lge::result<> {
 
 auto collisions::on_dice_hit(const dice_hit &hit) -> lge::result<> {
 	constexpr auto damping = 0.75F;
-	constexpr auto bounce_boost = 1.3F;
+	constexpr auto bounce_boost = 1.05F;
 
 	auto &mov = ctx.world.get<movement>(hit.entity);
 	const auto n = hit.normal;
@@ -223,12 +215,8 @@ auto collisions::throw_dice(
 	const float rot_speed = std::uniform_real_distribution{min_rotation_speed, max_rotation_speed}(rng)
 							* (std::uniform_int_distribution{0, 1}(rng) == 0 ? 1.0F : -1.0F);
 
-	ctx.world.emplace<movement>(dice,
-								movement{.velocity = vel,
-										 .rotation_speed = rot_speed,
-										 .delay = delay,
-										 .collision_cooldown = 1.0F,
-										 .half_size = dice_size_ * 0.5F});
+	ctx.world.emplace<movement>(
+		dice, movement{.velocity = vel, .rotation_speed = rot_speed, .delay = delay, .half_size = dice_size_ * 0.5F});
 
 	auto &plc = ctx.world.emplace<lge::placement>(dice, pos.x, pos.y);
 	plc.rotation = std::uniform_real_distribution{0.0F, 360.0F}(rng);
