@@ -57,9 +57,9 @@ effects, and query audio state to drive behaviour.
 ## [06 — Collisions](06_collisions/)
 
 The most complete example. Dice are thrown onto a board and collide with each other and the walls. Shows collision
-detection, how to respond to it with game-side physics (lge detects overlaps and fires events — all velocity, bounce,
-and friction are implemented in the example itself), audio with cooldown throttling, and coordinating multiple systems
-through a shared event.
+detection and how to encapsulate all physics, audio, and roll tracking inside a single self-contained system. The game
+posts one event to throw and receives one event with the result — the system owns everything in between.
 
 **Concepts:** `collidable` component, collision events, SAT overlap detection, game-side physics response, reflection
-formula, sound, event-driven system coordination, debug draw for collisions
+formula, self-contained systems, system lifecycle, event-driven input/output, roll tracking, sound, debug draw for
+collisions
