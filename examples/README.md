@@ -45,13 +45,16 @@ scenes
 
 ---
 
-## [05 — Sound](04_sound/)
+## [05 — Sound](05_sound/)
 
-TBC
+A character dances while music plays and returns to idle when it stops. Shows how to stream music, play one-shot sound
+effects, and query audio state to drive behaviour.
+
+**Concepts:** music streaming, sound effects, audio state query, audio resource lifecycle
 
 ---
 
-## [06 — Collisions](05_collisions/)
+## [06 — Collisions](06_collisions/)
 
 The most complete example. Dice are thrown onto a board and collide with each other and the walls. Shows collision
 detection, how to respond to it with game-side physics (lge detects overlaps and fires events — all velocity, bounce,
