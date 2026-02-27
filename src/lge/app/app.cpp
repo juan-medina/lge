@@ -100,14 +100,14 @@ auto app::init() -> result<> {
 	if(const auto err = register_system<animation_system>(phase::game_update).unwrap(); err) [[unlikely]] {
 		return error("failed to register animation_system", *err);
 	}
-	if(const auto err = register_system<bounds_system>(phase::game_update).unwrap(); err) [[unlikely]] {
-		return error("failed to register bounds_system", *err);
-	}
 	if(const auto err = register_system<hidden_system>(phase::game_update).unwrap(); err) [[unlikely]] {
 		return error("failed to register hidden_system", *err);
 	}
 	if(const auto err = register_system<transform_system>(phase::global_update).unwrap(); err) [[unlikely]] {
 		return error("failed to register transform_system", *err);
+	}
+	if(const auto err = register_system<bounds_system>(phase::global_update).unwrap(); err) [[unlikely]] {
+		return error("failed to register bounds_system", *err);
 	}
 	if(const auto err = register_system<order_system>(phase::global_update).unwrap(); err) [[unlikely]] {
 		return error("failed to register order_system", *err);

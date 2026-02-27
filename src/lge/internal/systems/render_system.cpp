@@ -154,29 +154,14 @@ auto render_system::handle_sprite(const entt::entity entity, const glm::mat3 &wo
 		spr.sheet, spr.frame, pivot_world, scaled_size, plc.pivot, rotation, spr.flip_horizontal, spr.flip_vertical);
 }
 
-auto render_system::handle_bounds(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
+auto render_system::handle_bounds(const entt::entity entity, const glm::mat3 & /*world_transform*/) const -> void {
 	const auto &[p0, p1, p2, p3] = ctx.world.get<bounds>(entity);
-	const auto &m = ctx.world.get<metrics>(entity);
-	const auto &plc = ctx.world.get<placement>(entity);
-
-	const auto pivot_world = transform_point(world_transform, plc.pivot * m.size);
-	const auto rotation_rad = glm::radians(get_rotation(world_transform));
-	const auto cr = glm::cos(rotation_rad);
-	const auto sr = glm::sin(rotation_rad);
-	const auto world_scale = get_scale(world_transform);
-
-	const auto transform_local = [&](const glm::vec2 &local) -> glm::vec2 {
-		const auto scaled = local * world_scale;
-		return pivot_world + glm::vec2{(scaled.x * cr) - (scaled.y * sr), (scaled.x * sr) + (scaled.y * cr)};
-	};
 
 	color quad_color = bounds_color;
 	if(ctx.world.all_of<collidable>(entity)) {
 		quad_color = ctx.world.all_of<overlapping>(entity) ? overlap_color : collidable_color;
 	}
-
-	ctx.render.render_quad(
-		transform_local(p0), transform_local(p1), transform_local(p2), transform_local(p3), quad_color);
+	ctx.render.render_quad(p0, p1, p2, p3, quad_color);
 }
 
 } // namespace lge
