@@ -7,11 +7,13 @@
 
 namespace examples {
 
-struct movement {
+struct dice {
 	glm::vec2 velocity{};
 	float rotation_speed{};
 	float delay{0.0F};
 	glm::vec2 half_size{};
+	int value{1};
+	bool settled{false};
 };
 
 } // namespace examples

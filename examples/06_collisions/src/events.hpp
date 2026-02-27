@@ -3,15 +3,17 @@
 
 #pragma once
 
-#include <entt/entity/entity.hpp>
-#include <entt/entity/fwd.hpp>
-#include <glm/ext/vector_float2.hpp>
+#include <vector>
 
 namespace examples {
 
-struct dice_hit {
-	entt::entity entity{entt::null};
-	glm::vec2 normal{};
+struct dice_throw {
+	int count{};
+};
+
+struct dice_roll_result {
+	std::vector<int> values;
+	int total{};
 };
 
 } // namespace examples
