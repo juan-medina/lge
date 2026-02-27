@@ -7,6 +7,7 @@
 #include <lge/core/result.hpp>
 #include <lge/interface/resources.hpp>
 #include <lge/internal/raylib/raylib_font.hpp>
+#include <lge/internal/raylib/raylib_music.hpp>
 #include <lge/internal/raylib/raylib_sound.hpp>
 #include <lge/internal/raylib/raylib_texture.hpp>
 
@@ -133,6 +134,35 @@ auto raylib_resource_manager::get_raylib_sound(const sound_handle handle) const 
 
 auto raylib_resource_manager::for_each_sound(std::function<void(Sound)> fn) const -> void {
 	sounds_.for_each([&fn](const raylib_sound &s) -> void { fn(s.raylib_native_sound); });
+}
+
+auto raylib_resource_manager::load_music(std::string_view uri) -> result<music_handle> {
+	log::debug("loading music from uri `{}`", uri);
+
+	if(!exists(uri)) [[unlikely]] {
+		return error("music file does not exist: " + std::string(uri));
+	}
+
+	music_handle handle;
+	if(const auto err = musics_.load(uri).unwrap(handle); err) [[unlikely]] {
+		return error("failed to load music", *err);
+	}
+	return handle;
+}
+
+auto raylib_resource_manager::unload_music(const music_handle handle) -> result<> {
+	if(const auto err = musics_.unload(handle).unwrap(); err) [[unlikely]] {
+		return error("failed to unload sound", *err);
+	}
+	return true;
+}
+
+auto raylib_resource_manager::get_raylib_music(music_handle handle) const -> result<Music> {
+	const raylib_music *data = nullptr;
+	if(const auto err = musics_.get(handle).unwrap(data); err) [[unlikely]] {
+		return error("sound not found", *err);
+	}
+	return data->raylib_native_music;
 }
 
 } // namespace lge

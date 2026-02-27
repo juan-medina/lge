@@ -168,6 +168,9 @@ auto app::main_loop() -> result<> {
 		return error("failed to end frame", *err);
 	}
 
+	if(const auto err = backend_.audio_manager_ptr->update_music().unwrap(); err) [[unlikely]] {
+		return error("failed to update music", *err);
+	}
 	return true;
 }
 

@@ -6,6 +6,7 @@
 #include <lge/core/result.hpp>
 #include <lge/interface/resources.hpp>
 #include <lge/internal/raylib/raylib_font.hpp>
+#include <lge/internal/raylib/raylib_music.hpp>
 #include <lge/internal/raylib/raylib_sound.hpp>
 #include <lge/internal/raylib/raylib_texture.hpp>
 #include <lge/internal/resource_manager/base_resource_manager.hpp>
@@ -39,10 +40,19 @@ public:
 	[[nodiscard]] auto get_raylib_sound(sound_handle handle) const -> result<Sound>;
 	auto for_each_sound(std::function<void(Sound)> fn) const -> void;
 
+	// =============================================================================
+	// Music
+	// =============================================================================
+
+	[[nodiscard]] auto load_music(std::string_view uri) -> result<music_handle> override;
+	[[nodiscard]] auto unload_music(music_handle handle) -> result<> override;
+	[[nodiscard]] auto get_raylib_music(music_handle handle) const -> result<Music>;
+
 private:
 	font_store fonts_;
 	texture_store textures_;
 	sound_store sounds_;
+	music_store musics_;
 };
 
 } // namespace lge

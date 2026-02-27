@@ -70,6 +70,13 @@ public:
 
 	[[nodiscard]] virtual auto load_sound(std::string_view uri) -> result<sound_handle> = 0;
 	[[nodiscard]] virtual auto unload_sound(sound_handle handle) -> result<> = 0;
+
+	// =============================================================================
+	// Music
+	// =============================================================================
+
+	[[nodiscard]] virtual auto load_music(std::string_view uri) -> result<music_handle> = 0;
+	[[nodiscard]] virtual auto unload_music(music_handle handle) -> result<> = 0;
 };
 
 } // namespace lge

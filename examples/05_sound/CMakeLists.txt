@@ -1,9 +1,9 @@
 # SPDX-FileCopyrightText: 2026 Juan Medina
 # SPDX-License-Identifier: MIT
 
-project(example_05_collisions
+project(example_05_sound
         VERSION 0.1.0.0
-        DESCRIPTION "example 05 - collisions"
+        DESCRIPTION "example 05 - sound"
         LANGUAGES CXX
 )
 
@@ -27,4 +27,3 @@ lge_add_application(${PROJECT_NAME}
         APP_ICON_MAC ${CMAKE_CURRENT_SOURCE_DIR}/../web/web-app-manifest-512x512.png
         GAME_RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../resources
 )
-

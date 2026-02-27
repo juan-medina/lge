@@ -1,5 +1,5 @@
 {
-	"sheet": "hiker_sheet.json",
+	"sheet": "dancer_sheet.json",
 	"animations": {
 		"hips": {
 			"frames": [
@@ -39,6 +39,12 @@
 				"snap8.png"
 			],
 			"fps": 6
+		},
+		"idle": {
+			"frames": [
+				"snap2.png"
+			],
+			"fps": 1
 		}
 	}
 }

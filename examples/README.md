@@ -45,7 +45,13 @@ scenes
 
 ---
 
-## [05 — Collisions](05_collisions/)
+## [05 — Sound](04_sound/)
+
+TBC
+
+---
+
+## [06 — Collisions](05_collisions/)
 
 The most complete example. Dice are thrown onto a board and collide with each other and the walls. Shows collision
 detection, how to respond to it with game-side physics (lge detects overlaps and fires events — all velocity, bounce,

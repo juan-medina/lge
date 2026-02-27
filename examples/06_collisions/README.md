@@ -1,4 +1,4 @@
-# Example 05 — Collisions
+# Example 06 — Collisions
 
 The most complete example. Shows collision detection, event-driven response, audio, and how to coordinate multiple
 systems through events. Demonstrates that lge detects overlaps and fires events — all physics behaviour is implemented

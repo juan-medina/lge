@@ -19,11 +19,20 @@ public:
 	[[nodiscard]] auto init() -> result<> override;
 	[[nodiscard]] auto end() -> result<> override;
 
-	[[nodiscard]] auto play(sound_handle handle) noexcept -> result<> override;
+	[[nodiscard]] auto play_sound(sound_handle handle) noexcept -> result<> override;
+
+	[[nodiscard]] auto play_music(music_handle handle) noexcept -> result<> override;
+	[[nodiscard]] auto stop_music() noexcept -> result<> override;
+	[[nodiscard]] auto pause_music() noexcept -> result<> override;
+	[[nodiscard]] auto resume_music() noexcept -> result<> override;
+	[[nodiscard]] auto is_music_playing() const noexcept -> bool override;
+	[[nodiscard]] auto update_music() noexcept -> result<> override;
+
 	auto stop_all() noexcept -> void override;
 
 private:
 	raylib_resource_manager &resource_manager_; // NOLINT(*-avoid-const-or-ref-data-members)
+	music_handle current_music_{invalid_music};
 };
 
 } // namespace lge

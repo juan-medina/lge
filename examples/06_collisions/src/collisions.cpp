@@ -98,7 +98,7 @@ auto collisions::end() -> lge::result<> {
 // throw_dices — all from same corner, staggered by time
 auto collisions::throw_dices() -> lge::result<> {
 	ctx.audio.stop_all();
-	if(const auto err = ctx.audio.play(dice_throw_sound_).unwrap(); err) [[unlikely]] {
+	if(const auto err = ctx.audio.play_sound(dice_throw_sound_).unwrap(); err) [[unlikely]] {
 		return lge::error("failed to play dice throw sound", *err);
 	}
 
@@ -199,7 +199,7 @@ auto collisions::on_dice_hit(const dice_hit &hit) -> lge::result<> {
 	if(hit_sound_cooldown_ > 0.0F) {
 		return true;
 	}
-	if(const auto err = ctx.audio.play(dice_hit_sounds_[next_hit_sound_index_]).unwrap(); err) [[unlikely]] {
+	if(const auto err = ctx.audio.play_sound(dice_hit_sounds_[next_hit_sound_index_]).unwrap(); err) [[unlikely]] {
 		return lge::error("failed to play dice hit sound", *err);
 	}
 	next_hit_sound_index_ = (next_hit_sound_index_ + 1) % dice_hit_sounds_.size();

@@ -26,7 +26,15 @@ public:
 	[[nodiscard]] virtual auto init() -> result<> = 0;
 	[[nodiscard]] virtual auto end() -> result<> = 0;
 
-	[[nodiscard]] virtual auto play(sound_handle handle) noexcept -> result<> = 0;
+	[[nodiscard]] virtual auto play_sound(sound_handle handle) noexcept -> result<> = 0;
+
+	[[nodiscard]] virtual auto play_music(music_handle handle) noexcept -> result<> = 0;
+	[[nodiscard]] virtual auto stop_music() noexcept -> result<> = 0;
+	[[nodiscard]] virtual auto pause_music() noexcept -> result<> = 0;
+	[[nodiscard]] virtual auto resume_music() noexcept -> result<> = 0;
+	[[nodiscard]] virtual auto is_music_playing() const noexcept -> bool = 0;
+	[[nodiscard]] virtual auto update_music() noexcept -> result<> = 0;
+
 	virtual auto stop_all() noexcept -> void = 0;
 };
 

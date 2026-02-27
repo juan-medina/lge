@@ -54,6 +54,10 @@ struct sound_tag {};
 using sound_handle = resource_handle<sound_tag>;
 inline constexpr sound_handle invalid_sound{};
 
+struct music_tag {};
+using music_handle = resource_handle<music_tag>;
+inline constexpr music_handle invalid_music{};
+
 // =============================================================================
 // Data
 // =============================================================================
