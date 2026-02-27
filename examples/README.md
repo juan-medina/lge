@@ -47,10 +47,12 @@ scenes
 
 ## [05 — Sound](05_sound/)
 
-A character dances while music plays and returns to idle when it stops. Shows how to stream music, play one-shot sound
-effects, and query audio state to drive behaviour.
+A character dances while music plays and returns to idle when it stops. Extends the interaction model with mouse support
+— clicking the dancer toggles the music, the cursor changes on hover, and the sprite dims when the mouse is away to
+signal it is clickable.
 
-**Concepts:** music streaming, sound effects, audio state query, audio resource lifecycle
+**Concepts:** music streaming, sound effects, audio state query, audio resource lifecycle, `clickable` component, click
+events, `hovered` component, sprite tint, input routing between mouse and controller
 
 ---
 
