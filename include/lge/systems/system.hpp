@@ -33,6 +33,14 @@ public:
 		return phase_;
 	}
 
+	[[nodiscard]] virtual auto init() -> result<> {
+		return true;
+	}
+
+	[[nodiscard]] virtual auto end() -> result<> {
+		return true;
+	}
+
 protected:
 	context &ctx;
 

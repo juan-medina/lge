@@ -94,15 +94,33 @@ auto app::init() -> result<> {
 		return error("failed to initialize audio manager", *err);
 	}
 
-	register_system<metrics_system>(phase::local_update);
-	register_system<animation_system>(phase::game_update);
-	register_system<bounds_system>(phase::game_update);
-	register_system<hidden_system>(phase::game_update);
-	register_system<transform_system>(phase::global_update);
-	register_system<order_system>(phase::global_update);
-	register_system<collision_system>(phase::global_update);
-	register_system<render_system>(phase::render);
-	register_system<transition_system>(phase::post_render, scenes);
+	if(const auto err = register_system<metrics_system>(phase::local_update).unwrap(); err) [[unlikely]] {
+		return error("failed to register metrics_system", *err);
+	}
+	if(const auto err = register_system<animation_system>(phase::game_update).unwrap(); err) [[unlikely]] {
+		return error("failed to register animation_system", *err);
+	}
+	if(const auto err = register_system<bounds_system>(phase::game_update).unwrap(); err) [[unlikely]] {
+		return error("failed to register bounds_system", *err);
+	}
+	if(const auto err = register_system<hidden_system>(phase::game_update).unwrap(); err) [[unlikely]] {
+		return error("failed to register hidden_system", *err);
+	}
+	if(const auto err = register_system<transform_system>(phase::global_update).unwrap(); err) [[unlikely]] {
+		return error("failed to register transform_system", *err);
+	}
+	if(const auto err = register_system<order_system>(phase::global_update).unwrap(); err) [[unlikely]] {
+		return error("failed to register order_system", *err);
+	}
+	if(const auto err = register_system<collision_system>(phase::global_update).unwrap(); err) [[unlikely]] {
+		return error("failed to register collision_system", *err);
+	}
+	if(const auto err = register_system<render_system>(phase::render).unwrap(); err) [[unlikely]] {
+		return error("failed to register render_system", *err);
+	}
+	if(const auto err = register_system<transition_system>(phase::post_render, scenes).unwrap(); err) [[unlikely]] {
+		return error("failed to register transition_system", *err);
+	}
 
 	log::info("application initialized successfully");
 
@@ -120,6 +138,12 @@ auto app::end() -> result<> {
 
 	if(const auto err = backend_.renderer_ptr->end().unwrap(); err) [[unlikely]] {
 		return error("failed to shutdown renderer", *err);
+	}
+
+	for(const auto &system: systems_) {
+		if(const auto err = system->end().unwrap(); err) [[unlikely]] {
+			return error("failed to end system", *err);
+		}
 	}
 
 	return true;

@@ -55,11 +55,15 @@ protected:
 
 	template<typename T, typename... Args>
 		requires std::is_base_of_v<system, T>
-	void register_system(phase p, Args &&...args) {
+	[[nodiscard]] auto register_system(phase p, Args &&...args) -> result<> {
 		auto system = std::make_unique<T>(p, ctx, std::forward<Args>(args)...);
+		if(const auto err = system->init().unwrap(); err) [[unlikely]] {
+			return error("failed to init system", *err);
+		}
 		const auto type_name = get_type_name<T>();
 		systems_.push_back(std::move(system));
 		log::debug("system of type `{}` registered", type_name);
+		return true;
 	}
 
 	// =============================================================================

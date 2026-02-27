@@ -53,7 +53,9 @@ auto collisions::init() -> lge::result<> {
 		}
 	}
 
-	register_system<movement_system>(lge::phase::game_update);
+	if(const auto err = register_system<movement_system>(lge::phase::game_update).unwrap(); err) [[unlikely]] {
+		return lge::error("failed to register movement_system", *err);
+	}
 
 	ctx.events.on<lge::collision>([this](const lge::collision &col) -> lge::result<> { return on_collision(col); });
 	ctx.events.on<dice_hit>([this](const dice_hit &hit) -> lge::result<> { return on_dice_hit(hit); });

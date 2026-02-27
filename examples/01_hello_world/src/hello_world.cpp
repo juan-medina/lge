@@ -59,7 +59,9 @@ auto hello_world::init() -> lge::result<> {
 		world_text_ent_, 0, gap_between_labels / 2, 0.0F, glm::vec2{1.F, 1.F}, lge::pivot::top_center);
 	lge::attach(ctx.world, center_ent_, world_text_ent_);
 
-	register_system<oscillation_system>(lge::phase::game_update);
+	if(const auto err = register_system<oscillation_system>(lge::phase::game_update).unwrap(); err) [[unlikely]] {
+		return lge::error("failed to register oscillation_system", *err);
+	}
 
 	return true;
 }
