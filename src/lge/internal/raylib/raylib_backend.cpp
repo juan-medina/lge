@@ -17,7 +17,7 @@ namespace lge::raylib_backend {
 auto create() -> backend {
 	auto resource_manager = std::make_shared<raylib_resource_manager>();
 	auto renderer = std::make_unique<raylib_renderer>(*resource_manager);
-	auto input = std::make_unique<raylib_input>();
+	auto input = std::make_unique<raylib_input>(*renderer);
 	auto audio = std::make_shared<raylib_audio_manager>(*resource_manager);
 
 	return backend{

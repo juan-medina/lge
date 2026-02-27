@@ -3,7 +3,9 @@
 
 #pragma once
 
+#include <lge/core/colors.hpp>
 #include <lge/interface/resource_manager.hpp>
+#include <lge/interface/resources.hpp>
 
 #include <entt/core/fwd.hpp>
 #include <entt/core/hashed_string.hpp>
@@ -17,6 +19,7 @@ struct sprite {
 	entt::hashed_string frame = ""_hs;
 	bool flip_horizontal = false;
 	bool flip_vertical = false;
+	color tint = colors::white;
 };
 
 } // namespace lge

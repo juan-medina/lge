@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <glm/ext/vector_float2.hpp>
 #include <vector>
 
 namespace lge {
@@ -186,6 +187,9 @@ public:
 	}
 
 	virtual auto update(float delta_time) -> void = 0;
+
+	[[nodiscard]] virtual auto get_mouse_position() const -> glm::vec2 = 0;
+	[[nodiscard]] virtual auto is_mouse_button_pressed(size_t button) const -> bool = 0;
 
 protected:
 	std::array<binding, max_actions> bindings{};

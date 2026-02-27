@@ -8,11 +8,17 @@
 #include <lge/core/result.hpp>
 #include <lge/interface/resources.hpp>
 
+#include <cstdint>
 #include <entt/core/fwd.hpp>
 #include <glm/ext/vector_float2.hpp>
 #include <string>
 
 namespace lge {
+
+enum class cursor_type : uint8_t {
+	arrow,
+	hand,
+};
 
 class renderer {
 public:
@@ -70,7 +76,8 @@ public:
 							   const glm::vec2 &pivot,
 							   float rotation,
 							   bool flip_horizontal,
-							   bool flip_vertical) const -> void = 0;
+							   bool flip_vertical,
+							   color tint) const -> void = 0;
 
 	virtual auto get_label_size(font_handle font, const std::string &text, const int &size) -> glm::vec2 = 0;
 
@@ -97,6 +104,10 @@ public:
 	}
 
 	virtual auto set_clear_color(const color &clear_color) -> void = 0;
+
+	[[nodiscard]] virtual auto screen_to_world(const glm::vec2 &screen_position) const -> glm::vec2 = 0;
+
+	virtual auto set_cursor(cursor_type type) -> void = 0;
 
 private:
 	bool debug_draw_ = false;

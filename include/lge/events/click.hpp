@@ -7,9 +7,8 @@
 
 namespace lge {
 
-struct collision {
-	entt::entity first;
-	entt::entity second;
+struct click {
+	entt::entity entity;
 };
 
 } // namespace lge

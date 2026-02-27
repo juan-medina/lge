@@ -33,9 +33,9 @@ protected:
 
 private:
 	static constexpr auto example_title = "Sound!";
-	static constexpr auto kb_message = "Space play/stop music, F5 debug draw,\n"
-									   "F11: toggle fullscreen, Esc: exit";
-	static constexpr auto controller_message = "Controller A play/stop music,\n"
+	static constexpr auto kb_message = "Space or click dancer to play/stop music,\n"
+									   "F5: debug draw, F11: toggle fullscreen, Esc: exit";
+	static constexpr auto controller_message = "Controller A to play/stop music,\n"
 											   "START: debug draw, SELECT: toggle fullscreen, B: exit";
 
 	static constexpr auto anim_path = "resources/game/sprites/dancer_anim.json";
@@ -56,7 +56,10 @@ private:
 	lge::music_handle music_{lge::invalid_music};
 
 	entt::entity sprite_{entt::null};
+
 	[[nodiscard]] auto get_dance() -> entt::hashed_string;
+	[[nodiscard]] auto toggle_music() -> lge::result<>;
+
 	std::random_device rd_;
 	std::mt19937 rng_{rd_()};
 

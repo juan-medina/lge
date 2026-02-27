@@ -12,6 +12,7 @@
 #include <lge/internal/systems/hidden_system.hpp>
 #include <lge/internal/systems/metrics_system.hpp>
 #include <lge/internal/systems/order_system.hpp>
+#include <lge/internal/systems/pointer_system.hpp>
 #include <lge/internal/systems/render_system.hpp>
 #include <lge/internal/systems/transform_system.hpp>
 #include <lge/internal/systems/transition_system.hpp>
@@ -114,6 +115,9 @@ auto app::init() -> result<> {
 	}
 	if(const auto err = register_system<collision_system>(phase::global_update).unwrap(); err) [[unlikely]] {
 		return error("failed to register collision_system", *err);
+	}
+	if(const auto err = register_system<pointer_system>(phase::global_update).unwrap(); err) [[unlikely]] {
+		return error("failed to register pointer_system", *err);
 	}
 	if(const auto err = register_system<render_system>(phase::render).unwrap(); err) [[unlikely]] {
 		return error("failed to register render_system", *err);

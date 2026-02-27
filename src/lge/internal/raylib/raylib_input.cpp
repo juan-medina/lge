@@ -9,6 +9,7 @@
 
 #include <array>
 #include <cstdlib>
+#include <glm/ext/vector_float2.hpp>
 
 namespace lge {
 
@@ -30,7 +31,16 @@ auto raylib_input::update(const float /*delta_time*/) -> void {
 	prev_stick_dpad_ = stick;
 }
 
-auto raylib_input::accumulate_key_states(state &st, const binding &b) const -> void {
+auto raylib_input::get_mouse_position() const -> glm::vec2 {
+	const auto pos = GetMousePosition();
+	return renderer_.screen_to_world({pos.x, pos.y});
+}
+
+auto raylib_input::is_mouse_button_pressed(const size_t button) const -> bool {
+	return IsMouseButtonPressed(static_cast<int>(button));
+}
+
+auto raylib_input::accumulate_key_states(state &st, const binding &b) -> void {
 	for(const auto k: b.keys) {
 		const auto rk = key_to_raylib(k);
 		st.pressed = st.pressed || IsKeyPressed(rk);

@@ -4,10 +4,13 @@
 #pragma once
 
 #include <lge/interface/input.hpp>
+#include <lge/interface/renderer.hpp>
 
 #include <raylib.h>
 
 #include <array>
+#include <cstddef>
+#include <glm/ext/vector_float2.hpp>
 
 #ifdef __EMSCRIPTEN__
 #	include <unordered_set>
@@ -17,7 +20,12 @@ namespace lge {
 
 class raylib_input: public input {
 public:
+	explicit raylib_input(renderer &renderer): renderer_(renderer) {}
+
 	auto update(float delta_time) -> void override;
+
+	[[nodiscard]] auto get_mouse_position() const -> glm::vec2 override;
+	[[nodiscard]] auto is_mouse_button_pressed(size_t button) const -> bool override;
 
 private:
 	static constexpr auto controller_axis_dead_zone = 0.3F;
@@ -35,7 +43,7 @@ private:
 
 	[[nodiscard]] auto update_virtual_dpad_states() const -> std::array<bool, 4>;
 
-	auto accumulate_key_states(state &st, const binding &b) const -> void;
+	static auto accumulate_key_states(state &st, const binding &b) -> void;
 	auto accumulate_button_states(state &st, const binding &b, const std::array<bool, 4> &stick) const -> void;
 	auto apply_stick_dpad(state &st, button b, const std::array<bool, 4> &stick) const -> void;
 
@@ -180,6 +188,8 @@ private:
 	static constexpr auto button_to_raylib(const button b) -> int {
 		return button_values[static_cast<int>(b)];
 	}
+
+	renderer &renderer_;
 };
 
 } // namespace lge

@@ -22,15 +22,15 @@ struct collision_fixture {
 	lge::dispatcher dispatcher{};
 	entt::registry world{};
 	lge::context ctx{
-		.render    = *backend.renderer_ptr,
-		.actions   = *backend.input_ptr,
+		.render = *backend.renderer_ptr,
+		.actions = *backend.input_ptr,
 		.resources = *backend.resource_manager_ptr,
-		.audio     = *backend.audio_manager_ptr,
-		.world     = world,
-		.events    = dispatcher,
+		.audio = *backend.audio_manager_ptr,
+		.world = world,
+		.events = dispatcher,
 	};
 	lge::transform_system transforms{lge::phase::global_update, ctx};
-	lge::bounds_system    bounds{lge::phase::global_update, ctx};
+	lge::bounds_system bounds{lge::phase::global_update, ctx};
 	lge::collision_system collisions{lge::phase::global_update, ctx};
 
 	auto update() -> void {
@@ -40,10 +40,8 @@ struct collision_fixture {
 	}
 
 	// Creates a collidable entity at the given position, rotation and size (center pivot).
-	[[nodiscard]] auto add_collidable(const float x,
-									  const float y,
-									  const float rotation,
-									  const glm::vec2 &size) -> entt::entity {
+	[[nodiscard]] auto add_collidable(const float x, const float y, const float rotation, const glm::vec2 &size)
+		-> entt::entity {
 		const auto e = add_entity(world, lge::placement{x, y, rotation, {1.F, 1.F}, lge::pivot::center}, size);
 		world.emplace<lge::collidable>(e);
 		return e;

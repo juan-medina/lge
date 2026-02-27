@@ -67,7 +67,8 @@ public:
 					   const glm::vec2 &pivot,
 					   float rotation,
 					   bool flip_horizontal,
-					   bool flip_vertical) const -> void override;
+					   bool flip_vertical,
+					   color tint) const -> void override;
 
 	auto render_quad(const glm::vec2 &p0,
 					 const glm::vec2 &p1,
@@ -89,6 +90,10 @@ public:
 					   float border_thickness) const -> void override;
 
 	auto set_clear_color(const color &clear_color) -> void override;
+
+	[[nodiscard]] auto screen_to_world(const glm::vec2 &screen_position) const -> glm::vec2 override;
+
+	auto set_cursor(cursor_type type) -> void override;
 
 private:
 	raylib_resource_manager &resource_manager_;

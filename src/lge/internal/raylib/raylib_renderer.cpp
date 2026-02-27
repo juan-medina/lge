@@ -7,6 +7,7 @@
 #include <lge/core/colors.hpp>
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
+#include <lge/interface/renderer.hpp>
 #include <lge/interface/resources.hpp>
 
 #include "raylib_resource_manager.hpp"
@@ -355,7 +356,8 @@ auto raylib_renderer::render_sprite(const sprite_sheet_handle sheet,
 									const glm::vec2 &pivot,
 									const float rotation,
 									bool flip_horizontal,
-									bool flip_vertical) const -> void {
+									bool flip_vertical,
+									color tint) const -> void {
 	sprite_sheet_frame f{};
 	if(const auto err = resource_manager_.get_sprite_sheet_frame(sheet, frame).unwrap(f); err) [[unlikely]] {
 		return;
@@ -380,7 +382,7 @@ auto raylib_renderer::render_sprite(const sprite_sheet_handle sheet,
 	const auto dest = Rectangle{.x = screen_pos.x, .y = screen_pos.y, .width = size.x, .height = size.y};
 	const auto origin = Vector2{.x = pivot.x * size.x, .y = pivot.y * size.y};
 
-	DrawTexturePro(rl_texture, source, dest, origin, rotation, WHITE);
+	DrawTexturePro(rl_texture, source, dest, origin, rotation, color_to_raylib(tint));
 }
 
 auto raylib_renderer::render_label(const font_handle font,
@@ -514,6 +516,23 @@ auto raylib_renderer::render_circle(const glm::vec2 &center,
 
 auto raylib_renderer::set_clear_color(const color &clear_color) -> void {
 	clear_color_ = color_to_raylib(clear_color);
+}
+
+auto raylib_renderer::screen_to_world(const glm::vec2 &screen_position) const -> glm::vec2 {
+	const auto screen_center = glm::vec2{screen_size_.x * 0.5F, screen_size_.y * 0.5F};
+	const auto world_position = (screen_position - screen_center) / scale_factor_;
+	return world_position;
+}
+
+auto raylib_renderer::set_cursor(const cursor_type type) -> void {
+	switch(type) {
+	case cursor_type::arrow:
+		SetMouseCursor(MOUSE_CURSOR_ARROW);
+		break;
+	case cursor_type::hand:
+		SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+		break;
+	}
 }
 
 } // namespace lge

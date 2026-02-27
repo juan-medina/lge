@@ -3,13 +3,8 @@
 
 #pragma once
 
-#include <entt/entity/fwd.hpp>
-
 namespace lge {
 
-struct collision {
-	entt::entity first;
-	entt::entity second;
-};
+struct hovered {};
 
 } // namespace lge

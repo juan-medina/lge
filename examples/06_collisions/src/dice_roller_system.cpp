@@ -303,7 +303,7 @@ auto dice_roller_system::check_roll_complete() -> lge::result<> {
 
 auto dice_roller_system::randomise_face(const entt::entity entity, dice &d) -> void {
 	const auto prev = d.value;
-	while(d.value  == prev) {
+	while(d.value == prev) {
 		d.value = std::uniform_int_distribution{1, 6}(rng_);
 	}
 	ctx.world.get<lge::sprite>(entity).frame = faces[static_cast<size_t>(d.value - 1)];

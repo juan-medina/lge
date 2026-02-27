@@ -150,8 +150,15 @@ auto render_system::handle_sprite(const entt::entity entity, const glm::mat3 &wo
 	const auto world_scale = get_scale(world_transform);
 	const auto scaled_size = m.size * world_scale;
 
-	ctx.render.render_sprite(
-		spr.sheet, spr.frame, pivot_world, scaled_size, plc.pivot, rotation, spr.flip_horizontal, spr.flip_vertical);
+	ctx.render.render_sprite(spr.sheet,
+							 spr.frame,
+							 pivot_world,
+							 scaled_size,
+							 plc.pivot,
+							 rotation,
+							 spr.flip_horizontal,
+							 spr.flip_vertical,
+							 spr.tint);
 }
 
 auto render_system::handle_bounds(const entt::entity entity, const glm::mat3 & /*world_transform*/) const -> void {
