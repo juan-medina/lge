@@ -78,7 +78,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC EnTT::EnTT)
 target_include_directories(lge SYSTEM PUBLIC external/entt/src/entt)
 
 # jsoncons
-target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/external/jsoncons/include)
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/jsoncons/include)
 
 # glm
 add_subdirectory(external/glm)
