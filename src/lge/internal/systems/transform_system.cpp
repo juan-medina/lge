@@ -63,14 +63,10 @@ auto transform_system::update(const float /*dt*/) -> result<> {
 		}
 
 		const auto &parent_world = ctx.world.get<transform>(entity).world;
-		const auto &parent_placement = ctx.world.get<placement>(entity);
-		const auto parent_pivot_offset = ctx.world.all_of<metrics>(entity)
-											 ? parent_placement.pivot * ctx.world.get<metrics>(entity).size
-											 : glm::vec2{0.F, 0.F};
 
-		// The parent's pivot in world space — same calculation render_system uses
-		const auto pv = parent_world * glm::vec3{parent_pivot_offset.x, parent_pivot_offset.y, 1.F};
-		const auto parent_pos = glm::vec2{pv.x, pv.y};
+		// The world matrix translation column is the top-left corner of the parent's
+		// geometry in world space — children offset from here, not from the pivot point.
+		const auto parent_pos = glm::vec2{parent_world[2][0], parent_world[2][1]};
 
 		for(const auto &kids = ctx.world.get<children>(entity).ids; const auto child: kids) {
 			const auto &local = ctx.world.get<placement>(child);
@@ -99,7 +95,7 @@ auto transform_system::update(const float /*dt*/) -> result<> {
 			const float c = glm::cos(combined_rad);
 			const auto child_scale = parent_scale * local.scale;
 
-			// Render pos = child pivot world - RS * child_pivot_offset (RS includes child_scale)
+			// Render pos = child pivot world - RS * child_pivot_offset
 			const auto render_pos =
 				child_pivot_world
 				- glm::vec2{(c * child_scale.x * child_pivot_offset.x) + (s * child_scale.y * child_pivot_offset.y),

@@ -266,3 +266,34 @@ TEST_CASE("transform: hierarchy mutation", "[transform][hierarchy]") {
 		REQUIRE(world_pos(f.world, child).x == 110.F);
 	}
 }
+
+TEST_CASE("transform: child position relative to parent geometry, not parent pivot",
+		  "[transform][hierarchy][pivot][regression]") {
+	fixture f;
+
+	SECTION("child at local (0,0) lands at parent top-left corner when parent has center pivot") {
+		// parent at (0,0), center pivot, size (100,60)
+		// parent geometry starts at (-50,-30)
+		// child at local (0,0) must land at (-50,-30), not at (0,0)
+		const auto parent =
+			add_entity(f.world, lge::placement{0.F, 0.F, 0.F, {1.F, 1.F}, lge::pivot::center}, {100.F, 60.F});
+		const auto child = add_child(f.world, parent, lge::placement{0.F, 0.F});
+		REQUIRE(!f.system.update(0.F).has_error());
+		const auto pos = world_pos(f.world, child);
+		REQUIRE(pos.x == Approx(-50.F).margin(tolerance));
+		REQUIRE(pos.y == Approx(-30.F).margin(tolerance));
+	}
+
+	SECTION("child at local (10,0) offsets from parent top-left corner") {
+		// parent at (0,0), top_left pivot, size (100,60)
+		// parent geometry starts at (0,0)
+		// child at local (10,0) must land at (10,0)
+		const auto parent =
+			add_entity(f.world, lge::placement{0.F, 0.F, 0.F, {1.F, 1.F}, lge::pivot::top_left}, {100.F, 60.F});
+		const auto child = add_child(f.world, parent, lge::placement{10.F, 0.F});
+		REQUIRE(!f.system.update(0.F).has_error());
+		const auto pos = world_pos(f.world, child);
+		REQUIRE(pos.x == Approx(10.F).margin(tolerance));
+		REQUIRE(pos.y == Approx(0.F).margin(tolerance));
+	}
+}

@@ -229,3 +229,31 @@ TEST_CASE("bounds: missing components", "[bounds]") {
 		REQUIRE(!f.world.all_of<lge::bounds>(e));
 	}
 }
+
+TEST_CASE("bounds: parent with non-center pivot and metrics", "[bounds][regression]") {
+	bounds_fixture f;
+
+	SECTION("top_left pivot: bounds start at entity position") {
+		// parent at (50,40), top_left pivot, size (100,60)
+		// geometry starts at (50,40) — bounds must wrap it exactly there
+		add_entity(f.world, lge::placement{50.F, 40.F, 0.F, {1.F, 1.F}, lge::pivot::top_left}, {100.F, 60.F});
+		f.update();
+		const auto &b = f.world.get<lge::bounds>(*f.world.view<lge::bounds>().begin());
+		REQUIRE(b.p0.x == Approx(50.F).margin(tolerance));
+		REQUIRE(b.p0.y == Approx(40.F).margin(tolerance));
+		REQUIRE(b.p2.x == Approx(150.F).margin(tolerance));
+		REQUIRE(b.p2.y == Approx(100.F).margin(tolerance));
+	}
+
+	SECTION("bottom_right pivot: bounds end at entity position") {
+		// parent at (50,40), bottom_right pivot, size (100,60)
+		// geometry ends at (50,40) — bounds must wrap it
+		add_entity(f.world, lge::placement{50.F, 40.F, 0.F, {1.F, 1.F}, lge::pivot::bottom_right}, {100.F, 60.F});
+		f.update();
+		const auto &b = f.world.get<lge::bounds>(*f.world.view<lge::bounds>().begin());
+		REQUIRE(b.p0.x == Approx(-50.F).margin(tolerance));
+		REQUIRE(b.p0.y == Approx(-20.F).margin(tolerance));
+		REQUIRE(b.p2.x == Approx(50.F).margin(tolerance));
+		REQUIRE(b.p2.y == Approx(40.F).margin(tolerance));
+	}
+}
