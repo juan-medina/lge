@@ -62,11 +62,15 @@ auto transform_system::update(const float /*dt*/) -> result<> {
 			continue;
 		}
 
-		const auto &parent_world = ctx.world.get<transform>(entity).world;
+		const auto parent_world = ctx.world.get<transform>(entity).world;
+		const auto &parent_placement = ctx.world.get<placement>(entity);
+		const auto parent_pivot_offset = ctx.world.all_of<metrics>(entity)
+											 ? parent_placement.pivot * ctx.world.get<metrics>(entity).size
+											 : glm::vec2{0.F, 0.F};
 
-		// The world matrix translation column is the top-left corner of the parent's
-		// geometry in world space — children offset from here, not from the pivot point.
-		const auto parent_pos = glm::vec2{parent_world[2][0], parent_world[2][1]};
+		// The parent's logical position in world space — children position relative to this.
+		const auto pv = parent_world * glm::vec3{parent_pivot_offset.x, parent_pivot_offset.y, 1.F};
+		const auto parent_pos = glm::vec2{pv.x, pv.y};
 
 		for(const auto &kids = ctx.world.get<children>(entity).ids; const auto child: kids) {
 			const auto &local = ctx.world.get<placement>(child);
