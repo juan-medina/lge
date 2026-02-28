@@ -27,8 +27,8 @@ private:
 	auto change_selection(game_type type) -> void;
 
 	entt::entity menu_message_ent_ = entt::null;
-	static constexpr auto kb_message = "Cursor left/right & enter to choose";
-	static constexpr auto controller_message = "Controller left/right & A to choose";
+	static constexpr auto kb_message = "{#FFFF00}Cursor left/right & enter{#} to choose";
+	static constexpr auto controller_message = "{#FFFF00}Controller left/right & A{#} to choose";
 };
 
 } // namespace examples

@@ -33,10 +33,12 @@ protected:
 
 private:
 	static constexpr auto example_title = "Sound!";
-	static constexpr auto kb_message = "Space or click dancer to play/stop music,\n"
-									   "F5: debug draw, F11: toggle fullscreen, Esc: exit";
-	static constexpr auto controller_message = "Controller A to play/stop music,\n"
-											   "START: debug draw, SELECT: toggle fullscreen, B: exit";
+	static constexpr auto kb_message =
+		"{#FFFF00}Space or click{#} dancer to play/stop music,\n"
+		"{#FFFF00}F5{#}: debug draw, {#FFFF00}F11{#}: toggle fullscreen, {#FFFF00}Esc{#}: exit";
+	static constexpr auto controller_message =
+		"Controller {#FFFF00}A{#} to play/stop music,\n"
+		"{#FFFF00}START{#}: debug draw, {#FFFF00}SELECT{#}: toggle fullscreen, {#FFFF00}B{#}: exit";
 
 	static constexpr auto anim_path = "resources/game/sprites/dancer_anim.json";
 	static constexpr auto music_path = "resources/game/music/world_wanderer.ogg";

@@ -29,10 +29,11 @@ protected:
 
 private:
 	static constexpr auto example_title = "Layers!";
-	static constexpr auto kb_message = "press 1: change color on top, F5 to toggle debug draw,\n"
-									   "F11: toggle fullscreen, Esc: exit";
-	static constexpr auto controller_message = "controller A: blue on top, START: debug draw,\n"
-											   "SELECT: toggle fullscreen, B: exit";
+	static constexpr auto kb_message =
+		"Press {#FFFF00}1{#}: change color on top, {#FFFF00}F5{#}: to toggle debug draw,\n"
+		"{#FFFF00}F11{#}: toggle fullscreen, {#FFFF00}Esc{#}: exit";
+	static constexpr auto controller_message = "controller {#FFFF00}A{#}: blue on top, {#FFFF00}START{#}: debug draw,\n"
+											   "{#FFFF00}SELECT{#}: toggle fullscreen, {#FFFF00}B{#}: exit";
 
 	enum class top_color : std::int8_t {
 		none = -1,

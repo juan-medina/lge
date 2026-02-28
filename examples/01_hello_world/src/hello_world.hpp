@@ -25,10 +25,12 @@ protected:
 
 private:
 	static constexpr auto example_title = "Hello world!";
-	static constexpr auto kb_message = "Press {#FFFF00}1{#}: hide hello+world, {#FFFF00}2{#}: hide world, {#FFFF00}F5{#}: debug draw,\n"
-									   "{#FFFF00}F11{#}: toggle fullscreen, {#FFFF00}Esc{#}: exit";
-	static constexpr auto controller_message = "Press controller {#FFFF00}A{#}: hide hello+world, {#FFFF00}X{#}: hide world,\n"
-											   "{#FFFF00}START{#}: debug draw, {#FFFF00}SELECT{#}: toggle fullscreen, {#FFFF00}B{#}: exit";
+	static constexpr auto kb_message =
+		"Press {#FFFF00}1{#}: hide hello+world, {#FFFF00}2{#}: hide world, {#FFFF00}F5{#}: debug draw,\n"
+		"{#FFFF00}F11{#}: toggle fullscreen, {#FFFF00}Esc{#}: exit";
+	static constexpr auto controller_message =
+		"Press controller {#FFFF00}A{#}: hide hello+world, {#FFFF00}X{#}: hide world,\n"
+		"{#FFFF00}START{#}: debug draw, {#FFFF00}SELECT{#}: toggle fullscreen, {#FFFF00}B{#}: exit";
 
 	static constexpr size_t hide_hello_world_action = actions::total_base_actions + 0;
 	static constexpr size_t hide_world_action = actions::total_base_actions + 1;

@@ -36,10 +36,11 @@ private:
 	static constexpr auto bands_color = lge::color::from_hex(0xDA5E53FF);
 
 	static constexpr auto example_title = "Sprites!";
-	static constexpr auto kb_message = "Cursor left/right to move, F5 debug draw,\n"
-									   "F11: toggle fullscreen, Esc: exit";
-	static constexpr auto controller_message = "Controller left/right to move,\n"
-											   "START: debug draw, SELECT: toggle fullscreen, B: exit";
+	static constexpr auto kb_message = "{#FFFF00}Cursor left/right{#} to move, {#FFFF00}F5{#}: debug draw,\n"
+									   "{#FFFF00}F11{#}: toggle fullscreen, {#FFFF00}Esc{#}: exit";
+	static constexpr auto controller_message =
+		"Controller {#FFFF00}left/right{#} to move,\n"
+		"{#FFFF00}START{#}: debug draw, {#FFFF00}SELECT{#}: toggle fullscreen, {#FFFF00}B{#}: exit";
 
 	static constexpr auto anim_path = "resources/game/sprites/hiker_anim.json";
 

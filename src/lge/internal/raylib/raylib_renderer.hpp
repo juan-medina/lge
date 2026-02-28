@@ -132,10 +132,10 @@ private:
 	[[nodiscard]] auto resolve_font(font_handle font) const -> Font;
 
 	static auto render_text_line(const Font &rl_font,
-						  const std::string &text,
-						  float size,
-						  const Color &color,
-						  const glm::vec2 &position) -> void;
+								 const std::string &text,
+								 float size,
+								 const Color &color,
+								 const glm::vec2 &position) -> void;
 
 	font_handle default_font_{};
 	static constexpr auto default_font_path = "resources/lge/font/peaberry_mono.fnt";

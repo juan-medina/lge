@@ -5,7 +5,6 @@
 
 #include <lge/core/colors.hpp>
 #include <lge/core/result.hpp>
-#include <lge/interface/resources.hpp>
 
 #include "../../src/actions.hpp"
 #include "../../src/example.hpp"
@@ -27,8 +26,10 @@ protected:
 private:
 	static constexpr auto custom_clear_color = lge::color::from_hex(0x1E303CFF);
 	static constexpr auto example_title = "Collisions!";
-	static constexpr auto kb_message = "Space/Enter: throw dice, \nF5: debug draw, F11: fullscreen, Esc: exit";
-	static constexpr auto controller_message = "A: throw dice, \nSTART: debug draw, SELECT: fullscreen, B: exit";
+	static constexpr auto kb_message = "{#FFFF00}Space/Enter{#}: throw dice, \n{#FFFF00}F5{#}: debug draw, "
+									   "{#FFFF00}F11{#}: fullscreen, {#FFFF00}Esc{#}: exit";
+	static constexpr auto controller_message = "{#FFFF00}A{#}: throw dice, \n{#FFFF00}START{#}: debug draw, "
+											   "{#FFFF00}SELECT{#}: fullscreen, {#FFFF00}B{#}: exit";
 
 	static constexpr size_t throw_action = actions::total_base_actions + 0;
 

@@ -23,8 +23,8 @@ public:
 
 private:
 	entt::entity menu_message_ent_ = entt::null;
-	static constexpr auto kb_message = "Backspace to return to menu";
-	static constexpr auto controller_message = "Controller Y to return to menu";
+	static constexpr auto kb_message = "{#FFFF00}Backspace{#} to return to menu";
+	static constexpr auto controller_message = "{#FFFF00}Controller Y{#} to return to menu";
 };
 
 } // namespace examples

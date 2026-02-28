@@ -136,8 +136,7 @@ TEST_CASE("rich_text: parse_rich_text produces correct segments", "[rich_text]")
 
 	SECTION("multiple color tags produce multiple segments") {
 		// "normal color, this is {#FF0000}solid red, {#FF00001A}transparent red {#}, and normal again"
-		const auto text =
-			"normal, {#FF0000}solid red, {#FF00001A}transparent red {#}normal again";
+		const auto text = "normal, {#FF0000}solid red, {#FF00001A}transparent red {#}normal again";
 		const auto segs = lge::parse_rich_text(text, default_color);
 		REQUIRE(segs.size() == 4);
 		REQUIRE(segs[0].segment_color == default_color);
