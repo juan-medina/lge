@@ -9,12 +9,14 @@
 #include <lge/interface/renderer.hpp>
 #include <lge/interface/resource_manager.hpp>
 #include <lge/internal/raylib/raylib_resource_manager.hpp>
+#include <lge/internal/text/rich_text.hpp>
 
 #include <raylib.h>
 
 #include <entt/core/fwd.hpp>
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float4.hpp>
+#include <span>
 #include <string>
 #include <string_view>
 
@@ -59,6 +61,13 @@ public:
 					  const glm::vec2 &pivot_position,
 					  const glm::vec2 &rotated_offset,
 					  float rotation) const -> void override;
+
+	auto render_rich_label(font_handle font,
+						   std::span<const text_segment> segments,
+						   const int &size,
+						   const glm::vec2 &pivot_position,
+						   const glm::vec2 &rotated_offset,
+						   float rotation) const -> void override;
 
 	auto render_sprite(sprite_sheet_handle sheet,
 					   entt::id_type frame,
@@ -119,6 +128,14 @@ private:
 	[[nodiscard]] auto to_screen(const glm::vec2 &p) const -> glm::vec2 {
 		return {p.x + (drawing_resolution_.x * 0.5F), p.y + (drawing_resolution_.y * 0.5F)};
 	}
+
+	[[nodiscard]] auto resolve_font(font_handle font) const -> Font;
+
+	static auto render_text_line(const Font &rl_font,
+						  const std::string &text,
+						  float size,
+						  const Color &color,
+						  const glm::vec2 &position) -> void;
 
 	font_handle default_font_{};
 	static constexpr auto default_font_path = "resources/lge/font/peaberry_mono.fnt";

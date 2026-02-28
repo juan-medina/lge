@@ -16,6 +16,7 @@
 #include <lge/internal/components/overlapping.hpp>
 #include <lge/internal/components/render_order.hpp>
 #include <lge/internal/components/transform.hpp>
+#include <lge/internal/text/rich_text.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -104,14 +105,21 @@ auto render_system::handle_label(const entt::entity entity, const glm::mat3 &wor
 
 	const auto pivot_to_top_left_local = -plc.pivot * m.size * world_scale;
 
-	ctx.render.render_label(lbl.font,
-							lbl.text,
-							static_cast<int>(final_font_size),
-							lbl.text_color,
-							pivot_world,
-							pivot_to_top_left_local,
-							rotation);
+	if(has_rich_tags(lbl.text)) [[unlikely]] {
+		const auto segments = parse_rich_text(lbl.text, lbl.text_color);
+		ctx.render.render_rich_label(
+			lbl.font, segments, static_cast<int>(final_font_size), pivot_world, pivot_to_top_left_local, rotation);
+	} else [[likely]] {
+		ctx.render.render_label(lbl.font,
+								lbl.text,
+								static_cast<int>(final_font_size),
+								lbl.text_color,
+								pivot_world,
+								pivot_to_top_left_local,
+								rotation);
+	}
 }
+
 auto render_system::handle_rect(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
 	const auto &r = ctx.world.get<rect>(entity);
 	const auto &m = ctx.world.get<metrics>(entity);

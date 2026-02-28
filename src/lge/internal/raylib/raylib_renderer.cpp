@@ -9,6 +9,8 @@
 #include <lge/core/result.hpp>
 #include <lge/interface/renderer.hpp>
 #include <lge/interface/resources.hpp>
+#include <lge/internal/text/rich_text.hpp>
+#include <lge/text/text_segment.hpp>
 
 #include "raylib_resource_manager.hpp"
 
@@ -19,6 +21,8 @@
 #include <entt/core/fwd.hpp>
 #include <format>
 #include <glm/trigonometric.hpp>
+#include <rlgl.h>
+#include <span>
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <string_view>
@@ -226,17 +230,10 @@ auto raylib_renderer::get_drawing_resolution() const -> glm::vec2 {
 }
 
 auto raylib_renderer::get_label_size(const font_handle font, const std::string &text, const int &size) -> glm::vec2 {
-	auto rl_font = GetFontDefault();
-
-	if(const auto font_to_use = font.is_valid() ? font : default_font_; font_to_use.is_valid()) {
-		if(const auto err = resource_manager_.get_raylib_font(font_to_use).unwrap(rl_font); err) [[unlikely]] {
-			log::error("failed to get font with id {}, rendering label with default font instead", font_to_use);
-		}
-	}
-
+	const auto rl_font = resolve_font(font);
 	const auto spacing = static_cast<float>(size) / static_cast<float>(rl_font.baseSize);
-
-	const auto [width, height] = MeasureTextEx(rl_font, text.c_str(), static_cast<float>(size), spacing);
+	const auto plain = has_rich_tags(text) ? strip_rich_tags(text) : text;
+	const auto [width, height] = MeasureTextEx(rl_font, plain.c_str(), static_cast<float>(size), spacing);
 	return {width, height};
 }
 
@@ -331,6 +328,25 @@ auto raylib_renderer::screen_size_changed(const glm::vec2 screen_size) -> result
 	return true;
 }
 
+auto raylib_renderer::resolve_font(const font_handle font) const -> Font {
+	auto rl_font = GetFontDefault();
+	if(const auto font_to_use = font.is_valid() ? font : default_font_; font_to_use.is_valid()) {
+		if(const auto err = resource_manager_.get_raylib_font(font_to_use).unwrap(rl_font); err) [[unlikely]] {
+			log::error("failed to get font with id {}, using default font instead", font_to_use);
+		}
+	}
+	return rl_font;
+}
+auto raylib_renderer::render_text_line(
+	const Font &rl_font, const std::string &text, float size, const Color &color, const glm::vec2 &position) -> void {
+	DrawTextEx(rl_font,
+			   text.c_str(),
+			   {.x = position.x, .y = position.y},
+			   size,
+			   size / static_cast<float>(rl_font.baseSize),
+			   color);
+}
+
 auto raylib_renderer::get_texture_size(const texture_handle texture) -> glm::vec2 {
 	Texture2D rl_texture{};
 	if(const auto err = resource_manager_.get_raylib_texture(texture).unwrap(rl_texture); err) [[unlikely]] {
@@ -392,25 +408,71 @@ auto raylib_renderer::render_label(const font_handle font,
 								   const glm::vec2 &pivot_position,
 								   const glm::vec2 &pivot_to_top_left,
 								   const float rotation) const -> void {
+	const auto rl_font = resolve_font(font);
 	const auto screen_pivot = to_screen(pivot_position);
 
-	auto rl_font = GetFontDefault();
-	if(const auto font_to_use = font.is_valid() ? font : default_font_; font_to_use.is_valid()) {
-		if(const auto err = resource_manager_.get_raylib_font(font_to_use).unwrap(rl_font); err) [[unlikely]] {
-			log::error("failed to get font with id {}, rendering label with default font instead", font_to_use);
+	rlPushMatrix();
+	rlTranslatef(screen_pivot.x, screen_pivot.y, 0.0F);
+	rlRotatef(rotation, 0.0F, 0.0F, 1.0F);
+	rlTranslatef(pivot_to_top_left.x, pivot_to_top_left.y, 0.0F);
+
+	render_text_line(rl_font, text, static_cast<float>(size), color_to_raylib(color), {0.0F, 0.0F});
+
+	rlPopMatrix();
+}
+
+auto raylib_renderer::render_rich_label(const font_handle font,
+										const std::span<const text_segment> segments,
+										const int &size,
+										const glm::vec2 &pivot_position,
+										const glm::vec2 &pivot_to_top_left,
+										const float rotation) const -> void {
+	if(segments.empty()) [[unlikely]] {
+		return;
+	}
+
+	const auto rl_font = resolve_font(font);
+	const auto fsize = static_cast<float>(size);
+	const auto line_height = fsize;
+	const auto screen_pivot = to_screen(pivot_position);
+
+	rlPushMatrix();
+	rlTranslatef(screen_pivot.x, screen_pivot.y, 0.0F);
+	rlRotatef(rotation, 0.0F, 0.0F, 1.0F);
+	rlTranslatef(pivot_to_top_left.x, pivot_to_top_left.y, 0.0F);
+
+	float cursor_x = 0.0F;
+	float cursor_y = 0.0F;
+
+	for(const auto &seg: segments) {
+		if(seg.text.empty()) [[unlikely]] {
+			continue;
+		}
+
+		const std::string_view sv{seg.text};
+		std::size_t line_start = 0;
+
+		while(line_start <= sv.size()) {
+			const auto newline_pos = sv.find('\n', line_start);
+			const auto end = (newline_pos == std::string_view::npos) ? sv.size() : newline_pos;
+			const auto line = std::string{sv.substr(line_start, end - line_start)};
+
+			if(!line.empty()) {
+				render_text_line(rl_font, line, fsize, color_to_raylib(seg.segment_color), {cursor_x, cursor_y});
+				cursor_x += MeasureTextEx(rl_font, line.c_str(), fsize, fsize / static_cast<float>(rl_font.baseSize)).x;
+			}
+
+			if(newline_pos == std::string_view::npos) {
+				break;
+			}
+
+			cursor_x = 0.0F;
+			cursor_y += line_height;
+			line_start = newline_pos + 1;
 		}
 	}
 
-	const auto spacing = static_cast<float>(size) / static_cast<float>(rl_font.baseSize);
-
-	DrawTextPro(rl_font,
-				text.c_str(),
-				{.x = screen_pivot.x, .y = screen_pivot.y},
-				{.x = -pivot_to_top_left.x, .y = -pivot_to_top_left.y},
-				rotation,
-				static_cast<float>(size),
-				spacing,
-				color_to_raylib(color));
+	rlPopMatrix();
 }
 
 auto raylib_renderer::render_quad(const glm::vec2 &p0,

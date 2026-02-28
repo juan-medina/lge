@@ -7,10 +7,12 @@
 #include <lge/core/colors.hpp>
 #include <lge/core/result.hpp>
 #include <lge/interface/resources.hpp>
+#include <lge/text/text_segment.hpp>
 
 #include <cstdint>
 #include <entt/core/fwd.hpp>
 #include <glm/ext/vector_float2.hpp>
+#include <span>
 #include <string>
 
 namespace lge {
@@ -49,6 +51,13 @@ public:
 							  const glm::vec2 &pivot_position,
 							  const glm::vec2 &rotated_offset,
 							  float rotation) const -> void = 0;
+
+	virtual auto render_rich_label(font_handle font,
+								   std::span<const text_segment> segments,
+								   const int &size,
+								   const glm::vec2 &pivot_position,
+								   const glm::vec2 &rotated_offset,
+								   float rotation) const -> void = 0;
 
 	virtual auto render_quad(const glm::vec2 &p0,
 							 const glm::vec2 &p1,

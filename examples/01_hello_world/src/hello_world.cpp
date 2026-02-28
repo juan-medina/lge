@@ -46,14 +46,15 @@ auto hello_world::init() -> lge::result<> {
 	static constexpr auto gap_between_labels = 10.0F;
 
 	const auto hello_text_ent = ctx.world.create();
-	auto &hello_label = ctx.world.emplace<lge::label>(hello_text_ent, "Hello");
+	auto &hello_label = ctx.world.emplace<lge::label>(hello_text_ent, "H{#00FF00}e{#}llo");
 	hello_label.text_color = lge::colors::yellow;
 	ctx.world.emplace<lge::placement>(
 		hello_text_ent, 0, -gap_between_labels / 2, 0.0F, glm::vec2{1.F, 1.F}, lge::pivot::bottom_center);
 	lge::attach(ctx.world, center_ent_, hello_text_ent);
 
 	world_text_ent_ = ctx.world.create();
-	auto &world_label = ctx.world.emplace<lge::label>(world_text_ent_, "World");
+
+	auto &world_label = ctx.world.emplace<lge::label>(world_text_ent_, "Wor{#0000FF}l{#}d");
 	world_label.text_color = lge::colors::red;
 	ctx.world.emplace<lge::placement>(
 		world_text_ent_, 0, gap_between_labels / 2, 0.0F, glm::vec2{1.F, 1.F}, lge::pivot::top_center);
