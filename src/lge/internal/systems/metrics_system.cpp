@@ -12,6 +12,8 @@
 #include <lge/internal/components/previous_label.hpp>
 #include <lge/internal/components/previous_shapes.hpp>
 #include <lge/internal/components/previous_sprite.hpp>
+#include <lge/internal/components/rich_segments.hpp>
+#include <lge/internal/text/rich_text.hpp>
 
 #include <entity/fwd.hpp>
 #include <entt/entt.hpp>
@@ -50,7 +52,7 @@ auto metrics_system::calculate_circle_metrics(const entt::entity entity, const c
 }
 
 auto metrics_system::is_label_dirty(const label &lbl, const previous_label &p) -> bool {
-	return lbl.text != p.text || lbl.size != p.size || lbl.font != p.font;
+	return lbl.text != p.text || lbl.size != p.size || lbl.font != p.font || lbl.text_color != p.text_color;
 }
 
 auto metrics_system::is_rect_dirty(const rect &r, const previous_rect &p) -> bool {
@@ -86,11 +88,22 @@ auto metrics_system::handle_sprites() const -> void {
 auto metrics_system::handle_labels() const -> void {
 	for(const auto entity: ctx.world.view<label>()) {
 		auto &p = ctx.world.get_or_emplace<previous_label>(entity);
-		if(auto &lbl = ctx.world.get<label>(entity); !ctx.world.all_of<metrics>(entity) || is_label_dirty(lbl, p)) {
+		auto &lbl = ctx.world.get<label>(entity);
+
+		if(!ctx.world.all_of<metrics>(entity) || is_label_dirty(lbl, p)) {
 			calculate_label_metrics(entity, lbl);
+
+			if(has_rich_tags(lbl.text)) {
+				ctx.world.emplace_or_replace<rich_segments>(entity,
+															rich_segments{parse_rich_text(lbl.text, lbl.text_color)});
+			} else {
+				ctx.world.remove<rich_segments>(entity);
+			}
+
 			p.text = lbl.text;
 			p.size = lbl.size;
 			p.font = lbl.font;
+			p.text_color = lbl.text_color;
 		}
 	}
 }
