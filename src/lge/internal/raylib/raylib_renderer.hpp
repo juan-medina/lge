@@ -138,7 +138,7 @@ private:
 								 const glm::vec2 &position) -> void;
 
 	font_handle default_font_{};
-	static constexpr auto default_font_path = "resources/lge/font/peaberry_mono.fnt";
+	static constexpr auto default_font_path = "resources/lge/font/peaberry_pixel_outline_16.fnt";
 	static constexpr auto default_icon_path = "resources/lge/icon/lge.png";
 };
 
