@@ -443,13 +443,18 @@ auto raylib_renderer::render_rect(const glm::vec2 &center,
 								  const color &fill_color,
 								  const float border_thickness) const -> void {
 	const auto screen_center = to_screen(center);
-	const auto fill = color_to_raylib(fill_color);
-	const auto border = color_to_raylib(border_color);
 
-	auto rec = Rectangle{.x = screen_center.x, .y = screen_center.y, .width = size.x, .height = size.y};
-	DrawRectanglePro(rec, {.x = size.x * 0.5F, .y = size.y * 0.5F}, rotation, fill);
+	// has fill, draw the filled rectangle
+	if(fill_color.a > 0) {
+		const auto fill = color_to_raylib(fill_color);
+		auto rec = Rectangle{.x = screen_center.x, .y = screen_center.y, .width = size.x, .height = size.y};
+		DrawRectanglePro(rec, {.x = size.x * 0.5F, .y = size.y * 0.5F}, rotation, fill);
+	}
 
+	// has border, draw the border
 	if(border_color.a > 0 && border_thickness > 0.0F) {
+		const auto border = color_to_raylib(border_color);
+
 		const auto rotation_rad = glm::radians(rotation);
 		const auto cos_r = glm::cos(rotation_rad);
 		const auto sin_r = glm::sin(rotation_rad);

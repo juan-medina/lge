@@ -115,9 +115,9 @@ auto render_system::handle_label(const entt::entity entity, const glm::mat3 &wor
 auto render_system::handle_rect(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
 	const auto &r = ctx.world.get<rect>(entity);
 	const auto &m = ctx.world.get<metrics>(entity);
-	const auto &plc = ctx.world.get<placement>(entity);
 
-	const auto center = transform_point(world_transform, plc.pivot * m.size);
+	const auto center = transform_point(world_transform, glm::vec2{0.5F, 0.5F} * m.size);
+
 	const auto rotation = get_rotation(world_transform);
 	const auto world_scale = get_scale(world_transform);
 	const auto scaled_size = m.size * world_scale;
