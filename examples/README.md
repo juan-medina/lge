@@ -13,7 +13,7 @@ debug draw, F11 fullscreen, Esc exit).
 The entry point for lge. Covers the core building blocks used in every game: creating entities, attaching components,
 parenting entities in a hierarchy, writing a custom system, and toggling visibility.
 
-**Concepts:** ECS basics, hierarchy, custom systems, hidden component, actions
+**Concepts:** ECS basics, hierarchy, custom systems, hidden component, actions, rich text labels
 
 ---
 
