@@ -150,6 +150,10 @@ auto app::end() -> result<> {
 		}
 	}
 
+	if(const auto err = scenes.end().unwrap(); err) [[unlikely]] {
+		return error("failed to end scenes", *err);
+	}
+
 	return true;
 }
 
