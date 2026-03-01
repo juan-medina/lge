@@ -4,11 +4,9 @@
 #pragma once
 
 #include <lge/core/result.hpp>
-#include <lge/internal/components/bounds.hpp>
 #include <lge/systems/system.hpp>
 
 #include <array>
-#include <glm/ext/matrix_float3x3.hpp>
 #include <glm/ext/vector_float2.hpp>
 
 namespace lge {

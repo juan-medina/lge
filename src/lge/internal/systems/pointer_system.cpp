@@ -6,21 +6,15 @@
 
 #include <lge/components/clickable.hpp>
 #include <lge/components/hovered.hpp>
-#include <lge/components/placement.hpp>
 #include <lge/core/result.hpp>
 #include <lge/events/click.hpp>
 #include <lge/interface/renderer.hpp>
 #include <lge/internal/components/bounds.hpp>
-#include <lge/internal/components/metrics.hpp>
-#include <lge/internal/components/transform.hpp>
 
 #include <array>
-#include <cmath>
 #include <cstddef>
 #include <entt/entt.hpp>
-#include <glm/ext/matrix_float3x3.hpp>
 #include <glm/ext/vector_float2.hpp>
-#include <glm/geometric.hpp>
 
 namespace lge {
 
