@@ -41,14 +41,23 @@ auto dice_roller_system::init() -> lge::result<> {
 		}
 	}
 
-	ctx.events.on<dice_throw>([this](const dice_throw &evt) -> lge::result<> { return on_dice_throw(evt); });
+	throw_sub_ =
+		ctx.events.subscribe<dice_throw>([this](const dice_throw &evt) -> lge::result<> { return on_dice_throw(evt); });
 
-	ctx.events.on<lge::collision>([this](const lge::collision &col) -> lge::result<> { return on_collision(col); });
+	collision_sub_ = ctx.events.subscribe<lge::collision>(
+		[this](const lge::collision &col) -> lge::result<> { return on_collision(col); });
 
 	return true;
 }
 
 auto dice_roller_system::end() -> lge::result<> {
+	if(const auto err = ctx.events.unsubscribe(collision_sub_).unwrap(); err) [[unlikely]] {
+		return lge::error("failed to unsubscribe from collision events", *err);
+	}
+	if(const auto err = ctx.events.unsubscribe(throw_sub_).unwrap(); err) [[unlikely]] {
+		return lge::error("failed to unsubscribe from dice throw events", *err);
+	}
+
 	if(const auto err = ctx.resources.unload_sound(dice_throw_sound_).unwrap(); err) [[unlikely]] {
 		return lge::error("failed to unload dice throw sound", *err);
 	}

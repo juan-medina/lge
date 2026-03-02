@@ -55,7 +55,7 @@ auto sound::init() -> lge::result<> {
 	ctx.world.emplace<lge::placement>(sprite_, 0.0F, 0.0F);
 	ctx.world.emplace<lge::clickable>(sprite_);
 
-	ctx.events.on<lge::click>([this](const lge::click &c) -> lge::result<> {
+	click_sub_ = ctx.events.subscribe<lge::click>([this](const lge::click &c) -> lge::result<> {
 		if(c.entity != sprite_) {
 			return true;
 		}
@@ -87,6 +87,10 @@ auto sound::update(const float dt) -> lge::result<> {
 }
 
 auto sound::end() -> lge::result<> {
+	if(const auto err = ctx.events.unsubscribe(click_sub_).unwrap(); err) [[unlikely]] {
+		return lge::error("failed to unsubscribe click event", *err);
+	}
+
 	if(const auto err = ctx.resources.unload_music(music_).unwrap(); err) [[unlikely]] {
 		return lge::error("failed to unload music", *err);
 	}

@@ -33,8 +33,8 @@ auto collisions::init() -> lge::result<> {
 		return lge::error("failed to register dice_roller_system", *err);
 	}
 
-	ctx.events.on<dice_roll_result>(
-		[this](const dice_roll_result &r) -> lge::result<> { return on_dice_roll_result(r); });
+	dice_roll_result_sub_ = ctx.events.subscribe<dice_roll_result>(
+		[](const dice_roll_result &r) -> lge::result<> { return on_dice_roll_result(r); });
 
 	return true;
 }
@@ -51,6 +51,10 @@ auto collisions::update(const float dt) -> lge::result<> {
 }
 
 auto collisions::end() -> lge::result<> {
+	if(const auto err = ctx.events.unsubscribe(dice_roll_result_sub_).unwrap(); err) [[unlikely]] {
+		return lge::error("failed to unsubscribe from dice roll result events", *err);
+	}
+
 	return example::end();
 }
 

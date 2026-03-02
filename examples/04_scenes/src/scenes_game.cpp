@@ -32,14 +32,14 @@ auto scenes_game::init() -> lge::result<> {
 		return lge::error("failed to set active scene to menu scene", *err);
 	}
 
-	ctx.events.on<go_to_game>([this](const auto &evt) -> lge::result<> {
+	go_to_game_sub_ = ctx.events.subscribe<go_to_game>([this](const auto &evt) -> lge::result<> {
 		if(const auto err = scenes.transition_activate<game_scene>(evt.type).unwrap(); err) [[unlikely]] {
 			return lge::error("failed to set active scene to game scene", *err);
 		}
 		return true;
 	});
 
-	ctx.events.on<go_to_menu>([this](const auto &) -> lge::result<> {
+	go_to_menu_sub_ = ctx.events.subscribe<go_to_menu>([this](const auto &) -> lge::result<> {
 		if(const auto err = scenes.transition_activate<menu_scene>().unwrap(); err) [[unlikely]] {
 			return lge::error("failed to set active scene to menu scene", *err);
 		}
@@ -54,6 +54,14 @@ auto scenes_game::update(const float dt) -> lge::result<> {
 }
 
 auto scenes_game::end() -> lge::result<> {
+	if(const auto err = ctx.events.unsubscribe(go_to_game_sub_).unwrap(); err) [[unlikely]] {
+		return lge::error("failed to unsubscribe go_to_game event", *err);
+	}
+
+	if(const auto err = ctx.events.unsubscribe(go_to_menu_sub_).unwrap(); err) [[unlikely]] {
+		return lge::error("failed to unsubscribe go_to_menu event", *err);
+	}
+
 	return example::end();
 }
 

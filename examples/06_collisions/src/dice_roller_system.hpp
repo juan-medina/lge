@@ -5,6 +5,7 @@
 
 #include <lge/components/placement.hpp>
 #include <lge/core/result.hpp>
+#include <lge/dispatcher/subscription.hpp>
 #include <lge/events/collision.hpp>
 #include <lge/interface/resources.hpp>
 #include <lge/systems/system.hpp>
@@ -118,6 +119,9 @@ private:
 
 	static constexpr auto dice_throw_sound_path = "resources/game/sounds/dice_throw.wav";
 	lge::sound_handle dice_throw_sound_{};
+
+	lge::subscription collision_sub_;
+	lge::subscription throw_sub_;
 };
 
 } // namespace examples

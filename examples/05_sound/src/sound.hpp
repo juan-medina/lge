@@ -4,6 +4,7 @@
 #pragma once
 
 #include <lge/core/result.hpp>
+#include <lge/dispatcher/subscription.hpp>
 #include <lge/interface/resources.hpp>
 
 #include "../../src/actions.hpp"
@@ -66,6 +67,7 @@ private:
 	std::mt19937 rng_{rd_()};
 
 	lge::sound_handle scratch_sound_{lge::invalid_sound};
+	lge::subscription click_sub_;
 };
 
 } // namespace examples

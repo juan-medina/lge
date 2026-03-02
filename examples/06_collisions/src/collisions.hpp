@@ -5,6 +5,7 @@
 
 #include <lge/core/colors.hpp>
 #include <lge/core/result.hpp>
+#include <lge/dispatcher/subscription.hpp>
 
 #include "../../src/actions.hpp"
 #include "../../src/example.hpp"
@@ -33,7 +34,8 @@ private:
 
 	static constexpr size_t throw_action = actions::total_base_actions + 0;
 
-	[[nodiscard]] auto on_dice_roll_result(const dice_roll_result &result) -> lge::result<>;
+	static [[nodiscard]] auto on_dice_roll_result(const dice_roll_result &result) -> lge::result<>;
+	lge::subscription dice_roll_result_sub_;
 };
 
 } // namespace examples

@@ -8,6 +8,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string>
+#include <utility>
 
 // =============================================================================
 // Events (shared contract between scenes and the app)
@@ -110,57 +111,20 @@ TEST_CASE("scene_manager + dispatcher: app-mediated scene transition", "[scene_m
 		must(f.scm.add<results_scene>());
 
 		// The app (this test) decides what level_completed means: go to results_scene.
-		// Neither scene knows the other exists.
-		f.ctx.events.on<level_completed>(
-			[&f](const level_completed &evt) -> lge::result<> { return f.scm.activate<results_scene>(evt); });
+		std::ignore = f.dispatcher.subscribe<level_completed>(
+			[&](const level_completed &e) -> lge::result<> { return f.scm.activate<results_scene>(e); });
 
 		must(f.scm.activate<gameplay_scene>());
 		test_log.clear();
 
-		// One tick: gameplay fires the event; app handler switches to results.
+		// One update: gameplay_scene posts level_completed → dispatcher → results_scene activates
 		must(f.scm.update(0.16F));
+		require_log({"gameplay_scene::update", "gameplay_scene::on_exit", "results_scene::on_enter:score=500"});
 
-		require_log({
-			"gameplay_scene::update",			 // scene runs first
-			"gameplay_scene::on_exit",			 // app transitions away from it
-			"results_scene::on_enter:score=500", // results scene receives the score
-		});
-	}
-
-	SECTION("results_scene is the active scene on the following tick") {
-		test_log.clear();
-		scene_fixture f;
-
-		must(f.scm.add<gameplay_scene>());
-		must(f.scm.add<results_scene>());
-
-		f.ctx.events.on<level_completed>(
-			[&f](const level_completed &evt) -> lge::result<> { return f.scm.activate<results_scene>(evt); });
-
-		must(f.scm.activate<gameplay_scene>());
-		must(f.scm.update(0.16F)); // triggers transition
 		test_log.clear();
 
-		// Second tick must drive results_scene, not gameplay_scene.
+		// Next update runs results_scene
 		must(f.scm.update(0.16F));
 		require_log({"results_scene::update"});
-	}
-
-	SECTION("score value posted by gameplay_scene arrives intact at results_scene") {
-		test_log.clear();
-		scene_fixture f;
-
-		must(f.scm.add<gameplay_scene>());
-		must(f.scm.add<results_scene>());
-
-		f.ctx.events.on<level_completed>(
-			[&f](const level_completed &evt) -> lge::result<> { return f.scm.activate<results_scene>(evt); });
-
-		must(f.scm.activate<gameplay_scene>());
-		must(f.scm.update(0.16F));
-
-		// Exactly one entry for results_scene::on_enter and it carries the right score.
-		const auto it = std::ranges::find(test_log, "results_scene::on_enter:score=500");
-		REQUIRE(it != test_log.end());
 	}
 }

@@ -4,6 +4,7 @@
 #pragma once
 
 #include <lge/core/result.hpp>
+#include <lge/dispatcher/subscription.hpp>
 
 #include "../../src/example.hpp"
 
@@ -19,6 +20,9 @@ protected:
 	[[nodiscard]] auto end() -> lge::result<> override;
 
 private:
+	lge::subscription go_to_game_sub_;
+	lge::subscription go_to_menu_sub_;
+
 	static constexpr auto example_title = "scenes_game!";
 	static constexpr auto kb_message =
 		"{#FFFF00}F5{#} debug draw, {#FFFF00}F11{#}: toggle fullscreen, {#FFFF00}Esc{#}: exit";
