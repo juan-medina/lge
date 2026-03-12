@@ -401,6 +401,47 @@ auto raylib_renderer::render_sprite(const sprite_sheet_handle sheet,
 	DrawTexturePro(rl_texture, source, dest, origin, rotation, color_to_raylib(tint));
 }
 
+auto raylib_renderer::render_panel(const sprite_sheet_handle sheet,
+								   const entt::id_type frame,
+								   const glm::vec2 &pivot_position,
+								   const glm::vec2 &size,
+								   const glm::vec2 &pivot,
+								   const float rotation,
+								   const float border,
+								   const color tint) const -> void {
+	sprite_sheet_frame f{};
+	if(const auto err = resource_manager_.get_sprite_sheet_frame(sheet, frame).unwrap(f); err) [[unlikely]] {
+		return;
+	}
+
+	texture_handle tex_handle{};
+	if(const auto err = resource_manager_.get_sprite_sheet_texture(sheet).unwrap(tex_handle); err) [[unlikely]] {
+		return;
+	}
+
+	Texture2D rl_texture{};
+	if(const auto err = resource_manager_.get_raylib_texture(tex_handle).unwrap(rl_texture); err) [[unlikely]] {
+		return;
+	}
+
+	const auto screen_pos = to_screen(pivot_position);
+
+	const auto border_i = static_cast<int>(border);
+	const NPatchInfo npatch{
+		.source = {.x = f.source_pos.x, .y = f.source_pos.y, .width = f.source_size.x, .height = f.source_size.y},
+		.left = border_i,
+		.top = border_i,
+		.right = border_i,
+		.bottom = border_i,
+		.layout = NPATCH_NINE_PATCH,
+	};
+
+	const auto dest = Rectangle{.x = screen_pos.x, .y = screen_pos.y, .width = size.x, .height = size.y};
+	const auto origin = Vector2{.x = pivot.x * size.x, .y = pivot.y * size.y};
+
+	DrawTextureNPatch(rl_texture, npatch, dest, origin, rotation, color_to_raylib(tint));
+}
+
 auto raylib_renderer::render_label(const font_handle font,
 								   const std::string &text,
 								   const int &size,

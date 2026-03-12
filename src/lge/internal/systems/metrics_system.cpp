@@ -4,12 +4,14 @@
 #include "metrics_system.hpp"
 
 #include <lge/components/label.hpp>
+#include <lge/components/panel.hpp>
 #include <lge/components/shapes.hpp>
 #include <lge/components/sprite.hpp>
 #include <lge/core/result.hpp>
 #include <lge/interface/renderer.hpp>
 #include <lge/internal/components/metrics.hpp>
 #include <lge/internal/components/previous_label.hpp>
+#include <lge/internal/components/previous_panel.hpp>
 #include <lge/internal/components/previous_shapes.hpp>
 #include <lge/internal/components/previous_sprite.hpp>
 #include <lge/internal/components/rich_segments.hpp>
@@ -32,6 +34,9 @@ auto metrics_system::update(const float /*dt*/) -> result<> {
 
 	// metrics for sprite
 	handle_sprites();
+
+	// metrics for panel
+	handle_panels();
 
 	return true;
 }
@@ -124,6 +129,24 @@ auto metrics_system::handle_circles() const -> void {
 		if(auto &c = ctx.world.get<circle>(entity); !ctx.world.all_of<metrics>(entity) || is_circle_dirty(c, p)) {
 			calculate_circle_metrics(entity, c);
 			p.radius = c.radius;
+		}
+	}
+}
+
+auto metrics_system::calculate_panel_metrics(const entt::entity entity, const panel &pnl) const -> void {
+	ctx.world.emplace_or_replace<metrics>(entity, metrics{.size = pnl.size});
+}
+
+auto metrics_system::is_panel_dirty(const panel &pnl, const previous_panel &p) -> bool {
+	return pnl.size != p.size;
+}
+
+auto metrics_system::handle_panels() const -> void {
+	for(const auto entity: ctx.world.view<panel>()) {
+		auto &p = ctx.world.get_or_emplace<previous_panel>(entity);
+		if(auto &pnl = ctx.world.get<panel>(entity); !ctx.world.all_of<metrics>(entity) || is_panel_dirty(pnl, p)) {
+			calculate_panel_metrics(entity, pnl);
+			p.size = pnl.size;
 		}
 	}
 }

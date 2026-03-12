@@ -31,7 +31,8 @@ private:
 	static constexpr auto ui_sheet_path = "resources/game/sprites/ui.json";
 
 	lge::sprite_sheet_handle ui_sheet_{lge::invalid_sprite_sheet};
-	entt::entity ui_sprite_{entt::null};
+	entt::entity panel1_{entt::null};
+	entt::entity panel2_{entt::null};
 };
 
 } // namespace examples

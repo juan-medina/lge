@@ -4,8 +4,8 @@
 #include "buttons.hpp"
 
 #include <lge/app/main.hpp>
+#include <lge/components/panel.hpp>
 #include <lge/components/placement.hpp>
-#include <lge/components/sprite.hpp>
 #include <lge/core/result.hpp>
 #include <lge/interface/resource_manager.hpp>
 
@@ -28,9 +28,13 @@ auto buttons::init() -> lge::result<> {
 		return lge::error("failed to load ui sprite sheet", *err);
 	}
 
-	ui_sprite_ = ctx.world.create();
-	ctx.world.emplace<lge::sprite>(ui_sprite_, ui_sheet_, "tile_0017.png"_hs);
-	ctx.world.emplace<lge::placement>(ui_sprite_, 0.0F, 0.0F);
+	panel1_ = ctx.world.create();
+	ctx.world.emplace<lge::panel>(panel1_, ui_sheet_, "tile_0017.png"_hs, glm::vec2{60.0F, 30.0F}, 15.0F);
+	ctx.world.emplace<lge::placement>(panel1_, -80.0F, 0.0F);
+
+	panel2_ = ctx.world.create();
+	ctx.world.emplace<lge::panel>(panel2_, ui_sheet_, "tile_0017.png"_hs, glm::vec2{30.0F, 60.0F}, 15.0F);
+	ctx.world.emplace<lge::placement>(panel2_, 80.0F, 0.0F);
 
 	return true;
 }

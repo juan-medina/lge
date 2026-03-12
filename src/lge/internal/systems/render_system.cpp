@@ -5,6 +5,7 @@
 
 #include <lge/components/collidable.hpp>
 #include <lge/components/label.hpp>
+#include <lge/components/panel.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/components/shapes.hpp>
 #include <lge/components/sprite.hpp>
@@ -64,6 +65,10 @@ auto render_system::update(const float /*dt*/) -> result<> {
 
 		if(ctx.world.all_of<sprite>(entity)) {
 			handle_sprite(entity, world_transform);
+		}
+
+		if(ctx.world.all_of<panel>(entity)) {
+			handle_panel(entity, world_transform);
 		}
 
 		if(ctx.world.all_of<bounds>(entity) && ctx.render.is_debug_draw()) {
@@ -165,6 +170,19 @@ auto render_system::handle_sprite(const entt::entity entity, const glm::mat3 &wo
 							 spr.flip_horizontal,
 							 spr.flip_vertical,
 							 spr.tint);
+}
+
+auto render_system::handle_panel(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
+	const auto &pnl = ctx.world.get<panel>(entity);
+	const auto &m = ctx.world.get<metrics>(entity);
+	const auto &plc = ctx.world.get<placement>(entity);
+
+	const auto pivot_world = transform_point(world_transform, plc.pivot * m.size);
+	const auto rotation = get_rotation(world_transform);
+	const auto world_scale = get_scale(world_transform);
+	const auto scaled_size = m.size * world_scale;
+
+	ctx.render.render_panel(pnl.sheet, pnl.frame, pivot_world, scaled_size, plc.pivot, rotation, pnl.border, pnl.tint);
 }
 
 auto render_system::handle_bounds(const entt::entity entity, const glm::mat3 & /*world_transform*/) const -> void {

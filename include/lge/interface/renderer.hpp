@@ -88,6 +88,15 @@ public:
 							   bool flip_vertical,
 							   color tint) const -> void = 0;
 
+	virtual auto render_panel(sprite_sheet_handle sheet,
+							  entt::id_type frame,
+							  const glm::vec2 &pivot_position,
+							  const glm::vec2 &size,
+							  const glm::vec2 &pivot,
+							  float rotation,
+							  float border,
+							  color tint) const -> void = 0;
+
 	virtual auto get_label_size(font_handle font, const std::string &text, const int &size) -> glm::vec2 = 0;
 
 	virtual auto get_texture_size(texture_handle texture) -> glm::vec2 = 0;

@@ -79,6 +79,15 @@ public:
 					   bool flip_vertical,
 					   color tint) const -> void override;
 
+	auto render_panel(sprite_sheet_handle sheet,
+					  entt::id_type frame,
+					  const glm::vec2 &pivot_position,
+					  const glm::vec2 &size,
+					  const glm::vec2 &pivot,
+					  float rotation,
+					  float border,
+					  color tint) const -> void override;
+
 	auto render_quad(const glm::vec2 &p0,
 					 const glm::vec2 &p1,
 					 const glm::vec2 &p2,
