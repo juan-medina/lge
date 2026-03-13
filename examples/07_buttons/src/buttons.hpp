@@ -7,11 +7,11 @@
 #include <lge/dispatcher/subscription.hpp>
 #include <lge/interface/resources.hpp>
 
-#include "../../src/actions.hpp"
 #include "../../src/example.hpp"
 
 #include <entt/entity/entity.hpp>
 #include <entt/entity/fwd.hpp>
+#include <string_view>
 
 namespace examples {
 
@@ -33,10 +33,10 @@ private:
 		"Press {#FFFF00}START{#}: debug draw, {#FFFF00}SELECT{#}: toggle fullscreen, {#FFFF00}B{#}: exit";
 
 	static constexpr auto ui_sheet_path = "resources/game/sprites/ui.json";
-
-	static constexpr lge::input::id popup_action = actions::total_base_actions + 0;
+	static constexpr auto input_sheet_path = "resources/game/sprites/input.json";
 
 	lge::sprite_sheet_handle ui_sheet_{lge::invalid_sprite_sheet};
+	lge::sprite_sheet_handle input_sheet_{lge::invalid_sprite_sheet};
 
 	entt::entity popup_button_{entt::null};
 	entt::entity popup_panel_{entt::null};

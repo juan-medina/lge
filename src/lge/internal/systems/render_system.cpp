@@ -197,29 +197,46 @@ auto render_system::handle_button(const entt::entity entity, const glm::mat3 &wo
 	const auto &m = ctx.world.get<metrics>(entity);
 	const auto &plc = ctx.world.get<placement>(entity);
 
-	const auto tint = ctx.world.all_of<pressed>(entity)	  ? btn.pressed_tint
-					  : ctx.world.all_of<hovered>(entity) ? btn.hover_tint
-														  : btn.normal_tint;
-
 	const auto pivot_world = transform_point(world_transform, plc.pivot * m.size);
 	const auto rotation = get_rotation(world_transform);
 	const auto world_scale = get_scale(world_transform);
 	const auto scaled_size = m.size * world_scale;
+
+	const auto tint = ctx.world.all_of<pressed>(entity)	  ? btn.pressed_tint
+					  : ctx.world.all_of<hovered>(entity) ? btn.hover_tint
+														  : btn.normal_tint;
 
 	ctx.render.render_panel(btn.sheet, btn.frame, pivot_world, scaled_size, plc.pivot, rotation, btn.border, tint);
 
 	const auto text_size = ctx.render.get_label_size(btn.font, btn.text, static_cast<int>(btn.text_size));
 	const auto center_world = transform_point(world_transform, glm::vec2{0.5F, 0.5F} * m.size);
 	const auto final_font_size = btn.text_size * world_scale.y;
-	const auto pivot_to_top_left_local = -glm::vec2{0.5F, 0.5F} * text_size * world_scale;
+	const auto pivot_to_top_left = -glm::vec2{0.5F, 0.5F} * text_size * world_scale;
 
 	ctx.render.render_label(btn.font,
 							btn.text,
 							static_cast<int>(final_font_size),
 							btn.text_color,
 							center_world,
-							pivot_to_top_left_local,
+							pivot_to_top_left,
 							rotation);
+
+	// Controller overlay — only when controller is active and overlay is defined
+	if(ctx.actions.is_controller_available() && btn.overlay_sheet.is_valid() && btn.overlay_frame != ""_hs) {
+		const auto frame_size = ctx.render.get_sprite_frame_size(btn.overlay_sheet, btn.overlay_frame);
+		const auto scaled_frame = frame_size * world_scale;
+		// Bottom-center of the button in world space
+		const auto bottom_center = transform_point(world_transform, glm::vec2{0.5F, 1.0F} * m.size);
+		ctx.render.render_sprite(btn.overlay_sheet,
+								 btn.overlay_frame,
+								 bottom_center,
+								 scaled_frame,
+								 pivot::center,
+								 rotation,
+								 false,
+								 false,
+								 colors::white);
+	}
 }
 
 auto render_system::handle_bounds(const entt::entity entity, const glm::mat3 & /*world_transform*/) const -> void {

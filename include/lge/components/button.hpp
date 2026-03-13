@@ -4,6 +4,7 @@
 #pragma once
 
 #include <lge/core/colors.hpp>
+#include <lge/interface/input.hpp>
 #include <lge/interface/resources.hpp>
 
 #include <entt/core/fwd.hpp>
@@ -22,11 +23,14 @@ struct button {
 	float border{0.0F};
 	std::string text;
 	color normal_tint = colors::white;
-	color hover_tint = color{200, 200, 200, 255};
-	color pressed_tint = color{150, 150, 150, 255};
+	color hover_tint = colors::gray_80;
+	color pressed_tint = colors::gray_40;
 	color text_color = colors::white;
 	float text_size = 17.0F;
 	font_handle font = invalid_font;
+	input::button controller_button = input::button::unknown;
+	sprite_sheet_handle overlay_sheet = invalid_sprite_sheet;
+	entt::hashed_string overlay_frame = ""_hs;
 };
 
 } // namespace lge

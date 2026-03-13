@@ -26,6 +26,7 @@ public:
 
 	[[nodiscard]] auto get_mouse_position() const -> glm::vec2 override;
 	[[nodiscard]] auto is_mouse_button_pressed(size_t button) const -> bool override;
+	[[nodiscard]] auto get_button_state(button b) const -> state override;
 
 private:
 	static constexpr auto controller_axis_dead_zone = 0.3F;

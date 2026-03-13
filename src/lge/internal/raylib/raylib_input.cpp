@@ -40,6 +40,18 @@ auto raylib_input::is_mouse_button_pressed(const size_t button) const -> bool {
 	return IsMouseButtonPressed(static_cast<int>(button));
 }
 
+auto raylib_input::get_button_state(const button b) const -> state {
+	if(!controller_available || default_controller < 0) {
+		return {};
+	}
+	const auto rb = button_to_raylib(b);
+	return state{
+		.pressed = IsGamepadButtonPressed(default_controller, rb),
+		.released = IsGamepadButtonReleased(default_controller, rb),
+		.down = IsGamepadButtonDown(default_controller, rb),
+	};
+}
+
 auto raylib_input::accumulate_key_states(state &st, const binding &b) -> void {
 	for(const auto k: b.keys) {
 		const auto rk = key_to_raylib(k);

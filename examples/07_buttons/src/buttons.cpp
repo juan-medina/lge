@@ -13,6 +13,7 @@
 #include <lge/core/colors.hpp>
 #include <lge/core/result.hpp>
 #include <lge/events/button_clicked.hpp>
+#include <lge/interface/input.hpp>
 #include <lge/interface/resource_manager.hpp>
 
 #include "../../src/example.hpp"
@@ -35,11 +36,9 @@ auto buttons::init() -> lge::result<> {
 		return lge::error("failed to load ui sprite sheet", *err);
 	}
 
-	ctx.actions.bind(popup_action,
-					 {
-						 .keys = {lge::input::key::space},
-						 .buttons = {lge::input::button::right_face_down},
-					 });
+	if(const auto err = ctx.resources.load_sprite_sheet(input_sheet_path).unwrap(input_sheet_); err) [[unlikely]] {
+		return lge::error("failed to load input sprite sheet", *err);
+	}
 
 	// -------------------------------------------------------------------------
 	// Popup button — always visible
@@ -56,6 +55,9 @@ auto buttons::init() -> lge::result<> {
 									   .hover_tint = lge::color::from_hex(0x6EA0F0FF),
 									   .pressed_tint = lge::color::from_hex(0x32508CFF),
 									   .text_color = lge::colors::white,
+									   .controller_button = lge::input::button::right_face_up,
+									   .overlay_sheet = input_sheet_,
+									   .overlay_frame = "tile_0007.png"_hs,
 								   });
 	ctx.world.emplace<lge::placement>(popup_button_, 0.0F, 0.0F);
 
@@ -92,6 +94,9 @@ auto buttons::init() -> lge::result<> {
 									   .hover_tint = lge::color::from_hex(0x8CDC8CFF),
 									   .pressed_tint = lge::color::from_hex(0x3C783CFF),
 									   .text_color = lge::colors::white,
+									   .controller_button = lge::input::button::right_face_down,
+									   .overlay_sheet = input_sheet_,
+									   .overlay_frame = "tile_0004.png"_hs,
 								   });
 	ctx.world.emplace<lge::placement>(ok_button_, -45.0F, 20.0F);
 	lge::attach(ctx.world, popup_panel_, ok_button_);
@@ -108,6 +113,9 @@ auto buttons::init() -> lge::result<> {
 									   .hover_tint = lge::color::from_hex(0xDC6464FF),
 									   .pressed_tint = lge::color::from_hex(0x781E1EFF),
 									   .text_color = lge::colors::white,
+									   .controller_button = lge::input::button::right_face_left,
+									   .overlay_sheet = input_sheet_,
+									   .overlay_frame = "tile_0006.png"_hs,
 								   });
 	ctx.world.emplace<lge::placement>(cancel_button_, 45.0F, 20.0F);
 	lge::attach(ctx.world, popup_panel_, cancel_button_);
@@ -130,9 +138,6 @@ auto buttons::init() -> lge::result<> {
 }
 
 auto buttons::update(const float dt) -> lge::result<> {
-	if(ctx.actions.get(popup_action).pressed) {
-		show_popup();
-	}
 	return example::update(dt);
 }
 
@@ -143,6 +148,10 @@ auto buttons::end() -> lge::result<> {
 
 	if(const auto err = ctx.resources.unload_sprite_sheet(ui_sheet_).unwrap(); err) [[unlikely]] {
 		return lge::error("failed to unload ui sprite sheet", *err);
+	}
+
+	if(const auto err = ctx.resources.unload_sprite_sheet(input_sheet_).unwrap(); err) [[unlikely]] {
+		return lge::error("failed to unload input sprite sheet", *err);
 	}
 
 	return example::end();

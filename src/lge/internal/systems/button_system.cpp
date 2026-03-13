@@ -8,6 +8,8 @@
 #include <lge/core/result.hpp>
 #include <lge/events/button_clicked.hpp>
 #include <lge/events/click.hpp>
+#include <lge/interface/input.hpp>
+#include <lge/internal/components/effective_hidden.hpp>
 
 #include <entt/entity/fwd.hpp>
 #include <entt/entt.hpp>
@@ -40,7 +42,23 @@ auto button_system::end() -> result<> {
 	return true;
 }
 
-auto button_system::update(float /*dt*/) -> result<> {
+auto button_system::update(const float /*dt*/) -> result<> {
+	if(!ctx.actions.is_controller_available()) {
+		return true;
+	}
+
+	for(const auto entity: ctx.world.view<button>(entt::exclude<effective_hidden>)) {
+		const auto &btn = ctx.world.get<button>(entity);
+		if(btn.controller_button == input::button::unknown) {
+			continue;
+		}
+		if(ctx.actions.get_button_state(btn.controller_button).pressed) {
+			if(const auto err = ctx.events.post(button_clicked{.entity = entity}).unwrap(); err) [[unlikely]] {
+				return *err;
+			}
+		}
+	}
+
 	return true;
 }
 

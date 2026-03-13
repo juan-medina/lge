@@ -190,6 +190,7 @@ public:
 
 	[[nodiscard]] virtual auto get_mouse_position() const -> glm::vec2 = 0;
 	[[nodiscard]] virtual auto is_mouse_button_pressed(size_t button) const -> bool = 0;
+	[[nodiscard]] virtual auto get_button_state(button b) const -> state = 0;
 
 protected:
 	std::array<binding, max_actions> bindings{};
