@@ -6,17 +6,17 @@
   "images": [
     {
       "name": "parallax-demon-woods-close-trees.png",
-      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/parallax_demon_woods_pack/layers/parallax-demon-woods-close-trees.png",
+      "path": "layers/parallax-demon-woods-close-trees.png",
       "folder": ""
     },
     {
       "name": "parallax-demon-woods-far-trees.png",
-      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/parallax_demon_woods_pack/layers/parallax-demon-woods-far-trees.png",
+      "path": "layers/parallax-demon-woods-far-trees.png",
       "folder": ""
     },
     {
       "name": "parallax-demon-woods-mid-trees.png",
-      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/parallax_demon_woods_pack/layers/parallax-demon-woods-mid-trees.png",
+      "path": "layers/parallax-demon-woods-mid-trees.png",
       "folder": ""
     }
   ],

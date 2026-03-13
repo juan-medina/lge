@@ -6,62 +6,62 @@
   "images": [
     {
       "name": "idle_1.png",
-      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Hiker/sheets/idle/idle_1.png",
+      "path": "sheets/idle/idle_1.png",
       "folder": ""
     },
     {
       "name": "idle_2.png",
-      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Hiker/sheets/idle/idle_2.png",
+      "path": "sheets/idle/idle_2.png",
       "folder": ""
     },
     {
       "name": "idle_3.png",
-      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Hiker/sheets/idle/idle_3.png",
+      "path": "sheets/idle/idle_3.png",
       "folder": ""
     },
     {
       "name": "idle_4.png",
-      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Hiker/sheets/idle/idle_4.png",
+      "path": "sheets/idle/idle_4.png",
       "folder": ""
     },
     {
       "name": "idle_5.png",
-      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Hiker/sheets/idle/idle_5.png",
+      "path": "sheets/idle/idle_5.png",
       "folder": ""
     },
     {
       "name": "idle_6.png",
-      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Hiker/sheets/idle/idle_6.png",
+      "path": "sheets/idle/idle_6.png",
       "folder": ""
     },
     {
       "name": "run_1.png",
-      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Hiker/sheets/run/run_1.png",
+      "path": "sheets/run/run_1.png",
       "folder": ""
     },
     {
       "name": "run_2.png",
-      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Hiker/sheets/run/run_2.png",
+      "path": "sheets/run/run_2.png",
       "folder": ""
     },
     {
       "name": "run_3.png",
-      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Hiker/sheets/run/run_3.png",
+      "path": "sheets/run/run_3.png",
       "folder": ""
     },
     {
       "name": "run_4.png",
-      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Hiker/sheets/run/run_4.png",
+      "path": "sheets/run/run_4.png",
       "folder": ""
     },
     {
       "name": "run_5.png",
-      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Hiker/sheets/run/run_5.png",
+      "path": "sheets/run/run_5.png",
       "folder": ""
     },
     {
       "name": "run_6.png",
-      "path": "C:/Users/mail/Documents/Source/lge/examples/media/sprites/Hiker/sheets/run/run_6.png",
+      "path": "sheets/run/run_6.png",
       "folder": ""
     }
   ],
