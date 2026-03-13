@@ -8,6 +8,7 @@
 #include <lge/internal/raylib/raylib_backend.hpp>
 #include <lge/internal/systems/animation_system.hpp>
 #include <lge/internal/systems/bounds_system.hpp>
+#include <lge/internal/systems/button_system.hpp>
 #include <lge/internal/systems/collision_system.hpp>
 #include <lge/internal/systems/hidden_system.hpp>
 #include <lge/internal/systems/metrics_system.hpp>
@@ -118,6 +119,9 @@ auto app::init() -> result<> {
 	}
 	if(const auto err = register_system<pointer_system>(phase::global_update).unwrap(); err) [[unlikely]] {
 		return error("failed to register pointer_system", *err);
+	}
+	if(const auto err = register_system<button_system>(phase::local_update).unwrap(); err) [[unlikely]] {
+		return error("failed to register button_system", *err);
 	}
 	if(const auto err = register_system<render_system>(phase::render).unwrap(); err) [[unlikely]] {
 		return error("failed to register render_system", *err);

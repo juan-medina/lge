@@ -21,7 +21,9 @@ struct button {
 	glm::vec2 size{};
 	float border{0.0F};
 	std::string text;
-	color tint = colors::white;
+	color normal_tint = colors::white;
+	color hover_tint = color{200, 200, 200, 255};
+	color pressed_tint = color{150, 150, 150, 255};
 	color text_color = colors::white;
 	float text_size = 17.0F;
 	font_handle font = invalid_font;
