@@ -43,6 +43,7 @@ private:
 	auto handle_circle(entt::entity entity, const glm::mat3 &world_transform) const -> void;
 	auto handle_sprite(entt::entity entity, const glm::mat3 &world_transform) const -> void;
 	auto handle_panel(entt::entity entity, const glm::mat3 &world_transform) const -> void;
+	auto handle_button(entt::entity entity, const glm::mat3 &world_transform) const -> void;
 	auto handle_bounds(entt::entity entity, const glm::mat3 &world_transform) const -> void;
 
 	static constexpr auto bounds_color = color::from_hex(0xFF00007F);	  // Red with 50% opacity

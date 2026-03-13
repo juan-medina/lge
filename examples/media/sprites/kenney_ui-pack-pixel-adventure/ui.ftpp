@@ -5,6 +5,11 @@
   "savePath": "",
   "images": [
     {
+      "name": "tile_0003.png",
+      "path": "Tiles/Large tiles/Thick outline/tile_0003.png",
+      "folder": ""
+    },
+    {
       "name": "tile_0017.png",
       "path": "Tiles/Large tiles/Thick outline/tile_0017.png",
       "folder": ""

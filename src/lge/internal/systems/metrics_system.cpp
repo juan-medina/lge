@@ -3,6 +3,7 @@
 
 #include "metrics_system.hpp"
 
+#include <lge/components/button.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/panel.hpp>
 #include <lge/components/shapes.hpp>
@@ -10,6 +11,7 @@
 #include <lge/core/result.hpp>
 #include <lge/interface/renderer.hpp>
 #include <lge/internal/components/metrics.hpp>
+#include <lge/internal/components/previous_button.hpp>
 #include <lge/internal/components/previous_label.hpp>
 #include <lge/internal/components/previous_panel.hpp>
 #include <lge/internal/components/previous_shapes.hpp>
@@ -37,6 +39,9 @@ auto metrics_system::update(const float /*dt*/) -> result<> {
 
 	// metrics for panel
 	handle_panels();
+
+	// metrics for button
+	handle_buttons();
 
 	return true;
 }
@@ -147,6 +152,24 @@ auto metrics_system::handle_panels() const -> void {
 		if(auto &pnl = ctx.world.get<panel>(entity); !ctx.world.all_of<metrics>(entity) || is_panel_dirty(pnl, p)) {
 			calculate_panel_metrics(entity, pnl);
 			p.size = pnl.size;
+		}
+	}
+}
+
+auto metrics_system::calculate_button_metrics(const entt::entity entity, const button &btn) const -> void {
+	ctx.world.emplace_or_replace<metrics>(entity, metrics{.size = btn.size});
+}
+
+auto metrics_system::is_button_dirty(const button &btn, const previous_button &p) -> bool {
+	return btn.size != p.size;
+}
+
+auto metrics_system::handle_buttons() const -> void {
+	for(const auto entity: ctx.world.view<button>()) {
+		auto &p = ctx.world.get_or_emplace<previous_button>(entity);
+		if(auto &btn = ctx.world.get<button>(entity); !ctx.world.all_of<metrics>(entity) || is_button_dirty(btn, p)) {
+			calculate_button_metrics(entity, btn);
+			p.size = btn.size;
 		}
 	}
 }

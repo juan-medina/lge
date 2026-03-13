@@ -1,9 +1,33 @@
 {
   "frames": {
-    "tile_0017.png": {
+    "tile_0003.png": {
       "frame": {
         "x": 0,
         "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "tile_0017.png": {
+      "frame": {
+        "x": 0,
+        "y": 32,
         "w": 32,
         "h": 32
       },
@@ -32,7 +56,7 @@
     "format": "RGBA8888",
     "size": {
       "w": 32,
-      "h": 32
+      "h": 64
     },
     "scale": 1
   }

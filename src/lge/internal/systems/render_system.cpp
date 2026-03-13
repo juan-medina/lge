@@ -3,6 +3,7 @@
 
 #include "render_system.hpp"
 
+#include <lge/components/button.hpp>
 #include <lge/components/collidable.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/panel.hpp>
@@ -69,6 +70,10 @@ auto render_system::update(const float /*dt*/) -> result<> {
 
 		if(ctx.world.all_of<panel>(entity)) {
 			handle_panel(entity, world_transform);
+		}
+
+		if(ctx.world.all_of<button>(entity)) {
+			handle_button(entity, world_transform);
 		}
 
 		if(ctx.world.all_of<bounds>(entity) && ctx.render.is_debug_draw()) {
@@ -183,6 +188,27 @@ auto render_system::handle_panel(const entt::entity entity, const glm::mat3 &wor
 	const auto scaled_size = m.size * world_scale;
 
 	ctx.render.render_panel(pnl.sheet, pnl.frame, pivot_world, scaled_size, plc.pivot, rotation, pnl.border, pnl.tint);
+}
+
+auto render_system::handle_button(const entt::entity entity, const glm::mat3 &world_transform) const -> void {
+	const auto &btn = ctx.world.get<button>(entity);
+	const auto &m = ctx.world.get<metrics>(entity);
+	const auto &plc = ctx.world.get<placement>(entity);
+
+	const auto pivot_world = transform_point(world_transform, plc.pivot * m.size);
+	const auto rotation = get_rotation(world_transform);
+	const auto world_scale = get_scale(world_transform);
+	const auto scaled_size = m.size * world_scale;
+
+	ctx.render.render_panel(btn.sheet, btn.frame, pivot_world, scaled_size, plc.pivot, rotation, btn.border, btn.tint);
+
+	const auto text_size = ctx.render.get_label_size(btn.font, btn.text, static_cast<int>(btn.text_size));
+	const auto center_world = transform_point(world_transform, glm::vec2{0.5F, 0.5F} * m.size);
+	const auto final_font_size = btn.text_size * world_scale.y;
+	const auto pivot_to_top_left_local = -glm::vec2{0.5F, 0.5F} * text_size * world_scale;
+
+	ctx.render.render_label(
+		btn.font, btn.text, static_cast<int>(final_font_size), btn.text_color, center_world, pivot_to_top_left_local, rotation);
 }
 
 auto render_system::handle_bounds(const entt::entity entity, const glm::mat3 & /*world_transform*/) const -> void {
