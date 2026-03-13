@@ -1,9 +1,9 @@
 # SPDX-FileCopyrightText: 2026 Juan Medina
 # SPDX-License-Identifier: MIT
 
-project(example_06_collisions
+project(example_07_collisions
         VERSION 0.1.0.0
-        DESCRIPTION "example 06 - collisions"
+        DESCRIPTION "example 07 - collisions"
         LANGUAGES CXX
 )
 

@@ -1,4 +1,4 @@
-# Example 06 — Collisions
+# Example 07 — Collisions
 
 The most complete example. Dice are thrown onto a board and collide with each other and the walls. Shows collision
 detection, event-driven physics fully encapsulated in a system, audio lifecycle, and a clean separation between game

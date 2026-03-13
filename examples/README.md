@@ -56,7 +56,18 @@ events, `hovered` component, sprite tint, input routing between mouse and contro
 
 ---
 
-## [06 — Collisions](06_collisions/)
+## [06 — Buttons](06_buttons/)
+
+A popup dialog driven entirely by button events. A single button opens a panel with Ok and Cancel choices; the result
+is shown as coloured text after dismissal. Buttons respond visually to hover and press, and display controller icons
+when a controller is active — pressing the bound face button fires the same event as a mouse click.
+
+**Concepts:** `button` component, hover/pressed tint states, `button_clicked` event, modal panels, `hidden` component,
+hierarchy visibility, controller button bindings, controller overlay sprites, rich text labels
+
+---
+
+## [07 — Collisions](07_collisions/)
 
 The most complete example. Dice are thrown onto a board and collide with each other and the walls. Shows collision
 detection and how to encapsulate all physics, audio, and roll tracking inside a single self-contained system. The game
@@ -65,14 +76,3 @@ posts one event to throw and receives one event with the result — the system o
 **Concepts:** `collidable` component, collision events, SAT overlap detection, game-side physics response, reflection
 formula, self-contained systems, system lifecycle, event-driven input/output, roll tracking, sound, debug draw for
 collisions
-
----
-
-## [07 — Buttons](07_buttons/)
-
-A popup dialog driven entirely by button events. A single button opens a panel with Ok and Cancel choices; the result
-is shown as coloured text after dismissal. Buttons respond visually to hover and press, and display controller icons
-when a controller is active — pressing the bound face button fires the same event as a mouse click.
-
-**Concepts:** `button` component, hover/pressed tint states, `button_clicked` event, modal panels, `hidden` component,
-hierarchy visibility, controller button bindings, controller overlay sprites, rich text labels

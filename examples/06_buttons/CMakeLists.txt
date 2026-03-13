@@ -1,9 +1,9 @@
 # SPDX-FileCopyrightText: 2026 Juan Medina
 # SPDX-License-Identifier: MIT
 
-project(example_07_buttons
+project(example_06_buttons
         VERSION 0.1.0.0
-        DESCRIPTION "example 07 - buttons"
+        DESCRIPTION "example 06 - buttons"
         LANGUAGES CXX
 )
 
