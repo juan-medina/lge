@@ -120,7 +120,7 @@ auto app::init() -> result<> {
 	if(const auto err = register_system<hidden_system>(phase::global_update).unwrap(); err) [[unlikely]] {
 		return error("failed to register hidden_system", *err);
 	}
-	if(const auto err = register_system<metrics_system>(phase::game_update).unwrap(); err) [[unlikely]] {
+	if(const auto err = register_system<metrics_system>(phase::global_update).unwrap(); err) [[unlikely]] {
 		return error("failed to register metrics_system", *err);
 	}
 	if(const auto err = register_system<render_system>(phase::render).unwrap(); err) [[unlikely]] {
