@@ -10,7 +10,7 @@
 
 namespace lge {
 
-auto scene_manager::init() -> result<> {
+auto scene_manager::init() -> result<> { // NOLINT(*-convert-member-functions-to-static)
 	return true;
 }
 
@@ -31,7 +31,7 @@ auto scene_manager::update(const float dt) -> result<> {
 		if(!current_scene_.has_value()) {
 			return true;
 		}
-		return current_scene_->get().update(dt);
+		return current_scene_->get().tick(dt);
 	}
 
 	case transition_state::fade_out: {
