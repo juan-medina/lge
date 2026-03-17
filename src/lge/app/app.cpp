@@ -96,9 +96,6 @@ auto app::init() -> result<> {
 		return error("failed to initialize audio manager", *err);
 	}
 
-	if(const auto err = register_system<metrics_system>(phase::game_update).unwrap(); err) [[unlikely]] {
-		return error("failed to register metrics_system", *err);
-	}
 	if(const auto err = register_system<animation_system>(phase::game_update).unwrap(); err) [[unlikely]] {
 		return error("failed to register animation_system", *err);
 	}
@@ -122,6 +119,9 @@ auto app::init() -> result<> {
 	}
 	if(const auto err = register_system<hidden_system>(phase::global_update).unwrap(); err) [[unlikely]] {
 		return error("failed to register hidden_system", *err);
+	}
+	if(const auto err = register_system<metrics_system>(phase::game_update).unwrap(); err) [[unlikely]] {
+		return error("failed to register metrics_system", *err);
 	}
 	if(const auto err = register_system<render_system>(phase::render).unwrap(); err) [[unlikely]] {
 		return error("failed to register render_system", *err);
