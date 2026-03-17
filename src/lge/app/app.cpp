@@ -10,6 +10,7 @@
 #include <lge/internal/systems/bounds_system.hpp>
 #include <lge/internal/systems/button_system.hpp>
 #include <lge/internal/systems/collision_system.hpp>
+#include <lge/internal/systems/destroy_pending_system.hpp>
 #include <lge/internal/systems/hidden_system.hpp>
 #include <lge/internal/systems/metrics_system.hpp>
 #include <lge/internal/systems/order_system.hpp>
@@ -99,6 +100,9 @@ auto app::init() -> result<> {
 	if(const auto err = register_system<animation_system>(phase::game_update).unwrap(); err) [[unlikely]] {
 		return error("failed to register animation_system", *err);
 	}
+	if(const auto err = register_system<destroy_pending_system>(phase::local_update).unwrap(); err) [[unlikely]] {
+		return error("failed to register destroy_pending_system", *err);
+	}
 	if(const auto err = register_system<transform_system>(phase::global_update).unwrap(); err) [[unlikely]] {
 		return error("failed to register transform_system", *err);
 	}
@@ -183,6 +187,7 @@ auto app::main_loop() -> result<> {
 	if(const auto err = scenes.update(delta_time).unwrap(); err) [[unlikely]] {
 		return error("failed to update scenes", *err);
 	}
+
 
 	if(const auto err = update_system(phase::local_update, delta_time).unwrap(); err) [[unlikely]] {
 		return error("failed to update systems in local update phase", *err);
