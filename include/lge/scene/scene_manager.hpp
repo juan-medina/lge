@@ -92,7 +92,7 @@ public:
 			if(const auto err = current_scene_->get().on_exit().unwrap(); err) [[unlikely]] {
 				return error("error exiting current scene", *err);
 			}
-			current_scene_->get().clear_owned();
+			current_scene_->get().clear_scene_entities();
 		}
 		auto *concrete = static_cast<T *>(it->second.get());
 		if(const auto err = concrete->on_enter(std::forward<Args>(args)...).unwrap(); err) [[unlikely]] {
@@ -132,7 +132,7 @@ public:
 				if(const auto err = current_scene_->get().on_exit().unwrap(); err) [[unlikely]] {
 					return error("error exiting current scene", *err);
 				}
-				current_scene_->get().clear_owned();
+				current_scene_->get().clear_scene_entities();
 			}
 			// Enter new scene (it starts paused — resumed when fade_in completes).
 			auto *concrete = static_cast<T *>(it->second.get());

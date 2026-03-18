@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 #include "menu_scene.hpp"
 
+#include <lge/components/clear_on_scene_exit.hpp>
 #include <lge/components/label.hpp>
 #include <lge/components/placement.hpp>
 #include <lge/core/colors.hpp>
@@ -35,18 +36,24 @@ auto menu_scene::init() -> lge::result<> {
 }
 
 auto menu_scene::on_enter() -> lge::result<> {
-	menu_message_ent_ = create_entity();
+	menu_message_ent_ = ctx.world.create();
+	ctx.world.emplace<lge::clear_on_scene_exit>(menu_message_ent_);
+
 	auto &message = ctx.world.emplace<lge::label>(menu_message_ent_, kb_message, lge::colors::white);
 	auto &mp = ctx.world.emplace<lge::placement>(menu_message_ent_, 0.0F, 100.0F);
 	mp.pivot = lge::pivot::center;
 	message.text = ctx.actions.is_controller_available() ? controller_message : kb_message;
 
-	const auto red_label = create_entity();
+	const auto red_label = ctx.world.create();
+	ctx.world.emplace<lge::clear_on_scene_exit>(red_label);
+
 	ctx.world.emplace<lge::label>(red_label, "Red game", lge::colors::light_red);
 	auto &rp = ctx.world.emplace<lge::placement>(red_label, -70.0F, 0.0F);
 	rp.pivot = lge::pivot::center;
 
-	const auto blue_label = create_entity();
+	const auto blue_label = ctx.world.create();
+	ctx.world.emplace<lge::clear_on_scene_exit>(blue_label);
+
 	ctx.world.emplace<lge::label>(blue_label, "Blue game", lge::colors::light_blue);
 	auto &bp = ctx.world.emplace<lge::placement>(blue_label, 70.0F, 0.0F);
 	bp.pivot = lge::pivot::center;

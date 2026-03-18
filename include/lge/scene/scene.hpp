@@ -4,13 +4,12 @@
 #pragma once
 
 #include <lge/app/context.hpp>
+#include <lge/components/clear_on_scene_exit.hpp>
 #include <lge/core/log.hpp>
 #include <lge/core/result.hpp>
 #include <lge/core/types.hpp>
 #include <lge/systems/system.hpp>
 
-#include <entt/core/fwd.hpp>
-#include <entt/entity/entity.hpp>
 #include <entt/entity/fwd.hpp>
 #include <memory>
 #include <vector>
@@ -47,15 +46,13 @@ public:
 		return true;
 	}
 
-	[[nodiscard]] auto create_entity() -> entt::entity {
-		const auto entity = ctx.world.create();
-		ctx.world.emplace<scene_owned>(entity);
-		return entity;
-	}
-
-	auto clear_owned() -> void {
-		const auto view = ctx.world.view<scene_owned>();
-		ctx.world.destroy(view.begin(), view.end());
+	auto clear_scene_entities() -> void {
+		for(const auto view = ctx.world.view<clear_on_scene_exit>();
+			const auto e: std::vector<entt::entity>{view.begin(), view.end()}) {
+			if(ctx.world.valid(e)) [[likely]] {
+				ctx.world.destroy(e);
+			}
+		}
 	}
 
 	// =============================================================================
@@ -82,8 +79,6 @@ private:
 	[[nodiscard]] auto update_systems(float dt) -> result<>;
 
 	std::vector<std::unique_ptr<system>> systems_;
-
-	struct scene_owned {};
 };
 
 } // namespace lge

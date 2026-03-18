@@ -5,6 +5,7 @@
 #include "lge/scene/scene.hpp"
 #include <lge/components/label.hpp>
 #include <lge/components/placement.hpp>
+#include <lge/components/clear_on_scene_exit.hpp>
 #include <lge/core/colors.hpp>
 #include <lge/core/result.hpp>
 
@@ -24,13 +25,15 @@ auto game_scene::init() -> lge::result<> {
 }
 
 auto game_scene::on_enter(game_type type) -> lge::result<> {
-	menu_message_ent_ = create_entity();
+	menu_message_ent_ = ctx.world.create();
+	ctx.world.emplace<lge::clear_on_scene_exit>(menu_message_ent_);
 	auto &message = ctx.world.emplace<lge::label>(menu_message_ent_, kb_message, lge::colors::white);
 	auto &mp = ctx.world.emplace<lge::placement>(menu_message_ent_, 0.0F, 100.0F);
 	mp.pivot = lge::pivot::center;
 	message.text = ctx.actions.is_controller_available() ? controller_message : kb_message;
 
-	const auto text_label = create_entity();
+	const auto text_label = ctx.world.create();
+	ctx.world.emplace<lge::clear_on_scene_exit>(text_label);
 	auto &l = ctx.world.emplace<lge::label>(text_label, "Game Scene", lge::colors::magenta, 34.0F);
 	ctx.world.emplace<lge::placement>(text_label);
 
